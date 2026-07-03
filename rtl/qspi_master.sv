@@ -61,12 +61,12 @@ module qspi_master #(
   logic clk_cnt_rst;
   always_ff @(posedge clk_i, negedge rst_ni) begin : clock_counter
     if (!rst_ni) begin
-      clk_cnt <= 9'd0;
+      clk_cnt <= 'd0;
     end else if (clk_cnt_rst) begin
-      clk_cnt <= 9'd0;
+      clk_cnt <= 'd0;
     end else begin
       if (clk_cnt == qspi_prescaler_i) begin
-        clk_cnt <= 9'd0;
+        clk_cnt <= 'd0;
       end else begin
         clk_cnt <= clk_cnt + 1;
       end
@@ -85,8 +85,8 @@ module qspi_master #(
       qspi_sck <= ~qspi_sck;
     end
   end
-  wire qspi_sck_posedge = ~qspi_sck_rst && ~qspi_sck && (clk_cnt == qspi_prescaler_i);
-  wire qspi_sck_negedge = ~qspi_sck_rst && qspi_sck && (clk_cnt == qspi_prescaler_i);
+  wire qspi_sck_posedge = ~qspi_sck && (clk_cnt == qspi_prescaler_i);
+  wire qspi_sck_negedge = qspi_sck && (clk_cnt == qspi_prescaler_i);
 
   // bit counter
   logic [5:0] bit_cnt;  // same size as qspi_dummy_len_i
@@ -251,6 +251,7 @@ module qspi_master #(
 
   // rx data register
   logic [31:0] rx_data;
+  logic qspi_rdata_ready;
   always_ff @(posedge clk_i, negedge rst_ni) begin : rx_data_reg
     if (!rst_ni) begin
       rx_data <= 'd0;
@@ -282,7 +283,7 @@ module qspi_master #(
 
   // CONTROL FSM
   logic qspi_done;
-  logic qspi_cs;
+  logic qspi_csn;
   typedef enum logic [2:0] {
     IDLE,
     PREPARE,
@@ -305,16 +306,12 @@ module qspi_master #(
   end
 
   // CRM state register
-  logic crm_active, crm_exit;
+  logic crm_active;
   always_ff @(posedge clk_i, negedge rst_ni) begin : crm_state
     if (!rst_ni) begin
       crm_active <= 1'b0;
     end else if (qspi_done) begin
-      if (crm_exit) begin
-        crm_active <= 1'b0;  // force exit if CRM exit condition is met
-      end else begin
-        crm_active <= qspi_crm_i;  // only lock CRM if first transfer is done
-      end
+      crm_active <= qspi_crm_i;  // only lock CRM if first transfer is done
     end
   end
 
@@ -377,7 +374,7 @@ module qspi_master #(
         qspi_sck_rst = 1'b1;  // reset SCK to idle state
 
         qspi_csn = 1'b1;  // deassert CSN
-        qspi_oe = 4'b0000;  // disable output
+        cphase_mode = 2'b00;  // disable output
 
         if (qspi_start_i) begin
           qspi_nstate = PREPARE;
@@ -435,9 +432,9 @@ module qspi_master #(
             tx_shifter_in_sel = 2'd2;  // select mode byte
             tx_shifter_load = 1'b1;  // load mode byte into shifter
             qspi_nstate = MODE;  // go to mode phase
-          end else if (!qspi_dummy_len_i) begin
+          end else if (qspi_dummy_len_i != 'd0) begin
             qspi_nstate = DUMMY;  // go to dummy phase
-          end else if (!qspi_data_mode_i) begin
+          end else if (qspi_data_mode_i != 'd0) begin
             tx_shifter_in_sel = 2'd3;  // select data byte
             tx_shifter_load = 1'b1;  // load data byte into shifter
             qspi_nstate = DATA;  // go to data phase
@@ -473,9 +470,9 @@ module qspi_master #(
               tx_shifter_in_sel = 2'd2;  // select mode byte
               tx_shifter_load = 1'b1;  // load mode byte into shifter
               qspi_nstate = MODE;  // go to mode phase
-            end else if (!qspi_dummy_len_i) begin
+            end else if (qspi_dummy_len_i != 'd0) begin
               qspi_nstate = DUMMY;  // go to dummy phase
-            end else if (!qspi_data_mode_i) begin
+            end else if (qspi_data_mode_i != 'd0) begin
               tx_shifter_in_sel = 2'd3;  // select data byte
               tx_shifter_load = 1'b1;  // load data byte into shifter
               qspi_nstate = DATA;  // go to data phase
@@ -502,9 +499,9 @@ module qspi_master #(
 
         if (byte_cnt_edge) begin
           cnt_rst = 1'b1;  // reset counters for next phase
-          if (!qspi_dummy_len_i) begin
+          if (qspi_dummy_len_i != 'd0) begin
             qspi_nstate = DUMMY;  // go to dummy phase
-          end else if (!qspi_data_mode_i) begin
+          end else if (qspi_data_mode_i != 'd0) begin
             tx_shifter_in_sel = 2'd3;  // select data byte
             tx_shifter_load = 1'b1;  // load data byte into shifter
             qspi_nstate = DATA;  // go to data phase
@@ -530,7 +527,7 @@ module qspi_master #(
         if (qspi_sck_negedge) begin
           if (bit_cnt == (qspi_dummy_len_i - 1)) begin
             cnt_rst = 1'b1;  // reset counters for next phase
-            if (!qspi_data_mode_i) begin
+            if (qspi_data_mode_i != 'd0) begin
               tx_shifter_in_sel = 2'd3;  // select data byte
               tx_shifter_load = 1'b1;  // load data byte into shifter
               qspi_nstate = DATA;  // go to data phase
@@ -572,7 +569,7 @@ module qspi_master #(
             qspi_nstate = DONE;  // go to done state if no more data
           end else begin
             if (byte_cnt[1:0] == 2'd3) begin
-              qspi_sck_rst = (fifo_empty_i || fifo_full_i);  // pause SCK if FIFO is empty or full
+              // qspi_sck_rst = (fifo_empty_i || fifo_full_i);  // pause SCK if FIFO is empty or full TODO:FIX THIS
               qspi_rdata_ready = ~qspi_data_dir_i;  // read data is ready to be pushed to FIFO
             end else if (byte_cnt[1:0] == 2'd2) begin
               qspi_wdata_load = qspi_data_dir_i;  // load next write data word into register
