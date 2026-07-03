@@ -1,6 +1,6 @@
 // Fully configurable 32-bit QSPI master module
 // Supports single, dual and quad modes for command, address (3 or 4 bytes) and data phases
-// Supports DDR and XIP
+// Supports DDR and XIP with configurable prescaler (minimum 2)
 // Author: Team Crispi - SSCS Chipathon 2026
 
 module qspi_master #(
@@ -33,7 +33,7 @@ module qspi_master #(
     input logic [1:0] qspi_cmd_mode_i,  // 00: no command, 01: single, 10: dual, 11: quad
     input logic [1:0] qspi_addr_mode_i,  // 00: no address, 01: single, 10: dual, 11: quad
     input logic [1:0] qspi_data_mode_i,  // 00: no data, 01: single, 10: dual, 11: quad
-    input logic [CS_NUM-1:0] qspi_csn_sel_i,  // chip select for each CSN
+    input logic [CS_NUM-1:0] qspi_csn_sel_i,  // csn selector
     input logic qspi_sck_mode_i,  // 0: (mode 0) CPOL=0, CPHA=0; 1: (mode 3) CPOL=1, CPHA=1
     input logic qspi_data_dir_i,  // 0: read, 1: write
     input logic qspi_crm_i,  // continuous read mode, ignores data length and keeps reading
@@ -573,7 +573,7 @@ module qspi_master #(
           end else begin
             if (byte_cnt[1:0] == 2'd3) begin
               qspi_sck_rst = (fifo_empty_i || fifo_full_i);  // pause SCK if FIFO is empty or full
-              qspi_rdata_ready = ~qspi_data_dir_i;  // signal read data is ready to be pushed to FIFO
+              qspi_rdata_ready = ~qspi_data_dir_i;  // read data is ready to be pushed to FIFO
             end else if (byte_cnt[1:0] == 2'd2) begin
               qspi_wdata_load = qspi_data_dir_i;  // load next write data word into register
             end
@@ -611,7 +611,7 @@ module qspi_master #(
   end
 
   // OUTPUT ASSIGNS
-  assign qspi_csn_o = {4{qspi_csn}} | qspi_csn_sel_i;  // drive CSN for each chip select
+  assign qspi_csn_o = {CS_NUM{qspi_csn}} | qspi_csn_sel_i;  // drive CSN for each chip select
   assign qspi_sck_o = qspi_sck;
   assign qspi_o = tx_shifter_out;
   assign rx_shifter_in = qspi_i;
