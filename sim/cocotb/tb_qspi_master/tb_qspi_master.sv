@@ -146,4 +146,10 @@ module tb_qspi_master #(
       .WP  (qspi_io[2]),
       .SIO3(qspi_io[3])
   );
+
+    // --- Waveform Generation ---
+    initial begin
+        $dumpfile("qspi_waves.vcd"); // 
+        $dumpvars(0, tb_qspi_master);
+    end
 endmodule
