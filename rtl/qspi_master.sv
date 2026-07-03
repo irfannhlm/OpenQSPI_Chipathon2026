@@ -611,7 +611,7 @@ module qspi_master #(
   end
 
   // OUTPUT ASSIGNS
-  assign qspi_csn_o = {CS_NUM{qspi_csn}} | qspi_csn_sel_i;  // drive CSN for each chip select
+  assign qspi_csn_o = {CS_NUM{qspi_csn}} | ~qspi_csn_sel_i;  // drive CSN for each chip select
   assign qspi_sck_o = qspi_sck;
   assign qspi_o = tx_shifter_out;
   assign rx_shifter_in = qspi_i;
