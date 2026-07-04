@@ -58,13 +58,13 @@ module qspi_master #(
   // QSPI SCK GEN
   // clock counter
   logic [7:0] clk_cnt;
-  logic clk_cnt_rst, clk_cnt_en;
+  logic clk_cnt_rst;
   always_ff @(posedge clk_i, negedge rst_ni) begin : clock_counter
     if (!rst_ni) begin
       clk_cnt <= 'd0;
     end else if (clk_cnt_rst) begin
       clk_cnt <= 'd0;
-    end else if (clk_cnt_en) begin
+    end else begin
       if (clk_cnt == qspi_prescaler_i) begin
         clk_cnt <= 'd0;
       end else begin
@@ -102,6 +102,17 @@ module qspi_master #(
   end
 
   // bit counter
+  logic [2:0] bit_cnt_limit;
+  logic [1:0] bit_cnt_mode;  // 0x: single, 10: dual, 11: quad
+  always_comb begin : adjust_bit_cnt
+    case (bit_cnt_mode)
+      2'd0: bit_cnt_limit = 3'd0;  // 0 for no limit
+      2'd1: bit_cnt_limit = 3'd7;  // x1 for single
+      2'd2: bit_cnt_limit = 3'd3;  // x2 for dual
+      2'd3: bit_cnt_limit = 3'd1;  // x4 for quad
+      default: bit_cnt_limit = 3'd7;
+    endcase
+  end
   logic [5:0] bit_cnt;  // same size as qspi_dummy_len_i
   logic bit_cnt_rst;
   logic bit_cnt_ddr;
@@ -112,19 +123,12 @@ module qspi_master #(
     end else if (bit_cnt_rst) begin
       bit_cnt <= 'd0;
     end else if (bit_cnt_edge) begin
-      bit_cnt <= bit_cnt + 1;
+      if (bit_cnt[2:0] == bit_cnt_limit && bit_cnt_limit != 0) begin
+        bit_cnt <= 'd0;  // reset counter if limit reached
+      end else begin
+        bit_cnt <= bit_cnt + 1;
+      end
     end
-  end
-  logic [2:0] bit_cnt_limit;
-  logic [1:0] bit_cnt_mode;  // 0x: single, 10: dual, 11: quad
-  always_comb begin : adjust_bit_cnt
-    case (bit_cnt_mode)
-      2'd0: bit_cnt_limit = 3'd7;  // x1 for single
-      2'd1: bit_cnt_limit = 3'd7;  // x1 for single
-      2'd2: bit_cnt_limit = 3'd3;  // x2 for dual
-      2'd3: bit_cnt_limit = 3'd1;  // x4 for quad
-      default: bit_cnt_limit = 3'd7;
-    endcase
   end
 
   // byte counter
@@ -269,7 +273,7 @@ module qspi_master #(
     if (!rst_ni) begin
       rx_data <= 'd0;
     end else begin
-      if (byte_cnt_edge) begin
+      if (rx_shifter_en && byte_cnt_edge) begin
         if (qspi_endian_i) begin
           // little endian
           case (byte_cnt[1:0])
@@ -392,6 +396,13 @@ module qspi_master #(
 
         if (qspi_start_i) begin
           qspi_csn_en = 1'b1;  // assert CSN
+          qspi_wdata_load = 1'b1;  // load write data
+          tx_shifter_load = 1'b1;  // load tx byte into shifter
+          if (crm_active) begin
+            tx_shifter_in_sel = 2'd1;  // load address byte directly if CRM is active
+          end else begin
+            tx_shifter_in_sel = 2'd0;  // load command byte into shifter
+          end
           qspi_nstate = PREPARE;
         end else begin
           qspi_nstate = IDLE;
@@ -399,21 +410,18 @@ module qspi_master #(
       end
 
       PREPARE: begin  // 1 cycle delay
-        cnt_rst = 1'b0;  // start counters
+        cnt_rst = 1'b1;  // dont start counters
         clk_timer_rst = 1'b0;  // start timeout timer
         qspi_sck_rst = 1'b0;  // start SCK generation
 
         qspi_csn_en = 1'b1;  // keep CSN asserted
         qspi_sck_en = 1'b1;  // enable SCK generation
-        cphase_mode = 2'b00;  // disable output
 
-        qspi_wdata_load = 1'b1;  // load write data
-        tx_shifter_load = 1'b1;  // load tx byte into shifter
         if (crm_active) begin
-          tx_shifter_in_sel = 2'd1;  // load address byte directly if CRM is active
+          cphase_mode = qspi_addr_mode_i;  // start output address
           qspi_nstate = ADDRESS;  // skip command phase if CRM is active
         end else begin
-          tx_shifter_in_sel = 2'd0;  // load command byte into shifter
+          cphase_mode = qspi_cmd_mode_i;  // start output command
           qspi_nstate = COMMAND;  // default to command phase
         end
       end
@@ -581,6 +589,7 @@ module qspi_master #(
           if (byte_cnt == (qspi_data_len_i - 1)) begin
             cnt_rst = 1'b1;  // reset counters for next phase
             qspi_sck_rst = 1'b1;  // reset SCK to idle state
+            qspi_rdata_ready = ~qspi_data_dir_i;  // read data is ready to be pushed to FIFO
             qspi_nstate = DONE;  // go to done state if no more data
           end else begin
             if (byte_cnt[1:0] == 2'd3) begin
@@ -640,13 +649,14 @@ module qspi_master #(
   assign qspi_byte_cnt_o = byte_cnt;
 
   assign fifo_pop_o = qspi_wdata_load && !fifo_empty_i;  // pop FIFO when loading write data
-  assign fifo_push_o = qspi_rdata_ready && !fifo_full_i;  // push FIFO when read data is ready
-  assign qspi_done_o = qspi_done;
-
   always_ff @(posedge clk_i, negedge rst_ni) begin : delayed_output
     if (!rst_ni) begin
+      fifo_push_o <= 1'b0;
+      qspi_done_o <= 1'b0;
       qspi_timeout_o <= 1'b0;
     end else begin
+      fifo_push_o <= qspi_rdata_ready && !fifo_full_i;  // delayed 1 cycle for rx_data loading
+      qspi_done_o <= qspi_done;
       qspi_timeout_o <= clk_timer_expired;
     end
   end

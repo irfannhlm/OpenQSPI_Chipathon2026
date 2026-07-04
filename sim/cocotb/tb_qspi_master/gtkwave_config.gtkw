@@ -1,0 +1,180 @@
+[*]
+[*] GTKWave Analyzer v4.0.0-prealpha (7d7b4db) (w)1999-2022 BSI
+[*] Sat Jul  4 09:30:50 2026
+[*]
+[dumpfile] "/foss/designs/OpenQSPI_Chipathon2026/sim/cocotb/tb_qspi_master/qspi_waves.vcd"
+[dumpfile_mtime] "Sat Jul  4 08:53:18 2026"
+[dumpfile_size] 6145681
+[savefile] "/foss/designs/OpenQSPI_Chipathon2026/sim/cocotb/tb_qspi_master/gtkwave_config.gtkw"
+[timestart] 4000390000
+[size] 1920 1163
+[pos] -1 -1
+*-21.280396 4004870000 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+[markername] AA
+[markername] BB
+[markername] CC
+[markername] DD
+[markername] EE
+[markername] FF
+[markername] GG
+[markername] HH
+[markername] II
+[markername] JJ
+[markername] KK
+[markername] LL
+[markername] MM
+[markername] NN
+[markername] OO
+[markername] PP
+[markername] QQ
+[markername] RR
+[markername] SS
+[markername] TT
+[markername] UU
+[markername] VV
+[markername] WW
+[markername] XX
+[markername] YY
+[markername] ZZ
+[treeopen] tb_qspi_master.
+[sst_width] 297
+[signals_width] 198
+[sst_expanded] 1
+[sst_vpaned_height] 346
+@28
+tb_qspi_master.clk_i
+tb_qspi_master.rst_ni
+@c00200
+-QSPI Interface
+@c00028
+tb_qspi_master.qspi_csn[2:0]
+@28
+(0)tb_qspi_master.qspi_csn[2:0]
+(1)tb_qspi_master.qspi_csn[2:0]
+(2)tb_qspi_master.qspi_csn[2:0]
+@1401200
+-group_end
+@28
+tb_qspi_master.qspi_sck
+@800022
+tb_qspi_master.qspi_io[3:0]
+@28
+(0)tb_qspi_master.qspi_io[3:0]
+(1)tb_qspi_master.qspi_io[3:0]
+(2)tb_qspi_master.qspi_io[3:0]
+(3)tb_qspi_master.qspi_io[3:0]
+@1001200
+-group_end
+@1401200
+-QSPI Interface
+@c00200
+-QSPI Control
+@28
+tb_qspi_master.qspi_start_i
+tb_qspi_master.qspi_done_o
+tb_qspi_master.qspi_abort_i
+tb_qspi_master.qspi_timeout_o
+@1401200
+-QSPI Control
+@c00200
+-RX Shifter
+@820
+tb_qspi_master.u_master.rx_data[31:0]
+@22
+tb_qspi_master.u_master.rx_shifter[7:0]
+@28
+tb_qspi_master.u_master.qspi_rdata_ready
+@c00022
+tb_qspi_master.u_master.rx_shifter_in[3:0]
+@28
+(0)tb_qspi_master.u_master.rx_shifter_in[3:0]
+(1)tb_qspi_master.u_master.rx_shifter_in[3:0]
+(2)tb_qspi_master.u_master.rx_shifter_in[3:0]
+(3)tb_qspi_master.u_master.rx_shifter_in[3:0]
+@1401200
+-group_end
+@28
+tb_qspi_master.u_master.rx_shift
+tb_qspi_master.u_master.rx_shifter_ddr
+tb_qspi_master.u_master.rx_shifter_en
+@c00028
+tb_qspi_master.u_master.rx_shifter_mode[1:0]
+@28
+(0)tb_qspi_master.u_master.rx_shifter_mode[1:0]
+(1)tb_qspi_master.u_master.rx_shifter_mode[1:0]
+@1401200
+-group_end
+-RX Shifter
+@c00200
+-Counters
+@c00024
+tb_qspi_master.u_master.clk_cnt[7:0]
+@28
+(0)tb_qspi_master.u_master.clk_cnt[7:0]
+(1)tb_qspi_master.u_master.clk_cnt[7:0]
+(2)tb_qspi_master.u_master.clk_cnt[7:0]
+(3)tb_qspi_master.u_master.clk_cnt[7:0]
+(4)tb_qspi_master.u_master.clk_cnt[7:0]
+(5)tb_qspi_master.u_master.clk_cnt[7:0]
+(6)tb_qspi_master.u_master.clk_cnt[7:0]
+(7)tb_qspi_master.u_master.clk_cnt[7:0]
+@1401200
+-group_end
+@24
+tb_qspi_master.u_master.bit_cnt[5:0]
+tb_qspi_master.u_master.byte_cnt[31:0]
+@28
+tb_qspi_master.u_master.cnt_rst
+tb_qspi_master.u_master.bit_cnt_edge
+tb_qspi_master.u_master.byte_cnt_edge
+tb_qspi_master.u_master.bit_cnt_limit[2:0]
+tb_qspi_master.u_master.qspi_sck_negedge
+tb_qspi_master.u_master.qspi_sck_posedge
+@1401200
+-Counters
+@c00200
+-FIFO control
+@820
+tb_qspi_master.u_master.qspi_rdata_o[31:0]
+@22
+tb_qspi_master.u_master.qspi_wdata_i[31:0]
+@28
+tb_qspi_master.u_master.fifo_empty_i
+tb_qspi_master.u_master.fifo_full_i
+tb_qspi_master.u_master.fifo_pop_o
+tb_qspi_master.u_master.fifo_push_o
+@1401200
+-FIFO control
+@c00200
+-QSPI RX/TX Data
+@22
+tb_qspi_master.u_master.qspi_cmd_i[7:0]
+tb_qspi_master.u_master.qspi_addr_i[31:0]
+tb_qspi_master.u_master.qspi_mode_byte_i[7:0]
+tb_qspi_master.u_master.qspi_wdata_i[31:0]
+@1401200
+-QSPI RX/TX Data
+@c00200
+-QSPI Config
+@28
+tb_qspi_master.u_master.qspi_addr_len_i
+@22
+tb_qspi_master.u_master.qspi_dummy_len_i[5:0]
+tb_qspi_master.u_master.qspi_data_len_i[31:0]
+@28
+tb_qspi_master.u_master.qspi_cmd_mode_i[1:0]
+tb_qspi_master.u_master.qspi_addr_mode_i[1:0]
+tb_qspi_master.u_master.qspi_data_mode_i[1:0]
+@22
+tb_qspi_master.u_master.qspi_prescaler_i[7:0]
+tb_qspi_master.u_master.qspi_timeout_i[31:0]
+@28
+tb_qspi_master.u_master.qspi_sck_mode_i
+tb_qspi_master.u_master.qspi_crm_i
+tb_qspi_master.u_master.qspi_ddr_i
+@1401200
+-QSPI Config
+@29
+tb_qspi_master.u_master.qspi_cstate[2:0]
+[pattern_trace] 1
+[pattern_trace] 0
