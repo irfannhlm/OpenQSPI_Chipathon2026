@@ -1,0 +1,13 @@
+W25QxxNExxIx preload summary
+
+Files updated:
+- MEM.TXT: main flash image with traceable ASCII blocks at @000000, @000100, @000200, and a legacy pattern at @000300.
+- SECSI.TXT: security-page image with traceable ASCII blocks at @000, @100, and @200.
+
+Files left unchanged on purpose:
+- SFDP.TXT: model feature table and geometry data.
+- SREG.TXT: OTP status-register defaults that affect startup behavior.
+
+Notes:
+- Unlisted flash bytes remain FF because the model pre-fills memory with FF.
+- The security-page file is loaded per page, so each block sits at the start of its 256-byte page.

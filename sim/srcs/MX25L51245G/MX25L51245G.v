@@ -28,8 +28,8 @@
 `timescale 1ns / 100ps
 
 
-`define MX25L51245GM 16SOP_24BALL
-//`define MX25L51245GZ2 8WSON
+// `define MX25L51245GM 16SOP_24BALL
+`define MX25L51245GZ2 8WSON
 `define Type_10G        //for non-factory mode
 //`define Type_08G      //for factory mode
 //`define LOADING_30pf
@@ -50,9 +50,9 @@
            `define Vtclqv 8
            `endif
 
-        `define File_Name         "none"     // Flash data file name for normal array
-        `define File_Name_Secu    "none"     // Flash data file name for security region
-        `define File_Name_SFDP    "none"     // Flash data file name for SFDP region
+        `define File_Name         "MX25L51245G.TXT"     // Flash data file name for normal array
+        `define File_Name_Secu    "MX25L51245G_Secu.TXT"     // Flash data file name for security region
+        `define File_Name_SFDP    "MX25L51245G_SFDP.TXT"     // Flash data file name for SFDP region
         `define VSecur_Reg1_0     2'b00      // security register[1:0]
         `define VSecur_Reg7       1'b0       // security register[7]
         `define VStatus_Reg7_2    6'b0       // status register[7:2] are non-volatile bits

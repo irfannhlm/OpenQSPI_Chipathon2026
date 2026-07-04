@@ -1,0 +1,17 @@
+s25fl128s.mem preload map
+
+The flash model still defaults all unlisted bytes to FF.
+The following blocks are placed for easy readback tracing:
+
+- Block 0 @000000-00001F: readable paragraph
+  Text: TRACE BLOCK A: quick brown fox.
+
+- Block 1 @000100-00011F: symbols and punctuation
+  Text: symbols: !@#$%^&*()[]{}<>?/+-=_.
+
+- Block 2 @000200-00021F: numbers and hex-style text
+  Text: numbers: 0123456789 and hex ABCD.
+
+These blocks are intentionally short and separated so you can
+verify address decoding, burst reads, and byte ordering with
+simple waveforms or memory dumps.
