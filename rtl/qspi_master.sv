@@ -26,7 +26,7 @@ module qspi_master #(
 
     // QSPI config
     input logic [31:0] qspi_timeout_i,  // timeout in clock cycles (0: no timeout)
-    input logic [7:0] qspi_prescaler_i,  // QSPI clock = clk_i / (qspi_prescaler_i + 2)
+    input logic [7:0] qspi_prescaler_i,  // QSPI clock = clk_i / (qspi_prescaler_i*2 + 2)
     input logic qspi_addr_len_i,  // 0: 3 bytes, 1: 4 bytes
     input logic [5:0] qspi_dummy_len_i,  // number of dummy cycles (max 63)
     input logic [31:0] qspi_data_len_i,  // number of bytes to read/write
@@ -58,13 +58,13 @@ module qspi_master #(
   // QSPI SCK GEN
   // clock counter
   logic [7:0] clk_cnt;
-  logic clk_cnt_rst;
+  logic clk_cnt_rst, clk_cnt_en;
   always_ff @(posedge clk_i, negedge rst_ni) begin : clock_counter
     if (!rst_ni) begin
       clk_cnt <= 'd0;
     end else if (clk_cnt_rst) begin
       clk_cnt <= 'd0;
-    end else begin
+    end else if (clk_cnt_en) begin
       if (clk_cnt == qspi_prescaler_i) begin
         clk_cnt <= 'd0;
       end else begin
@@ -75,24 +75,37 @@ module qspi_master #(
 
   // qspi_sck generation
   logic qspi_sck;
-  logic qspi_sck_rst;
+  logic qspi_sck_rst, qspi_sck_en;
   always_ff @(posedge clk_i, negedge rst_ni) begin : qspi_sck_gen
     if (!rst_ni) begin
       qspi_sck <= 1'b0;
     end else if (qspi_sck_rst) begin
       qspi_sck <= qspi_sck_mode_i;  // reset to idle state
-    end else if (clk_cnt == qspi_prescaler_i) begin
+    end else if (qspi_sck_en && clk_cnt == qspi_prescaler_i) begin
       qspi_sck <= ~qspi_sck;
     end
   end
   wire qspi_sck_posedge = ~qspi_sck && (clk_cnt == qspi_prescaler_i);
   wire qspi_sck_negedge = qspi_sck && (clk_cnt == qspi_prescaler_i);
 
+  // qspi_csn generation
+  logic [CS_NUM-1:0] qspi_csn;
+  logic qspi_csn_en;
+  always_ff @(posedge clk_i, negedge rst_ni) begin : qspi_csn_gen
+    if (!rst_ni) begin
+      qspi_csn <= {CS_NUM{1'b1}};  // reset to idle state
+    end else if (~qspi_csn_en) begin
+      qspi_csn <= {CS_NUM{1'b1}};  // reset to idle state
+    end else begin
+      qspi_csn <= ~qspi_csn_sel_i;  // assert selected CSn
+    end
+  end
+
   // bit counter
   logic [5:0] bit_cnt;  // same size as qspi_dummy_len_i
   logic bit_cnt_rst;
   logic bit_cnt_ddr;
-  logic bit_cnt_edge = qspi_sck_negedge || (qspi_sck_posedge && bit_cnt_ddr);
+  wire bit_cnt_edge = qspi_sck_negedge || (qspi_sck_posedge && bit_cnt_ddr);
   always_ff @(posedge clk_i, negedge rst_ni) begin : bit_counter
     if (!rst_ni) begin
       bit_cnt <= 'd0;
@@ -240,8 +253,8 @@ module qspi_master #(
       rx_shifter <= 8'd0;
     end else if (rx_shift) begin
       case (rx_shifter_mode)
-        2'd0: rx_shifter <= {rx_shifter[6:0], rx_shifter_in[0]};  // single mode, shift 1 bit
-        2'd1: rx_shifter <= {rx_shifter[6:0], rx_shifter_in[0]};  // single mode, shift 1 bit
+        2'd0: rx_shifter <= {rx_shifter[6:0], rx_shifter_in[1]};  // single mode, shift 1 bit
+        2'd1: rx_shifter <= {rx_shifter[6:0], rx_shifter_in[1]};  // single mode, shift 1 bit
         2'd2: rx_shifter <= {rx_shifter[5:0], rx_shifter_in[1:0]};  // dual mode, shift 2 bits
         2'd3: rx_shifter <= {rx_shifter[3:0], rx_shifter_in[3:0]};  // quad mode, shift 4 bits
         default: rx_shifter <= {rx_shifter[6:0], rx_shifter_in[0]};
@@ -283,7 +296,6 @@ module qspi_master #(
 
   // CONTROL FSM
   logic qspi_done;
-  logic qspi_csn;
   typedef enum logic [2:0] {
     IDLE,
     PREPARE,
@@ -349,8 +361,9 @@ module qspi_master #(
     cnt_rst = 1'b1;
     clk_timer_rst = 1'b1;
 
-    qspi_csn = 1'b1;  // default to deassert CSN
-    qspi_sck_rst = 1'b1;
+    qspi_csn_en = 1'b0;
+    qspi_sck_en = 1'b0;
+    qspi_sck_rst = 1'b0;
 
     rx_shifter_en = 1'b0;
     tx_shifter_en = 1'b0;
@@ -371,39 +384,37 @@ module qspi_master #(
       IDLE: begin
         cnt_rst = 1'b1;  // reset counters
         clk_timer_rst = 1'b1;  // reset timeout timer
-        qspi_sck_rst = 1'b1;  // reset SCK to idle state
 
-        qspi_csn = 1'b1;  // deassert CSN
+        qspi_sck_rst = 1'b1;  // reset SCK to idle state
+        qspi_csn_en = 1'b0;  // reset CSN to idle state
+
         cphase_mode = 2'b00;  // disable output
 
         if (qspi_start_i) begin
+          qspi_csn_en = 1'b1;  // assert CSN
           qspi_nstate = PREPARE;
         end else begin
           qspi_nstate = IDLE;
         end
       end
 
-      PREPARE: begin
+      PREPARE: begin  // 1 cycle delay
         cnt_rst = 1'b0;  // start counters
         clk_timer_rst = 1'b0;  // start timeout timer
         qspi_sck_rst = 1'b0;  // start SCK generation
 
-        qspi_csn = 1'b0;  // assert CSN
+        qspi_csn_en = 1'b1;  // keep CSN asserted
+        qspi_sck_en = 1'b1;  // enable SCK generation
         cphase_mode = 2'b00;  // disable output
 
-        if (qspi_sck_negedge) begin
-          cnt_rst = 1'b1;  // reset counters for next phase
-          qspi_wdata_load = 1'b1;  // load write data
-          tx_shifter_load = 1'b1;  // load tx byte into shifter
-          if (crm_active) begin
-            tx_shifter_in_sel = 2'd1;  // load address byte directly if CRM is active
-            qspi_nstate = ADDRESS;  // skip command phase if CRM is active
-          end else begin
-            tx_shifter_in_sel = 2'd0;  // load command byte into shifter
-            qspi_nstate = COMMAND;  // default to command phase
-          end
+        qspi_wdata_load = 1'b1;  // load write data
+        tx_shifter_load = 1'b1;  // load tx byte into shifter
+        if (crm_active) begin
+          tx_shifter_in_sel = 2'd1;  // load address byte directly if CRM is active
+          qspi_nstate = ADDRESS;  // skip command phase if CRM is active
         end else begin
-          qspi_nstate = PREPARE;
+          tx_shifter_in_sel = 2'd0;  // load command byte into shifter
+          qspi_nstate = COMMAND;  // default to command phase
         end
       end
 
@@ -412,7 +423,8 @@ module qspi_master #(
         clk_timer_rst = 1'b0;  // start timeout timer
         qspi_sck_rst = 1'b0;  // dont reset SCK
 
-        qspi_csn = 1'b0;  // keep CSN asserted
+        qspi_csn_en = 1'b1;  // keep CSN asserted
+        qspi_sck_en = 1'b1;  // continue SCK generation
         tx_shifter_en = 1'b1;  // enable tx shifter
 
         cphase_ddr = 1'b0;  // COMMAND always in SDR mode
@@ -424,7 +436,7 @@ module qspi_master #(
           qspi_nstate = DONE;  // go to done state if abort is asserted
         end else if (byte_cnt_edge) begin
           cnt_rst = 1'b1;  // reset counters for next phase
-          if (!qspi_addr_len_i) begin
+          if (qspi_addr_mode_i != 'd0) begin
             tx_shifter_in_sel = 2'd1;  // select address byte
             tx_shifter_load = 1'b1;  // load address byte into shifter
             qspi_nstate = ADDRESS;  // go to address phase
@@ -452,19 +464,19 @@ module qspi_master #(
         clk_timer_rst = 1'b0;  // start timeout timer
         qspi_sck_rst = 1'b0;  // dont reset SCK
 
+        qspi_csn_en = 1'b1;  // keep CSN asserted
+        qspi_sck_en = 1'b1;  // continue SCK generation
+        tx_shifter_en = 1'b1;  // enable tx shifter
+
         cphase_ddr = qspi_ddr_i;  // enable DDR if configured
         cphase_mode = qspi_addr_mode_i;  // set address phase mode
-
-        qspi_csn = 1'b0;  // keep CSN asserted
-
-        tx_shifter_en = 1'b1;  // enable tx shifter
 
         if (qspi_abort_i) begin
           cnt_rst = 1'b1;  // reset counters for next phase
           qspi_sck_rst = 1'b1;  // reset SCK to idle state
           qspi_nstate = DONE;  // go to done state if abort is asserted
         end else if (byte_cnt_edge) begin
-          if (byte_cnt[1:0] == ((qspi_addr_len_i ? 2'd2 : 2'd1))) begin
+          if (byte_cnt[1:0] == ((qspi_addr_len_i ? 2'd3 : 2'd2))) begin
             cnt_rst = 1'b1;  // reset counters for next phase
             if (crm_active || qspi_crm_i) begin
               tx_shifter_in_sel = 2'd2;  // select mode byte
@@ -491,7 +503,8 @@ module qspi_master #(
         clk_timer_rst = 1'b0;  // start timeout timer
         qspi_sck_rst = 1'b0;  // dont reset SCK
 
-        qspi_csn = 1'b0;  // keep CSN asserted
+        qspi_csn_en = 1'b1;  // keep CSN asserted
+        qspi_sck_en = 1'b1;  // continue SCK generation
         tx_shifter_en = 1'b1;  // enable tx shifter
 
         cphase_ddr = qspi_ddr_i;  // enable DDR if configured
@@ -519,7 +532,8 @@ module qspi_master #(
         clk_timer_rst = 1'b0;  // start timeout timer
         qspi_sck_rst = 1'b0;  // dont reset SCK
 
-        qspi_csn = 1'b0;  // keep CSN asserted
+        qspi_csn_en = 1'b1;  // keep CSN asserted
+        qspi_sck_en = 1'b1;  // continue SCK generation
 
         cphase_ddr = 1'b0;  // DUMMY always in SDR mode
         cphase_mode = 2'b00;  // disable output for DUMMY phase
@@ -548,7 +562,8 @@ module qspi_master #(
         clk_timer_rst = 1'b0;  // start timeout timer
         qspi_sck_rst = 1'b0;  // dont reset SCK
 
-        qspi_csn = 1'b0;  // keep CSN asserted
+        qspi_csn_en = 1'b1;  // keep CSN asserted
+        qspi_sck_en = 1'b1;  // continue SCK generation
         if (qspi_data_dir_i) begin
           tx_shifter_en = 1'b1;  // enable tx shifter for writing
         end else begin
@@ -569,7 +584,7 @@ module qspi_master #(
             qspi_nstate = DONE;  // go to done state if no more data
           end else begin
             if (byte_cnt[1:0] == 2'd3) begin
-              // qspi_sck_rst = (fifo_empty_i || fifo_full_i);  // pause SCK if FIFO is empty or full TODO:FIX THIS
+              qspi_sck_en = ~(fifo_empty_i || fifo_full_i);  // pause SCK if FIFO is empty or full TODO:FIX THIS
               qspi_rdata_ready = ~qspi_data_dir_i;  // read data is ready to be pushed to FIFO
             end else if (byte_cnt[1:0] == 2'd2) begin
               qspi_wdata_load = qspi_data_dir_i;  // load next write data word into register
@@ -584,21 +599,15 @@ module qspi_master #(
       end
 
       DONE: begin
-        cnt_rst = 1'b0;  // start counters
-        clk_timer_rst = 1'b0;  // start timeout timer
-        qspi_sck_rst = 1'b0;  // start SCK generation
+        cnt_rst = 1'b1;  // stop counters
+        clk_timer_rst = 1'b1;  // stop timeout timer
+        qspi_sck_rst = 1'b1;  // stop SCK generation
 
-        qspi_csn = 1'b0;  // keep CSN asserted
+        qspi_csn_en = 1'b1;  // keep CSN asserted
         cphase_mode = 2'b00;  // disable output
 
-        if (qspi_sck_negedge) begin
-          cnt_rst = 1'b1;  // reset counters for next phase
-          qspi_sck_rst = 1'b1;  // reset SCK to idle state
-          qspi_done = 1'b1;  // signal transfer done
-          qspi_nstate = IDLE;
-        end else begin
-          qspi_nstate = DONE;
-        end
+        qspi_done = 1'b1;  // signal transfer done
+        qspi_nstate = IDLE;
       end
 
       default: begin
@@ -608,13 +617,13 @@ module qspi_master #(
   end
 
   // OUTPUT ASSIGNS
-  assign qspi_csn_o = {CS_NUM{qspi_csn}} | ~qspi_csn_sel_i;  // drive CSN for each chip select
+  assign qspi_csn_o = qspi_csn;  // drive CSN for each chip select
   assign qspi_sck_o = qspi_sck;
   assign qspi_o = tx_shifter_out;
   assign rx_shifter_in = qspi_i;
 
   always_comb begin : qspi_oe_mux
-    if (!qspi_data_dir_i) begin
+    if (rx_shifter_en) begin
       qspi_oe = 4'b0000;  // disable output when reading
     end else begin
       case (cphase_mode)
@@ -631,11 +640,15 @@ module qspi_master #(
   assign qspi_byte_cnt_o = byte_cnt;
 
   assign fifo_pop_o = qspi_wdata_load && !fifo_empty_i;  // pop FIFO when loading write data
-  always_ff @(posedge clk_i) begin : delayed_output
-    fifo_push_o <= qspi_rdata_ready && !fifo_full_i;  // push FIFO when read data is ready
-  end
-
+  assign fifo_push_o = qspi_rdata_ready && !fifo_full_i;  // push FIFO when read data is ready
   assign qspi_done_o = qspi_done;
-  assign qspi_timeout_o = clk_timer_expired;
+
+  always_ff @(posedge clk_i, negedge rst_ni) begin : delayed_output
+    if (!rst_ni) begin
+      qspi_timeout_o <= 1'b0;
+    end else begin
+      qspi_timeout_o <= clk_timer_expired;
+    end
+  end
 
 endmodule
