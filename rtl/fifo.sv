@@ -1,5 +1,7 @@
 // Pointer based FIFO
 // inspired by cc_fifo.sv from pulp-platform (https://github.com/pulp-platform/common_cells/blob/master/src/cc_fifo.sv)
+// supports simultaneous push and pop operations, with flush and reset functionality
+// supports arbitrary depth (not only powers of 2)
 // Author: Team Crispi - SSCS Chipathon 2026
 
 module fifo #(
