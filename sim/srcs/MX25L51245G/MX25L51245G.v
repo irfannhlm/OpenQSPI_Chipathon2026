@@ -28,8 +28,8 @@
 `timescale 1ns / 100ps
 
 
-// `define MX25L51245GM 16SOP_24BALL
-`define MX25L51245GZ2 8WSON
+`define MX25L51245GM 16SOP_24BALL
+// `define MX25L51245GZ2 8WSON
 `define Type_10G        //for non-factory mode
 //`define Type_08G      //for factory mode
 //`define LOADING_30pf

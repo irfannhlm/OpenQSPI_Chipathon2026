@@ -17,6 +17,7 @@ COMPILE_ARGS += -I $(PWD)/../../srcs/MX25L51245G/
 # verilog sources
 VERILOG_SOURCES += $(PWD)/tb_qspi_master.sv
 VERILOG_SOURCES += $(PWD)/../../../rtl/qspi_master.sv
+VERILOG_SOURCES += $(PWD)/../../../rtl/fifo.sv
 VERILOG_SOURCES += $(PWD)/../../srcs/S25FL128S/s25fl128s.v
 VERILOG_SOURCES += $(PWD)/../../srcs/W25QxxNE_Family_v1.0n/W25QxxNExxIx_v1.0n.v
 VERILOG_SOURCES += $(PWD)/../../srcs/MX25L51245G/MX25L51245G.v

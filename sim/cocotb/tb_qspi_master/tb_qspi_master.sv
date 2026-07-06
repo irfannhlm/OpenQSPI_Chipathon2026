@@ -13,6 +13,7 @@ module tb_qspi_master #(
     // QSPI control signals
     input  logic qspi_abort_i,   // abort current transfer (will avoid MODE or DUMMY phase)
     input  logic qspi_start_i,   // start the transfer
+    output logic qspi_busy_o,    // transfer in progress
     output logic qspi_done_o,    // transfer done
     output logic qspi_timeout_o, // transfer timeout
 
@@ -36,21 +37,46 @@ module tb_qspi_master #(
     input logic [7:0] qspi_cmd_i,  // command to send
     input logic [31:0] qspi_addr_i,  // address to send, length is determined by qspi_addr_len_i
     input logic [7:0] qspi_mode_byte_i,  // mode byte to send after address phase
-    input logic [31:0] qspi_wdata_i,  // data to send, length is determined by qspi_data_len_i
-    output logic [31:0] qspi_rdata_o,  // data received, length is determined by qspi_data_len_i
     output logic [31:0] qspi_byte_cnt_o,  // the current byte count
 
     // FIFO interface
-    input  logic fifo_empty_i,
-    input  logic fifo_full_i,
-    output logic fifo_push_o,
-    output logic fifo_pop_o
+    output logic [31:0] fifo_rdata_o,
+    input logic [31:0] fifo_wdata_i,
+    output logic fifo_empty_o,
+    output logic fifo_full_o,
+    input logic fifo_push_i,
+    input logic fifo_pop_i
 );
+
+  // FIFO INSTANCE
+  logic [31:0] fifo_data_o, fifo_data_i;
+  logic fifo_push, fifo_pop, fifo_full, fifo_empty;
+  fifo #(
+      .DATA_WIDTH(32),
+      .DEPTH(16)
+  ) u_fifo (
+      // clock and reset
+      .clk_i  (clk_i),
+      .rst_ni (rst_ni),
+      .flush_i(1'b0),    // not used in this testbench
+
+      // FIFO Interface Write
+      .data_i(fifo_data_i),  // Data to be written
+      .push_i(fifo_push),    // Write enable
+      .full_o(fifo_full),    // FIFO Full Flag
+
+      // FIFO Interface Read
+      .data_o (fifo_data_o),  // Data to be read
+      .pop_i  (fifo_pop),     // Read enable
+      .empty_o(fifo_empty)    // FIFO Empty Flag 
+  );
 
   // QSPI MASTER INSTANCE
   logic qspi_sck;
   logic [CS_NUM-1:0] qspi_csn;
   logic [3:0] qspi_i, qspi_o, qspi_oe;
+  logic [31:0] qspi_wdata, qspi_rdata;
+  logic qspi_fifo_push, qspi_fifo_pop;
   qspi_master #(
       .CS_NUM(CS_NUM)
   ) u_master (
@@ -61,6 +87,7 @@ module tb_qspi_master #(
       // QSPI control signals
       .qspi_abort_i(qspi_abort_i),
       .qspi_start_i(qspi_start_i),
+      .qspi_busy_o(qspi_busy_o),
       .qspi_done_o(qspi_done_o),
       .qspi_timeout_o(qspi_timeout_o),
 
@@ -82,8 +109,8 @@ module tb_qspi_master #(
       .qspi_cmd_i(qspi_cmd_i),
       .qspi_addr_i(qspi_addr_i),
       .qspi_mode_byte_i(qspi_mode_byte_i),
-      .qspi_wdata_i(qspi_wdata_i),
-      .qspi_rdata_o(qspi_rdata_o),
+      .qspi_wdata_i(qspi_wdata),
+      .qspi_rdata_o(qspi_rdata),
       .qspi_byte_cnt_o(qspi_byte_cnt_o),
 
       // QSPI interface
@@ -94,11 +121,27 @@ module tb_qspi_master #(
       .qspi_oe(qspi_oe),
 
       // FIFO interface
-      .fifo_empty_i(fifo_empty_i),
-      .fifo_full_i (fifo_full_i),
-      .fifo_push_o (fifo_push_o),
-      .fifo_pop_o  (fifo_pop_o)
+      .fifo_empty_i(fifo_empty),
+      .fifo_full_i (fifo_full),
+      .fifo_push_o (qspi_fifo_push),
+      .fifo_pop_o  (qspi_fifo_pop)
   );
+
+  // FIFO data and control assigns
+  always_comb begin : fifo_assigns
+    fifo_rdata_o = fifo_data_o;
+    qspi_wdata = fifo_data_o;
+    fifo_push = fifo_push_i || qspi_fifo_push;
+    fifo_pop = fifo_pop_i || qspi_fifo_pop;
+    fifo_empty_o = fifo_empty;
+    fifo_full_o = fifo_full;
+
+    if (fifo_push_i) begin
+      fifo_data_i = fifo_wdata_i;
+    end else begin
+      fifo_data_i = qspi_rdata;
+    end
+  end
 
   // QSPI IO BUFFERS
   wire [3:0] qspi_io;
@@ -125,7 +168,6 @@ module tb_qspi_master #(
       .RSTNeg (rst_ni),
       .WPNeg  (qspi_io[2]),
       .HOLDNeg(qspi_io[3])
-
   );
   // W25Q65NE (Winbond)
   W25QxxNExxIx u_flash1 (
@@ -140,10 +182,11 @@ module tb_qspi_master #(
   // MX25L51245G (Macronix)
   MX25L51245G u_flash2 (
       .SCLK(qspi_sck),
-      .CS  (qspi_csn[2]),
-      .SI  (qspi_io[0]),
-      .SO  (qspi_io[1]),
-      .WP  (qspi_io[2]),
+      .CS(qspi_csn[2]),
+      .SI(qspi_io[0]),
+      .SO(qspi_io[1]),
+      .WP(qspi_io[2]),
+      .RESET(1'b1),  // tied high for simulation
       .SIO3(qspi_io[3])
   );
 

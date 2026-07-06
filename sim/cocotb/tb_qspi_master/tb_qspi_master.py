@@ -1,3 +1,6 @@
+import math
+import os
+import random
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import Timer, RisingEdge
@@ -70,11 +73,11 @@ async def init_qspi_master(dut):
     dut.qspi_cmd_i.value = 0
     dut.qspi_addr_i.value = 0
     dut.qspi_mode_byte_i.value = 0
-    dut.qspi_wdata_i.value = 0
 
     # FIFO Interface
-    dut.fifo_empty_i.value = 1  
-    dut.fifo_full_i.value = 0   
+    dut.fifo_wdata_i.value = 0
+    dut.fifo_push_i.value = 0
+    dut.fifo_pop_i.value = 0
 
     # Reset the DUT and wait power up
     await Timer(1, unit="us")
@@ -83,6 +86,25 @@ async def init_qspi_master(dut):
     dut._log.info("Waiting for all 3 Flash models to Power-Up...")
     await Timer(STARTUP_TIME*1000, unit="ms")
 
+async def fifo_push_data(dut, data):
+    """Pushes a 32-bit word into the QSPI Master's FIFO."""
+    dut.fifo_wdata_i.value = data
+    dut.fifo_push_i.value = 1
+    await RisingEdge(dut.clk_i)
+    dut.fifo_push_i.value = 0
+    await RisingEdge(dut.clk_i)
+
+async def fifo_pop_data(dut, num_words=1):
+    """Pops a 32-bit word from the QSPI Master's FIFO."""
+    fifo_data = []
+    for _ in range(num_words):
+        fifo_data.append(int(dut.fifo_rdata_o.value))
+        dut.fifo_pop_i.value = 1
+        await RisingEdge(dut.clk_i)
+        dut.fifo_pop_i.value = 0
+        await RisingEdge(dut.clk_i)
+        await Timer(500, unit="ns")
+    return fifo_data
 
 async def qspi_write_command(dut, cs_mask, cmd):
     """
@@ -120,8 +142,9 @@ async def qspi_write_register(dut, cs_mask, cmd, wdata, data_len=1):
     dut.qspi_data_mode_i.value = 1 # 1 Line SPI for Data
     dut.qspi_data_dir_i.value  = 1 # 1 = WRITE
     dut.qspi_data_len_i.value  = data_len
-    dut.qspi_wdata_i.value     = wdata # The payload to send
-    
+
+    await fifo_push_data(dut, wdata)
+
     # Fire the Start Pulse
     dut.qspi_start_i.value = 1
     await RisingEdge(dut.clk_i)
@@ -155,7 +178,9 @@ async def qspi_read_register(dut, cs_mask, cmd, data_len=1):
     while dut.qspi_done_o.value == 0:
         await RisingEdge(dut.clk_i)
         
-    return int(dut.qspi_rdata_o.value)
+    await RisingEdge(dut.clk_i)
+    read_data = await fifo_pop_data(dut, num_words=data_len)  # Pop the data from FIFO
+    return read_data[0] if read_data else 0  # Return the first word or 0 if empty
 
 
 async def qspi_read_transaction(dut, cs_mask, cmd, cmd_mode, addr, addr_mode, addr_len, dummy_len, data_mode, data_len=4, ddr=False):
@@ -176,10 +201,190 @@ async def qspi_read_transaction(dut, cs_mask, cmd, cmd_mode, addr, addr_mode, ad
     await RisingEdge(dut.clk_i)
     dut.qspi_start_i.value = 0
     
+    result_list = []
+    reader_task = cocotb.start_soon(delayed_rx_fifo_reader(dut, num_words=math.ceil(data_len / 4), result_list=result_list))
+
     while dut.qspi_done_o.value == 0:
         await RisingEdge(dut.clk_i)
         
-    return int(dut.qspi_rdata_o.value)
+    await reader_task  # Ensure the reader task has completed
+
+    return result_list
+
+async def delayed_rx_fifo_reader(dut, num_words, result_list):
+    """A robust reader that randomly stalls, forcing the hardware to handle FIFO limits."""
+    words_popped = 0
+    
+    while words_popped < num_words:
+        if dut.fifo_empty_o.value != 0: 
+            await RisingEdge(dut.clk_i)
+            continue
+            
+        # Randomly simulate a distracted CPU (10% chance to sleep)
+        # This allows the Verilog hardware FIFO to fill up naturally and trigger a clock pause
+        if random.random() < 0.1:
+            sleep_time = random.randint(1, 4)
+            dut._log.info(f"    [RX CPU] CPU distracted for {sleep_time}us... Letting FIFO fill!")
+            await Timer(sleep_time, unit="us")
+            
+        # Wake up and calculate a random burst to pop
+        words_left = num_words - words_popped
+        burst_size = random.randint(1, min(16, words_left))
+        
+        # Realign to clock edge
+        await RisingEdge(dut.clk_i)
+
+        popped_in_burst = 0
+        while popped_in_burst < burst_size:
+            # Only pop if we actually have data
+            if dut.fifo_empty_o.value == 0:
+                data = int(dut.fifo_rdata_o.value)
+                result_list.append(data)
+
+                # dut._log.info(f"    [RX] Popped Word {words_popped+1}/{num_words}: 0x{data:08X}")
+                
+                # Pulse the pop signal
+                dut.fifo_pop_i.value = 1
+                await RisingEdge(dut.clk_i)
+                dut.fifo_pop_i.value = 0
+                await RisingEdge(dut.clk_i)
+                
+                words_popped += 1
+                popped_in_burst += 1
+
+                # Have a random delay between pops
+                for i in range(1, random.randint(5, 30)):
+                    await RisingEdge(dut.clk_i)
+
+            else:
+                # FIFO is empty, break the burst early and loop back
+                break
+
+
+async def delayed_tx_fifo_writer(dut, data_words):
+    """Pushes half the data, lets the FIFO drain to EMPTY, waits, then pushes the rest."""
+    half = len(data_words) // 2
+    
+    # Push first half
+    for i in range(half):
+        dut.fifo_wdata_i.value = data_words[i]
+        dut.fifo_push_i.value = 1
+        await RisingEdge(dut.clk_i)
+        dut.fifo_push_i.value = 0
+        
+    dut._log.info("    [TX] Half data pushed! Letting FIFO drain to EMPTY to test Clock Pause...")
+    await Timer(random.randint(1, 3), unit="us")
+    dut._log.info("    [TX] Pushing remaining data...")
+    
+    # Push second half
+    for i in range(half, len(data_words)):
+        dut.fifo_wdata_i.value = data_words[i]
+        dut.fifo_push_i.value = 1
+        await RisingEdge(dut.clk_i)
+        dut.fifo_push_i.value = 0
+
+def load_golden_data_from_mem(file_path, endian="big"):
+    """
+    Parses a Verilog .mem file and returns a dictionary of memory sectors.
+    Key: Base Address (int)
+    Value: List of packed 32-bit words
+    """
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"Golden memory file not found: {file_path}")
+        
+    memory_blocks = {}
+    current_base_addr = 0
+    current_bytes = []
+    
+    def pack_and_save():
+        if not current_bytes:
+            return
+            
+        # Pad with zeros if the block doesn't end cleanly on a 4-byte boundary
+        while len(current_bytes) % 4 != 0:  
+            current_bytes.append(0x00)
+            
+        words = []
+        for i in range(0, len(current_bytes), 4):
+            # Extract the 4-byte chunk
+            chunk = current_bytes[i : i+4]
+            
+            if endian == "little":
+                # Little Endian: Byte 0 goes to the LSB [7:0]
+                word = (chunk[3] << 24) | (chunk[2] << 16) | \
+                       (chunk[1] << 8)  | chunk[0]
+            else:
+                # Big Endian (Default): Byte 0 goes to the MSB [31:24]
+                word = (chunk[0] << 24) | (chunk[1] << 16) | \
+                       (chunk[2] << 8)  | chunk[3]
+                       
+            words.append(word)
+            
+        memory_blocks[current_base_addr] = words
+
+    with open(file_path, 'r') as f:
+        for line in f:
+            line = line.split('//')[0].strip()
+            if not line:
+                continue
+                
+            tokens = line.split()
+            for token in tokens:
+                if token.startswith('@'):
+                    pack_and_save()
+                    current_base_addr = int(token[1:], 16)
+                    current_bytes = []
+                else:
+                    current_bytes.append(int(token, 16))
+                    
+    pack_and_save()
+    return memory_blocks
+
+def get_expected_words(golden_dict, target_addr, num_words, total_bytes, endian="big"):
+    """
+    Searches the sparse memory dictionary for the target address.
+    Calculates the internal word offset, extracts the slice, and masks
+    the final word if total_bytes is not word-aligned.
+    """
+    for base_addr, words in golden_dict.items():
+        block_byte_len = len(words) * 4
+        
+        if base_addr <= target_addr < (base_addr + block_byte_len):
+            word_offset = (target_addr - base_addr) // 4
+            expected_slice = words[word_offset : word_offset + num_words].copy() # Copy to avoid mutating original
+            
+            if len(expected_slice) < num_words:
+                raise ValueError(f"Requested {num_words} words, but only {len(expected_slice)} remain in block @0x{base_addr:06X}")
+                
+            # --- THE NON-ALIGNED PADDING FIX ---
+            # Calculate how many bytes in the very last word are actually "valid"
+            valid_bytes_in_last_word = total_bytes % 4
+            
+            # If it's not perfectly aligned (0), we need to mask the last word
+            if valid_bytes_in_last_word != 0:
+                last_word_idx = num_words - 1
+                original_last_word = expected_slice[last_word_idx]
+                
+                if endian == "big":
+                    # Keep the top N bytes. 
+                    # 1 byte  = 0xFF000000
+                    # 2 bytes = 0xFFFF0000
+                    # 3 bytes = 0xFFFFFF00
+                    shift_amount = (4 - valid_bytes_in_last_word) * 8
+                    mask = (0xFFFFFFFF << shift_amount) & 0xFFFFFFFF
+                else:
+                    # Keep the bottom N bytes.
+                    # 1 byte  = 0x000000FF
+                    # 2 bytes = 0x0000FFFF
+                    # 3 bytes = 0x00FFFFFF
+                    shift_amount = valid_bytes_in_last_word * 8
+                    mask = (1 << shift_amount) - 1
+                    
+                expected_slice[last_word_idx] = original_last_word & mask
+                
+            return expected_slice
+            
+    raise ValueError(f"Target address 0x{target_addr:06X} not found in Golden Memory!")
 
 
 async def test_s25fl_read_modes(dut):
@@ -249,54 +454,62 @@ async def test_s25fl_read_modes(dut):
         ("DDR Quad I/O Read (0xED)",0xED, 1, 3, 0, 7, 3, True), # (1-4-4) DDR
     ]
 
+    dut._log.info("Loading Golden Data from s25fl128s.mem...")
+    golden_memory_dict = load_golden_data_from_mem("s25fl128s.mem")
         
     for mode_name, cmd, cmd_mode, addr_mode, addr_len, dummy, data_mode, ddr in read_modes:
-        dut._log.info(f" -> Executing {mode_name}...")
+        
         
         try:
-            # Issue the Read
-            read_data = await qspi_read_transaction(
+            target_address = 0x000000 
+            test_data_len = random.randint(128, 500)  # Random length between 128 and 500 bytes
+            expected_words = math.ceil(test_data_len / 4)
+            
+            # Fetch the golden slice from our dictionary
+            expected_list = get_expected_words(golden_memory_dict, target_address, expected_words, test_data_len)
+
+            dut._log.info(f" -> Executing {mode_name} with random length: {test_data_len} Bytes ({expected_words} Words)...")
+
+            # Issue the Hardware Read
+            result_list = await qspi_read_transaction(
                 dut=dut, 
                 cs_mask=s25fl_mask, 
                 cmd=cmd, 
                 cmd_mode=cmd_mode, 
-                addr=0x000000, 
+                addr=target_address,
                 addr_mode=addr_mode, 
                 addr_len=addr_len,
                 dummy_len=dummy, 
                 data_mode=data_mode,
-                data_len=4,
+                data_len=test_data_len,
                 ddr=ddr
             )
-            
-            hex_str = f"0x{read_data:08X}"
-            try:
-                ascii_str = read_data.to_bytes(4, byteorder='big').decode('ascii', errors='replace')
-            except Exception:
-                ascii_str = "????"
 
-            dut._log.info(f"    Result: {hex_str} (ASCII: '{ascii_str}')")
-            
-            # Perform Checks
-            if read_data == 0:
-                raise ValueError("Returned all zeros (0x00000000).")
-            if read_data == 0xFFFFFFFF:
-                raise ValueError("Returned all FFs (Floating Bus). Quad Enable (QE) bit might be missing!")
+            dut._log.info(f"    [RX] Received {len(result_list)} Words from FIFO. Verifying against Golden Data...")            
 
-            # If we got here, the transaction was mathematically successful
+            # --- AUTOMATED SCOREBOARD VERIFICATION ---
+            if len(result_list) != expected_words:
+                 raise ValueError(f"FIFO Pop Mismatch! Expected {expected_words} words, got {len(result_list)}.")
+                 
+            for i in range(expected_words):
+                dut._log.info(f"    [VERIFY] Word {i}: Expected 0x{expected_list[i]:08X}, Got 0x{result_list[i]:08X}")
+                if result_list[i] != expected_list[i]:
+                    raise ValueError(f"DATA MISMATCH at Word {i}! Expected 0x{expected_list[i]:08X}, Got 0x{result_list[i]:08X}")
+
+            dut._log.info(f"    Test {mode_name} PASSED!")
+
             scoreboard.record("S25FL", mode_name, passed=True)
 
         except Exception as e:
-            # Catch failures so we can continue testing other modes/chips
             dut._log.error(f"    [!] FAILED: {str(e)}")
             scoreboard.record("S25FL", mode_name, passed=False, error_msg=str(e))
+
         
         # Let the bus rest between transactions to ensure CSn deselect times are met
         await Timer(500, unit="ns")
             
     # Print the Final Verdict
     scoreboard.report(dut._log)
-
 
 @cocotb.test()
 async def tb_qspi_master(dut):
