@@ -145,19 +145,20 @@ module qspi_master #(
     end
   end
 
-
   // TX ENGINE
   // main tx shifter
   logic [7:0] tx_shifter;
   logic [7:0] tx_shifter_in;  // input to shifter
   logic [3:0] tx_shifter_out;  // output to qspi_o
   logic [1:0] tx_shifter_mode;  // 0x: single, 10: dual, 11: quad
+  logic [1:0] tx_shifter_in_sel;  // 0: command, 1: address, 2: mode byte, 3: data
   logic tx_shifter_en, tx_shifter_load, tx_shifter_ddr;
-  wire tx_shift = tx_shifter_en && (qspi_sck_negedge || (qspi_sck_posedge && tx_shifter_ddr));
+  logic tx_shifter_preset;  // preset shifter with first byte of address/data
+  wire  tx_shift = tx_shifter_en && (qspi_sck_negedge || (qspi_sck_posedge && tx_shifter_ddr));
   always_ff @(posedge clk_i, negedge rst_ni) begin : output_shifter
     if (!rst_ni) begin
       tx_shifter <= 8'd0;
-    end else if (tx_shifter_load) begin
+    end else if (tx_shifter_load || tx_shifter_preset) begin
       tx_shifter <= tx_shifter_in;
     end else if (tx_shift) begin
       case (tx_shifter_mode)
@@ -191,7 +192,6 @@ module qspi_master #(
   end
 
   // tx shifter input mux
-  logic [1:0] tx_shifter_in_sel;  // 0: command, 1: address, 2: mode byte, 3: data
   logic [7:0] qspi_addr_byte;
   logic [7:0] qspi_wdata_byte;
   always_comb begin : tx_shifter_in_mux
@@ -204,44 +204,60 @@ module qspi_master #(
     endcase
   end
   always_comb begin : qspi_addr_mux
-    if (qspi_addr_len_i) begin
-      // 4 bytes address
-      case (byte_cnt[1:0])
-        2'd0: qspi_addr_byte = qspi_addr_i[31:24];
-        2'd1: qspi_addr_byte = qspi_addr_i[23:16];
-        2'd2: qspi_addr_byte = qspi_addr_i[15:8];
-        2'd3: qspi_addr_byte = qspi_addr_i[7:0];
-        default: qspi_addr_byte = 8'd0;
-      endcase
+    if (tx_shifter_preset) begin
+      // preset first byte of address into shifter
+      if (qspi_addr_len_i) begin
+        qspi_addr_byte = qspi_addr_i[31:24];  // 4 bytes address
+      end else begin
+        qspi_addr_byte = qspi_addr_i[23:16];  // 3 bytes address
+      end
     end else begin
-      // 3 bytes address
-      case (byte_cnt[1:0])
-        2'd0: qspi_addr_byte = qspi_addr_i[23:16];
-        2'd1: qspi_addr_byte = qspi_addr_i[15:8];
-        2'd2: qspi_addr_byte = qspi_addr_i[7:0];
-        default: qspi_addr_byte = 8'd0;
-      endcase
+      if (qspi_addr_len_i) begin
+        // 4 bytes address
+        case (byte_cnt[1:0])
+          2'd0: qspi_addr_byte = qspi_addr_i[23:16];
+          2'd1: qspi_addr_byte = qspi_addr_i[15:8];
+          2'd2: qspi_addr_byte = qspi_addr_i[7:0];
+          default: qspi_addr_byte = 8'd0;
+        endcase
+      end else begin
+        // 3 bytes address
+        case (byte_cnt[1:0])
+          2'd0: qspi_addr_byte = qspi_addr_i[15:8];
+          2'd1: qspi_addr_byte = qspi_addr_i[7:0];
+          default: qspi_addr_byte = 8'd0;
+        endcase
+      end
     end
   end
   always_comb begin : qspi_wdata_mux
-    if (qspi_endian_i) begin
-      // little endian
-      case (byte_cnt[1:0])
-        2'd0: qspi_wdata_byte = qspi_wdata[7:0];
-        2'd1: qspi_wdata_byte = qspi_wdata[15:8];
-        2'd2: qspi_wdata_byte = qspi_wdata[23:16];
-        2'd3: qspi_wdata_byte = qspi_wdata[31:24];
-        default: qspi_wdata_byte = 8'd0;
-      endcase
+    if (tx_shifter_preset) begin
+      // preset first byte of data into shifter
+      if (qspi_endian_i) begin
+        qspi_wdata_byte = qspi_wdata[7:0];  // little endian
+      end else begin
+        qspi_wdata_byte = qspi_wdata[31:24];  // big endian
+      end
     end else begin
-      // big endian
-      case (byte_cnt[1:0])
-        2'd0: qspi_wdata_byte = qspi_wdata[31:24];
-        2'd1: qspi_wdata_byte = qspi_wdata[23:16];
-        2'd2: qspi_wdata_byte = qspi_wdata[15:8];
-        2'd3: qspi_wdata_byte = qspi_wdata[7:0];
-        default: qspi_wdata_byte = 8'd0;
-      endcase
+      if (qspi_endian_i) begin
+        // little endian
+        case (byte_cnt[1:0])
+          2'd0: qspi_wdata_byte = qspi_wdata[15:8];
+          2'd1: qspi_wdata_byte = qspi_wdata[23:16];
+          2'd2: qspi_wdata_byte = qspi_wdata[31:24];
+          2'd3: qspi_wdata_byte = qspi_wdata[7:0];
+          default: qspi_wdata_byte = 8'd0;
+        endcase
+      end else begin
+        // big endian
+        case (byte_cnt[1:0])
+          2'd0: qspi_wdata_byte = qspi_wdata[23:16];
+          2'd1: qspi_wdata_byte = qspi_wdata[15:8];
+          2'd2: qspi_wdata_byte = qspi_wdata[7:0];
+          2'd3: qspi_wdata_byte = qspi_wdata[31:24];
+          default: qspi_wdata_byte = 8'd0;
+        endcase
+      end
     end
   end
 
@@ -268,28 +284,42 @@ module qspi_master #(
 
   // rx data register
   logic [31:0] rx_data;
-  logic qspi_rdata_ready;
+  logic qspi_rdata_rst, qspi_rdata_load;
+  logic [1:0] qspi_rdata_ready;
+  always_ff @(posedge clk_i, negedge rst_ni) begin : rx_data_delay
+    if (!rst_ni) begin
+      qspi_rdata_ready <= 'd0;
+      qspi_rdata_load  <= 1'b0;
+    end else begin
+      qspi_rdata_load <= rx_shifter_en && byte_cnt_edge;  // load every byte
+      // ready every 4 bytes or at the end of data
+      qspi_rdata_ready[0] <= rx_shifter_en && byte_cnt_edge && ((byte_cnt == (qspi_data_len_i-1)) || (byte_cnt[1:0] == 2'd3));
+      qspi_rdata_ready[1] <= qspi_rdata_ready[0];
+    end
+  end
   always_ff @(posedge clk_i, negedge rst_ni) begin : rx_data_reg
     if (!rst_ni) begin
       rx_data <= 'd0;
+    end else if (qspi_rdata_rst) begin
+      rx_data <= 'd0;
     end else begin
-      if (rx_shifter_en && byte_cnt_edge) begin
+      if (qspi_rdata_load) begin
         if (qspi_endian_i) begin
           // little endian
           case (byte_cnt[1:0])
-            2'd0: rx_data[7:0] <= rx_shifter;
-            2'd1: rx_data[15:8] <= rx_shifter;
-            2'd2: rx_data[23:16] <= rx_shifter;
-            2'd3: rx_data[31:24] <= rx_shifter;
+            2'd0: rx_data[31:24] <= rx_shifter;
+            2'd1: rx_data[7:0] <= rx_shifter;
+            2'd2: rx_data[15:8] <= rx_shifter;
+            2'd3: rx_data[23:16] <= rx_shifter;
             default: rx_data <= 'd0;
           endcase
         end else begin
           // big endian
           case (byte_cnt[1:0])
-            2'd0: rx_data[31:24] <= rx_shifter;
-            2'd1: rx_data[23:16] <= rx_shifter;
-            2'd2: rx_data[15:8] <= rx_shifter;
-            2'd3: rx_data[7:0] <= rx_shifter;
+            2'd0: rx_data[7:0] <= rx_shifter;
+            2'd1: rx_data[31:24] <= rx_shifter;
+            2'd2: rx_data[23:16] <= rx_shifter;
+            2'd3: rx_data[15:8] <= rx_shifter;
             default: rx_data <= 'd0;
           endcase
         end
@@ -334,7 +364,7 @@ module qspi_master #(
   // clock timer
   logic [31:0] clk_timer;
   logic clk_timer_rst;
-  logic clk_timer_expired = (clk_timer == qspi_timeout_i) && (qspi_timeout_i != 32'd0);
+  wire clk_timer_expired = (clk_timer == qspi_timeout_i) && (qspi_timeout_i != 32'd0);
   always_ff @(posedge clk_i, negedge rst_ni) begin : clk_timer_reg
     if (!rst_ni) begin
       clk_timer <= 'd0;
@@ -372,10 +402,11 @@ module qspi_master #(
     rx_shifter_en = 1'b0;
     tx_shifter_en = 1'b0;
     tx_shifter_load = 1'b0;
+    tx_shifter_preset = 1'b0;
     tx_shifter_in_sel = 2'd0;  // 0: command, 1: address, 2: mode byte, 3: data
 
     qspi_wdata_load = 1'b0;
-    qspi_rdata_ready = 1'b0;
+    qspi_rdata_rst = 1'b0;
 
     cphase_ddr = 1'b0;  // default to SDR
     cphase_mode = 2'b00;  // default to output disabled
@@ -396,8 +427,9 @@ module qspi_master #(
 
         if (qspi_start_i) begin
           qspi_csn_en = 1'b1;  // assert CSN
+          qspi_rdata_rst = 1'b1;  // reset rx data register
           qspi_wdata_load = 1'b1;  // load write data
-          tx_shifter_load = 1'b1;  // load tx byte into shifter
+          tx_shifter_preset = 1'b1;  // preset tx byte into shifter
           if (crm_active) begin
             tx_shifter_in_sel = 2'd1;  // load address byte directly if CRM is active
           end else begin
@@ -446,17 +478,11 @@ module qspi_master #(
           cnt_rst = 1'b1;  // reset counters for next phase
           if (qspi_addr_mode_i != 'd0) begin
             tx_shifter_in_sel = 2'd1;  // select address byte
-            tx_shifter_load = 1'b1;  // load address byte into shifter
+            tx_shifter_preset = 1'b1;  // preset first address byte into shifter
             qspi_nstate = ADDRESS;  // go to address phase
-          end else if (crm_active || qspi_crm_i) begin
-            tx_shifter_in_sel = 2'd2;  // select mode byte
-            tx_shifter_load = 1'b1;  // load mode byte into shifter
-            qspi_nstate = MODE;  // go to mode phase
-          end else if (qspi_dummy_len_i != 'd0) begin
-            qspi_nstate = DUMMY;  // go to dummy phase
-          end else if (qspi_data_mode_i != 'd0) begin
+          end else if (qspi_data_mode_i != 'd0 && qspi_data_len_i != 'd0) begin
             tx_shifter_in_sel = 2'd3;  // select data byte
-            tx_shifter_load = 1'b1;  // load data byte into shifter
+            tx_shifter_preset = 1'b1;  // preset first data byte into shifter
             qspi_nstate = DATA;  // go to data phase
           end else begin
             qspi_sck_rst = 1'b1;  // reset SCK to idle state
@@ -486,15 +512,15 @@ module qspi_master #(
         end else if (byte_cnt_edge) begin
           if (byte_cnt[1:0] == ((qspi_addr_len_i ? 2'd3 : 2'd2))) begin
             cnt_rst = 1'b1;  // reset counters for next phase
-            if (crm_active || qspi_crm_i) begin
+            if (qspi_crm_i && qspi_dummy_len_i != 'd0) begin
               tx_shifter_in_sel = 2'd2;  // select mode byte
               tx_shifter_load = 1'b1;  // load mode byte into shifter
               qspi_nstate = MODE;  // go to mode phase
             end else if (qspi_dummy_len_i != 'd0) begin
               qspi_nstate = DUMMY;  // go to dummy phase
-            end else if (qspi_data_mode_i != 'd0) begin
+            end else if (qspi_data_mode_i != 'd0 && qspi_data_len_i != 'd0) begin
               tx_shifter_in_sel = 2'd3;  // select data byte
-              tx_shifter_load = 1'b1;  // load data byte into shifter
+              tx_shifter_preset = 1'b1;  // preset first data byte into shifter
               qspi_nstate = DATA;  // go to data phase
             end else begin
               qspi_sck_rst = 1'b1;  // reset SCK to idle state
@@ -518,20 +544,36 @@ module qspi_master #(
         cphase_ddr = qspi_ddr_i;  // enable DDR if configured
         cphase_mode = qspi_addr_mode_i;  // set mode phase mode
 
-        if (byte_cnt_edge) begin
-          cnt_rst = 1'b1;  // reset counters for next phase
-          if (qspi_dummy_len_i != 'd0) begin
-            qspi_nstate = DUMMY;  // go to dummy phase
-          end else if (qspi_data_mode_i != 'd0) begin
-            tx_shifter_in_sel = 2'd3;  // select data byte
-            tx_shifter_load = 1'b1;  // load data byte into shifter
-            qspi_nstate = DATA;  // go to data phase
+        if (qspi_sck_negedge) begin
+          // count mode bits as dummy bits
+          if (bit_cnt == (qspi_dummy_len_i - 1)) begin
+            if (qspi_data_mode_i != 'd0) begin
+              cnt_rst = 1'b1;  // reset counters for next phase
+              tx_shifter_in_sel = 2'd3;  // select data byte
+              tx_shifter_preset = 1'b1;  // preset first data byte into shifter
+              qspi_nstate = DATA;  // go to data phase
+            end else begin
+              cnt_rst = 1'b1;  // reset counters for next phase
+              qspi_sck_rst = 1'b1;  // reset SCK to idle state
+              qspi_nstate = DONE;  // go to done state if no more phases
+            end
+          end else if (byte_cnt_edge) begin
+            if (qspi_dummy_len_i != 'd0) begin
+              cnt_rst = 1'b0;  // continue counters for dummy phase
+              qspi_nstate = DUMMY;  // go to dummy phase
+            end else if (qspi_data_mode_i != 'd0 && qspi_data_len_i != 'd0) begin
+              cnt_rst = 1'b1;  // reset counters for next phase
+              tx_shifter_in_sel = 2'd3;  // select data byte
+              tx_shifter_preset = 1'b1;  // preset first data byte into shifter
+              qspi_nstate = DATA;  // go to data phase
+            end else begin
+              cnt_rst = 1'b1;  // reset counters for next phase
+              qspi_sck_rst = 1'b1;  // reset SCK to idle state
+              qspi_nstate = DONE;  // go to done state if no more phases
+            end
           end else begin
-            qspi_sck_rst = 1'b1;  // reset SCK to idle state
-            qspi_nstate  = DONE;  // go to done state if no more phases
+            qspi_nstate = MODE;
           end
-        end else begin
-          qspi_nstate = MODE;
         end
       end
 
@@ -551,7 +593,7 @@ module qspi_master #(
             cnt_rst = 1'b1;  // reset counters for next phase
             if (qspi_data_mode_i != 'd0) begin
               tx_shifter_in_sel = 2'd3;  // select data byte
-              tx_shifter_load = 1'b1;  // load data byte into shifter
+              tx_shifter_preset = 1'b1;  // preset first data byte into shifter
               qspi_nstate = DATA;  // go to data phase
             end else begin
               qspi_sck_rst = 1'b1;  // reset SCK to idle state
@@ -587,16 +629,16 @@ module qspi_master #(
           qspi_nstate = DONE;  // go to done state if abort is asserted
         end else if (byte_cnt_edge) begin
           if (byte_cnt == (qspi_data_len_i - 1)) begin
-            cnt_rst = 1'b1;  // reset counters for next phase
+            cnt_rst = 1'b0;  // continue counters to flush last byte
             qspi_sck_rst = 1'b1;  // reset SCK to idle state
-            qspi_rdata_ready = ~qspi_data_dir_i;  // read data is ready to be pushed to FIFO
             qspi_nstate = DONE;  // go to done state if no more data
           end else begin
             if (byte_cnt[1:0] == 2'd3) begin
               qspi_sck_en = ~(fifo_empty_i || fifo_full_i);  // pause SCK if FIFO is empty or full TODO:FIX THIS
-              qspi_rdata_ready = ~qspi_data_dir_i;  // read data is ready to be pushed to FIFO
             end else if (byte_cnt[1:0] == 2'd2) begin
               qspi_wdata_load = qspi_data_dir_i;  // load next write data word into register
+            end else if (byte_cnt[1:0] == 2'd0) begin
+              qspi_rdata_rst = ~qspi_data_dir_i;  // reset rx data register for next read
             end
             tx_shifter_in_sel = 2'd3;  // select data byte
             tx_shifter_load = 1'b1;  // load next data byte into shifter
@@ -649,13 +691,13 @@ module qspi_master #(
   assign qspi_byte_cnt_o = byte_cnt;
 
   assign fifo_pop_o = qspi_wdata_load && !fifo_empty_i;  // pop FIFO when loading write data
+  assign fifo_push_o = qspi_rdata_ready[1] && !fifo_full_i;  // push FIFO when read data is ready 
+
   always_ff @(posedge clk_i, negedge rst_ni) begin : delayed_output
     if (!rst_ni) begin
-      fifo_push_o <= 1'b0;
       qspi_done_o <= 1'b0;
       qspi_timeout_o <= 1'b0;
     end else begin
-      fifo_push_o <= qspi_rdata_ready && !fifo_full_i;  // delayed 1 cycle for rx_data loading
       qspi_done_o <= qspi_done;
       qspi_timeout_o <= clk_timer_expired;
     end

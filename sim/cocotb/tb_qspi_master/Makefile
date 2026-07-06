@@ -2,6 +2,7 @@
 SIM ?= icarus
 TOPLEVEL_LANG ?= verilog
 COMPILE_ARGS += -g2012 -pfileline=1 -Wno-timescale
+SIM_ARGS += -l iverilog_sim.log
 #SIM_ARGS += -fst
 
 # defines
@@ -30,7 +31,6 @@ include $(shell cocotb-config --makefiles)/Makefile.sim
 .PHONY: copy_mem_files compile sim regression
 
 copy_mem_files:
-	@echo "--- Menyalin file inisialisasi memori ke folder simulasi ---"
 	@mkdir -p ./sim_build
 	@cp -f ../../srcs/S25FL128S/*.mem ./ 2>/dev/null || true
 	@cp -f ../../srcs/S25FL128S/*.mem ./sim_build/ 2>/dev/null || true
