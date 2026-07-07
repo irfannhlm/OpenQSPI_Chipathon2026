@@ -1,6 +1,6 @@
 <testsuites name="results">
   <testsuite name="all" package="all">
-    <property name="random_seed" value="1783155155" />
-    <testcase name="tb_qspi_master" classname="tb_qspi_master" file="/foss/designs/OpenQSPI_Chipathon2026/sim/cocotb/tb_qspi_master/tb_qspi_master.py" lineno="203" time="42.85111713409424" sim_time_ns="4020120.0" ratio_time="93815.99054745332" />
+    <property name="random_seed" value="1783365259" />
+    <testcase name="tb_qspi_master" classname="tb_qspi_master" file="/foss/designs/OpenQSPI_Chipathon2026/sim/cocotb/tb_qspi_master/tb_qspi_master.py" lineno="514" time="101.35856366157532" sim_time_ns="6354360.0" ratio_time="62691.89075346888" />
   </testsuite>
 </testsuites>
