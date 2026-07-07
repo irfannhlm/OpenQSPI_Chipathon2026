@@ -493,6 +493,8 @@ module qspi_master #(
             tx_shifter_in_sel = 2'd1;  // select address byte
             tx_shifter_preset = 1'b1;  // preset first address byte into shifter
             qspi_nstate = ADDRESS;  // go to address phase
+          end else if (qspi_dummy_len_i != 'd0) begin
+            qspi_nstate = DUMMY;
           end else if (qspi_data_mode_i != 'd0 && qspi_data_len_i != 'd0) begin
             tx_shifter_in_sel = 2'd3;  // select data byte
             tx_shifter_preset = 1'b1;  // preset first data byte into shifter
@@ -540,6 +542,8 @@ module qspi_master #(
               qspi_nstate  = DONE;  // go to done state if no more phases
             end
           end else begin
+            tx_shifter_in_sel = 2'd1;  // select address byte
+            tx_shifter_load = 1'b1;  // load next address byte into shifter
             qspi_nstate = ADDRESS;
           end
         end
