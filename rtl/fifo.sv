@@ -59,7 +59,7 @@ module fifo #(
     end
 
     // Read operation
-    else if (pop_i && !empty_o) begin
+    if (pop_i && !empty_o) begin
       // Output assignment is already handled by data_o
 
       // Wrap around logic
