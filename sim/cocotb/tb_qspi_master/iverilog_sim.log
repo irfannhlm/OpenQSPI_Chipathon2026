@@ -1,3 +1,0 @@
-WARNING: /foss/designs/OpenQSPI_Chipathon2026/sim/cocotb/tb_qspi_master/../../srcs/W25QxxNE_Family_v1.0n/W25QxxNExxIx_v1.0n.v:384: $readmemh: The behaviour for reg[...] mem[N:0]; $readmemh("...", mem); changed in the 1364-2005 standard. To avoid ambiguity, use mem[0:N] or explicit range parameters $readmemh("...", mem, start, stop);. Defaulting to 1364-2005 behavior.
-WARNING: /foss/designs/OpenQSPI_Chipathon2026/sim/cocotb/tb_qspi_master/../../srcs/W25QxxNE_Family_v1.0n/W25QxxNExxIx_v1.0n.v:384: $readmemh(SREG.TXT): Not enough words in the file for the requested range [0:31].
-VCD info: dumpfile qspi_waves.vcd opened for output.

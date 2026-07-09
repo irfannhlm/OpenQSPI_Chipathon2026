@@ -703,9 +703,9 @@ specify
         // Typical Byte Programming Time
         specparam        tdevice_BP                = 4e8;//tBP
         // Sector Erase Operation
-        specparam        tdevice_SE64              = 650e7;//tSE
+        specparam        tdevice_SE64              = 100e7;//tSE
         // Sector Erase Operation
-        specparam        tdevice_SE256             = 1875e7;//tSE
+        specparam        tdevice_SE256             = 150e7;//tSE
         // Bulk Erase Operation
         specparam        tdevice_BE                = 165e9;//tBE
         // WRR Cycle Time

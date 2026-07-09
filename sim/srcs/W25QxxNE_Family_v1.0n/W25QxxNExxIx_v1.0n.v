@@ -20,6 +20,9 @@
 *  1.0n       Lydia     20250728   * Initial Version Release
 *******************************************************************************/
 
+`define W25Q65NE
+`define IM
+
 `timescale 1ns / 100ps
 
 module W25QxxNExxIx (CSn, CLK, DIO, DO, WPn, HOLDn, RESETn);
@@ -362,7 +365,7 @@ parameter	tW    =  2000000;
 parameter 	tRES1 =  20000;			
 parameter	tDP   =  3000;			
 parameter	tPP   =  600000;		
-parameter	tSE   =  100000000;		
+parameter	tSE   =  10000000;		
 parameter 	tBE1  =  150000000;		
 parameter 	tBE2  =  200000000;		
 parameter     	tCE_unit =  1000000000;	//Lydia 250709	

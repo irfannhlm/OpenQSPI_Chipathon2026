@@ -1,28 +1,26 @@
 import os
+import sys
+import argparse
 
-# A large, readable block of text to stress-test the FIFO (700+ bytes)
-LOREM_IPSUM = (
-    "The QSPI Master Controller is currently executing a massive continuous read operation. "
-    "This text is designed to completely overflow the internal RX FIFO if the APB bus does "
-    "not pop the data fast enough. By reading hundreds of bytes, we can verify that the "
-    "hardware bidirectional clock-pausing mechanism works flawlessly. When the FIFO hits "
-    "its maximum capacity, the state machine must halt the SCLK toggling immediately, "
-    "holding the CSn line low, and patiently wait for the CPU to drain the buffer. "
-    "Once the buffer has space, the SCLK should resume perfectly without any phantom edges. "
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor "
-    "incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud "
-    "exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute "
-    "irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla "
-    "pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui "
-    "officia deserunt mollit anim id est laborum. END_OF_TRANSMISSION."
-)
+def read_input_file(filepath):
+    """Reads a .txt or .bin file and returns its content as raw bytes."""
+    if not os.path.exists(filepath):
+        raise FileNotFoundError(f"❌ Error: Could not find '{filepath}'")
+    
+    # Check the extension to determine how to read the file
+    _, ext = os.path.splitext(filepath)
+    
+    if ext.lower() == '.bin':
+        print(f"📂 Detected Binary File. Reading raw bytes...")
+        with open(filepath, 'rb') as f:
+            return f.read()
+    else:
+        print(f"📄 Detected Text File. Encoding to UTF-8 bytes...")
+        with open(filepath, 'r', encoding='utf-8') as f:
+            return f.read().encode('utf-8')
 
-def generate_hex_file(filename, header_comment, text_payload, start_address=0):
-    """Converts a readable string into a $readmemh compatible hex file."""
-    
-    # Convert the string to raw bytes (ASCII/UTF-8)
-    byte_data = text_payload.encode('utf-8')
-    
+def generate_hex_file(filename, header_comment, payload_bytes, start_address=0):
+    """Converts raw bytes into a $readmemh compatible hex file."""
     with open(filename, 'w') as f:
         f.write(f"// {header_comment}\n")
         f.write("// Unlisted locations remain FF (Flash Erased State)\n\n")
@@ -31,33 +29,46 @@ def generate_hex_file(filename, header_comment, text_payload, start_address=0):
         f.write(f"@{start_address:06X}\n")
         
         # Write the data, 16 bytes per line for easy reading in GTKWave/Hex editors
-        for i in range(0, len(byte_data), 16):
-            chunk = byte_data[i:i+16]
+        for i in range(0, len(payload_bytes), 16):
+            chunk = payload_bytes[i:i+16]
             hex_strings = [f"{b:02X}" for b in chunk]
             f.write(" ".join(hex_strings) + "\n")
             
-    print(f"Generated {filename} ({len(byte_data)} bytes)")
+    print(f"  ✅ Generated {filename} ({len(payload_bytes)} bytes)")
 
-# Generate the files for your specific flash models
 if __name__ == "__main__":
-    print("Generating Flash Memory initialization files...")
-    
-    generate_hex_file(
-        filename="s25fl128s.mem",
-        header_comment="Initial flash contents for Infineon S25FL128S",
-        text_payload=LOREM_IPSUM
-    )
-    
-    generate_hex_file(
-        filename="MX25L51245G.TXT",
-        header_comment="Main preload for Macronix MX25L51245G",
-        text_payload=LOREM_IPSUM
-    )
-    
-    generate_hex_file(
-        filename="MEM.TXT",
-        header_comment="Main flash preload for Winbond W25Q",
-        text_payload=LOREM_IPSUM
-    )
-    
-    print("Done! You can now run your Cocotb simulation.")
+    # Setup command line argument parsing
+    parser = argparse.ArgumentParser(description="Generate QSPI Flash Memory .mem/.TXT files from an input file.")
+    parser.add_argument("input_file", help="Path to the input .txt or .bin payload file.")
+    args = parser.parse_args()
+
+    try:
+        # 1. Read the raw bytes from the provided file
+        payload_bytes = read_input_file(args.input_file)
+        
+        # 2. Generate the files for your specific flash models
+        print("\n Generating Flash Memory initialization files...")
+        
+        generate_hex_file(
+            filename="s25fl128s.mem",
+            header_comment=f"Initial flash contents for Infineon S25FL128S (Source: {args.input_file})",
+            payload_bytes=payload_bytes
+        )
+        
+        generate_hex_file(
+            filename="MX25L51245G.TXT",
+            header_comment=f"Main preload for Macronix MX25L51245G (Source: {args.input_file})",
+            payload_bytes=payload_bytes
+        )
+        
+        generate_hex_file(
+            filename="MEM.TXT",
+            header_comment=f"Main flash preload for Winbond W25Q (Source: {args.input_file})",
+            payload_bytes=payload_bytes
+        )
+        
+        print("\n🚀 Done! You can now run your Cocotb simulation.")
+        
+    except Exception as e:
+        print(e)
+        sys.exit(1)
