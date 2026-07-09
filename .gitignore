@@ -1,2 +1,10 @@
 *.vcd
 *_build/
+
+# Simulation builds
+**/sim/*results.*
+**/sim/*.TXT
+**/sim/*.txt
+**/sim/*.mem
+**/sim/*.dat
+**/sim/*.log
