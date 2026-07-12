@@ -2,9 +2,10 @@
 *_build/
 
 # Simulation builds
-**/sim/*results.*
-**/sim/*.TXT
-**/sim/*.txt
-**/sim/*.mem
-**/sim/*.dat
-**/sim/*.log
+sim/**/*results.*
+sim/**/*.TXT
+sim/**/*.txt
+sim/**/*.mem
+sim/**/*.dat
+sim/**/*.log
+sim/**/*.err
