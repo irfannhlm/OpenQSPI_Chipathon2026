@@ -1,0 +1,89 @@
+[*]
+[*] GTKWave Analyzer v4.0.0-prealpha (7d7b4db) (w)1999-2022 BSI
+[*] Tue Jul 14 18:17:57 2026
+[*]
+[dumpfile] "/foss/designs/OpenQSPI_Chipathon2026/sim/cocotb/tb_uart_simple/sim_build/uart_simple.fst"
+[dumpfile_mtime] "Tue Jul 14 18:14:39 2026"
+[dumpfile_size] 59893
+[savefile] "/foss/designs/OpenQSPI_Chipathon2026/sim/cocotb/tb_uart_simple/gtkwave_nl.gtkw"
+[timestart] 32680000
+[size] 1920 1163
+[pos] -1 -1
+*-22.500000 17280000 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+[markername] AA
+[markername] BB
+[markername] CC
+[markername] DD
+[markername] EE
+[markername] FF
+[markername] GG
+[markername] HH
+[markername] II
+[markername] JJ
+[markername] KK
+[markername] LL
+[markername] MM
+[markername] NN
+[markername] OO
+[markername] PP
+[markername] QQ
+[markername] RR
+[markername] SS
+[markername] TT
+[markername] UU
+[markername] VV
+[markername] WW
+[markername] XX
+[markername] YY
+[markername] ZZ
+[sst_width] 297
+[signals_width] 166
+[sst_expanded] 1
+[sst_vpaned_height] 346
+@28
+uart_simple.clk_i
+uart_simple.rst_ni
+@800200
+-Counters
+@28
+uart_simple.bit_cnt[2:0]
+@22
+uart_simple.clk_cnt[5:0]
+@1000200
+-Counters
+@800200
+-Shifters
+@22
+uart_simple.rx_shift_reg[7:0]
+uart_simple.tx_shift_reg[8:0]
+@1000200
+-Shifters
+@800200
+-Control Signals
+@22
+uart_simple.tx_data_i[7:0]
+uart_simple.rx_data_o[7:0]
+@28
+uart_simple.rx_valid_o
+uart_simple.rx_error_o
+uart_simple.tx_done_o
+uart_simple.tx_start_i
+uart_simple.uart_busy_o
+@1000200
+-Control Signals
+@800200
+-UART
+@28
+uart_simple.uart_tx_o
+@29
+uart_simple.uart_rx_i
+@28
+uart_simple.uart_rx_filtered
+@1000200
+-UART
+@22
+uart_simple.uart_cstate[3:0]
+@28
+uart_simple.uart_mode
+[pattern_trace] 1
+[pattern_trace] 0
