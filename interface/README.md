@@ -8,8 +8,18 @@ an FPGA implementing a QSPI-based register interface.
 - PC sends 1 **ADDR** byte.
   - MSB = `1` -> **WRITE** mode
   - MSB = `0` -> **READ** mode
-- **READ** mode: FPGA responds with 4 data bytes.
-- **WRITE** mode: PC sends 4 data bytes, FPGA responds with 1 **ACK** byte.
+- **READ** mode: FPGA responds with 1 ACK byte, then 4 data bytes.
+  Sequence: `ADDR, ACK, DATA, DATA, DATA, DATA`.
+- **WRITE** mode: PC sends 4 data bytes, FPGA responds with 1 ACK byte.
+  Sequence: `ADDR, DATA, DATA, DATA, DATA, ACK`.
+
+**Byte order:** the 4 DATA bytes are transmitted **high byte first**
+(big-endian) — i.e. for a 32-bit value, the first data byte on the wire is
+the most significant byte and the last is the least significant. Both the
+Python GUI and the ESP32 test firmware reconstruct/log the 32-bit value this
+way (`int.from_bytes(data, byteorder="big")` in Python;
+`(data[0]<<24)|(data[1]<<16)|(data[2]<<8)|data[3]` in firmware) so this can be
+visually double-checked during testing.
 
 UART settings: 8 data bits, No parity, 1 stop bit (8N1), baud rate configurable
 in the GUI.
@@ -117,6 +127,27 @@ __pycache__/
 - **Write mode**: displays the sent data and the returned ACK byte.
 - The **Log** panel keeps a timestamped history of every transaction for
   debugging; **Last Result** shows a clean summary of the most recent one.
+
+## Testing with an ESP32-S3 (before the real FPGA is ready)
+
+`src_main.cpp` and `platformio.ini` in this repo contain a PlatformIO/Arduino
+firmware that simulates the FPGA side, for bring-up testing:
+
+- **Write mode**: echoes the 4 received data bytes back, then sends 1 ACK
+  byte (`0xAA`) — so the GUI can confirm round-trip data integrity, not just
+  a blind ACK.
+- **Read mode**: sends 1 ACK byte (`0xAA`), then 4 randomized data bytes.
+
+It uses UART1 on the ESP32-S3 (default pins `RX=18`, `TX=17` — adjust in code
+to match your wiring) so the USB-CDC `Serial` console stays free for debug
+prints. Wire UART1 to a USB-UART adapter (or directly if your setup supports
+it) connected to the PC running this GUI.
+
+**Note:** while using this test firmware, write-mode responses are 5 bytes
+(4 echoed + 1 ACK) instead of the 1-byte ACK in the final protocol spec — the
+GUI's write handler already accounts for this. Once you swap in the real
+FPGA/QSPI design with a plain 1-byte ACK, revert `self.ser.read(5)` back to
+`self.ser.read(1)` in `_do_write()`.
 
 ## Known limitations / next steps
 
