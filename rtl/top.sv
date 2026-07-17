@@ -4,8 +4,9 @@
 
 
 module top #(
-    parameter int NUM_CS = 2,
-    parameter int CLOCK_FREQ = 50_000_000
+    parameter int NUM_CS     = 2,
+    parameter int CLOCK_FREQ = 50_000_000,
+    parameter int BAUD_RATE  = 921_600
 ) (
     // Clock and reset
     input logic clk_i,
@@ -16,14 +17,91 @@ module top #(
     output logic uart_tx_o,
 
     // QSPI interface
-    output logic qspi_cs_o,
+    output logic [NUM_CS-1:0] qspi_csn_o,
     output logic qspi_clk_o,
     inout logic [3:0] qspi_io
 );
 
+
   // UART TO APB INSTANCE
+  // APB master interface
+  logic [31:0] paddr;
+  logic [31:0] pwdata;
+  logic pwrite;
+  logic penable;
+
+  logic psel;
+  logic [31:0] prdata;
+  logic pready;
+  logic pslverr;
+
+  uart_to_apb #(
+      // UART parameters
+      .CLOCK_FREQ(CLOCK_FREQ),
+      .BAUD_RATE (BAUD_RATE)
+  ) inst_uart_to_apb (
+      // Clock and reset
+      .clk_i (clk_i),
+      .rst_ni(rst_ni),
+
+      // UART interface
+      .uart_rx_i(uart_rx_i),
+      .uart_tx_o(uart_tx_o),
+
+      // APB master interface
+      .paddr_o  (paddr),
+      .pwdata_o (pwdata),
+      .pwrite_o (pwrite),
+      .penable_o(penable),
+
+      .psel_o(psel),
+      .prdata_i(prdata),
+      .pready_i(pready),
+      .pslverr_i(pslverr)
+
+  );
 
 
-  // APB UART INSTANCE
+  // APB_QSPI INSTANCE
+  // QSPI interface
+  logic [3:0] qspi_i;
+  logic [3:0] qspi_o;
+  logic [3:0] qspi_oe;  // output enable for qspi_o
+
+  apb_qspi #(
+      .FIFO_DEPTH(16)
+  ) inst_apb_qspi (
+      // clock and reset
+      .clk_i (clk_i),
+      .rst_ni(rst_ni),
+
+      // APB interface
+      .psel_i(psel),
+      .penable_i(penable),
+      .pwrite_i(pwrite),
+      .paddr_i(paddr),
+      .pwdata_i(pwdata),
+      .prdata_o(prdata),
+      .pready_o(pready),
+
+      // QSPI interface
+      .qspi_csn_o(qspi_csn_o),
+      .qspi_sck_o(qspi_sck_o),
+      .qspi_i(qspi_i),
+      .qspi_o(qspi_o),
+      .qspi_oe(qspi_oe)  // output enable for qspi_o
+  );
+
+  //IO BUFFER
+  assign qspi_i = qspi_io;
+  always_comb begin
+    for (int i = 0; i < 4; i++) begin
+      if (qspi_oe[i]) begin
+        qspi_io[i] = qspi_o[i];
+      end else begin
+        qspi_io[i] = 1'bz;
+      end
+    end
+  end
 
 endmodule
