@@ -9,3 +9,5 @@ sim/**/*.mem
 sim/**/*.dat
 sim/**/*.log
 sim/**/*.err
+
+venv
