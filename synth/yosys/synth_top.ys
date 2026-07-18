@@ -1,0 +1,14 @@
+read_verilog -sv ../../rtl/uart_simple.sv ../../rtl/fifo.sv ../../rtl/qspi_master.sv ../../rtl/apb_qspi.sv ../../rtl/uart_to_apb.sv ../../rtl/top.sv 
+hierarchy -check -top top
+
+synth -top top
+
+dfflibmap -liberty /foss/pdks/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu7t5v0/lib/gf180mcu_fd_sc_mcu7t5v0__tt_025C_3v30.lib
+
+abc -liberty /foss/pdks/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu7t5v0/lib/gf180mcu_fd_sc_mcu7t5v0__tt_025C_3v30.lib
+
+clean
+
+write_verilog top_netlist.v
+
+stat -liberty /foss/pdks/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu7t5v0/lib/gf180mcu_fd_sc_mcu7t5v0__tt_025C_3v30.lib
