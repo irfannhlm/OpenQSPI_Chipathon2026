@@ -256,34 +256,20 @@ class UartFpgaGui:
             self.ser.write(wdata)
             bin_str = self._bin_str(wdata)
             hex_str = " ".join(f"0x{b:02X}" for b in wdata)
+            sent_u32 = int.from_bytes(wdata, byteorder="big")
             self.result_queue.put(("log", f"TX DATA: {hex_str}  |  {bin_str}"))
 
-            # Test-bridge firmware echoes the 4 data bytes back, then sends
-            # 1 ACK byte, so we read 5 bytes total here. (A real FPGA design
-            # per the original protocol spec would only send 1 ACK byte --
-            # adjust this back to self.ser.read(1) once you move off the
-            # ESP32 test bridge.)
-            response = self.ser.read(5)
-            if len(response) < 5:
-                self.result_queue.put(("log", f"ERROR: timeout, only received "
-                                               f"{len(response)}/5 response bytes "
-                                               f"(expected 4 echoed bytes + 1 ACK)."))
+            ack = self.ser.read(1)
+            if len(ack) < 1:
+                self.result_queue.put(("log", "ERROR: timeout waiting for ACK byte."))
                 return
 
-            echoed, ack_byte = response[:4], response[4]
-            echoed_hex = " ".join(f"0x{b:02X}" for b in echoed)
-            echoed_bin = self._bin_str(echoed)
-            match = "MATCH" if echoed == wdata else "MISMATCH"
-            sent_u32 = int.from_bytes(wdata, byteorder="big")
-            echoed_u32 = int.from_bytes(echoed, byteorder="big")
-            self.result_queue.put(("log", f"RX ECHO: {echoed_hex}  |  {echoed_bin}  ({match})"))
+            ack_byte = ack[0]
             self.result_queue.put(("log", f"RX ACK: 0x{ack_byte:02X} ({ack_byte:08b})"))
             self.result_queue.put(("result",
                 f"Mode: WRITE\nAddress: 0x{addr_byte:02X}\n"
                 f"Sent data (hex): {hex_str}\nSent data (bin): {bin_str}\n"
                 f"Sent as 32-bit (high byte first): 0x{sent_u32:08X}\n"
-                f"Echoed back (hex): {echoed_hex}\nEchoed back (bin): {echoed_bin}  [{match}]\n"
-                f"Echoed as 32-bit (high byte first): 0x{echoed_u32:08X}\n"
                 f"ACK: 0x{ack_byte:02X} ({ack_byte:08b})"))
         except serial.SerialException as e:
             self.result_queue.put(("log", f"ERROR: {e}"))

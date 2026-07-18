@@ -133,21 +133,19 @@ __pycache__/
 `src_main.cpp` and `platformio.ini` in this repo contain a PlatformIO/Arduino
 firmware that simulates the FPGA side, for bring-up testing:
 
-- **Write mode**: echoes the 4 received data bytes back, then sends 1 ACK
-  byte (`0xAA`) — so the GUI can confirm round-trip data integrity, not just
-  a blind ACK.
+- **Write mode**: sends 1 ACK byte (`0xAA`) after receiving the 4 data bytes.
+  Sequence: `ADDR, DATA, DATA, DATA, DATA, ACK` (matches the final protocol spec).
 - **Read mode**: sends 1 ACK byte (`0xAA`), then 4 randomized data bytes.
+  Sequence: `ADDR, ACK, DATA, DATA, DATA, DATA` (matches the final protocol spec).
 
 It uses UART1 on the ESP32-S3 (default pins `RX=18`, `TX=17` — adjust in code
 to match your wiring) so the USB-CDC `Serial` console stays free for debug
 prints. Wire UART1 to a USB-UART adapter (or directly if your setup supports
 it) connected to the PC running this GUI.
 
-**Note:** while using this test firmware, write-mode responses are 5 bytes
-(4 echoed + 1 ACK) instead of the 1-byte ACK in the final protocol spec — the
-GUI's write handler already accounts for this. Once you swap in the real
-FPGA/QSPI design with a plain 1-byte ACK, revert `self.ser.read(5)` back to
-`self.ser.read(1)` in `_do_write()`.
+Since the GUI already knows what data it sent, write mode doesn't need the
+device to echo anything back for feedback — the **Last Result** panel shows
+the sent data (hex/binary/32-bit value) alongside the ACK the ESP32 returned.
 
 ## Known limitations / next steps
 
