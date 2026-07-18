@@ -4,7 +4,7 @@
 
 
 module top #(
-    parameter int NUM_CS     = 2,
+    parameter int CS_NUM     = 1,
     parameter int CLOCK_FREQ = 50_000_000,
     parameter int BAUD_RATE  = 921_600
 ) (
@@ -17,9 +17,9 @@ module top #(
     output logic uart_tx_o,
 
     // QSPI interface
-    output logic [NUM_CS-1:0] qspi_csn_o,
-    output logic qspi_clk_o,
-    inout logic [3:0] qspi_io
+    output logic [CS_NUM-1:0] qspi_csn_o,
+    output logic qspi_sck_o,
+    inout wire [3:0] qspi_io
 );
 
 
@@ -83,6 +83,7 @@ module top #(
       .pwdata_i(pwdata),
       .prdata_o(prdata),
       .pready_o(pready),
+      .pslverr_o(pslverr),
 
       // QSPI interface
       .qspi_csn_o(qspi_csn_o),
@@ -94,14 +95,9 @@ module top #(
 
   //IO BUFFER
   assign qspi_i = qspi_io;
-  always_comb begin
-    for (int i = 0; i < 4; i++) begin
-      if (qspi_oe[i]) begin
-        qspi_io[i] = qspi_o[i];
-      end else begin
-        qspi_io[i] = 1'bz;
-      end
-    end
-  end
+  assign qspi_io[0] = qspi_oe[0] ? qspi_o[0] : 1'bz;
+  assign qspi_io[1] = qspi_oe[1] ? qspi_o[1] : 1'bz;
+  assign qspi_io[2] = qspi_oe[2] ? qspi_o[2] : 1'bz;
+  assign qspi_io[3] = qspi_oe[3] ? qspi_o[3] : 1'bz;
 
 endmodule
