@@ -19,7 +19,7 @@ def get_baud_div(dut):
     except AttributeError:
         # If parameters are missing (Gate-Level Mode), use the Makefile variables!
         clock_freq = int(os.environ.get("CLOCK_FREQ", "50000000"))
-        baud_rate = int(os.environ.get("TEST_BAUD", "115200"))
+        baud_rate = int(os.environ.get("TEST_BAUD", "921600"))
         return clock_freq // baud_rate
     
 
@@ -72,6 +72,17 @@ async def uart_receive_byte(dut):
     return byte_val
 
 
+async def generic_pulse_monitor(clk, signal, event):
+    """
+    A generic background monitor that never misses a clock cycle.
+    It triggers the provided Python Event whenever the target signal goes HIGH.
+    """
+    while True:
+        await RisingEdge(clk)
+        if signal.value == 1:
+            event.set()
+
+
 async def setup_dut(dut):
     """Initialize standard signals and start the clock."""
 
@@ -89,16 +100,6 @@ async def setup_dut(dut):
         
     dut.rst_ni.value = 1
     await RisingEdge(dut.clk_i)
-
-async def generic_pulse_monitor(clk, signal, event):
-    """
-    A generic background monitor that never misses a clock cycle.
-    It triggers the provided Python Event whenever the target signal goes HIGH.
-    """
-    while True:
-        await RisingEdge(clk)
-        if signal.value == 1:
-            event.set()
 
 
 # ==============================================================================
