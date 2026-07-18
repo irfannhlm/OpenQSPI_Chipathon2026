@@ -11,6 +11,7 @@ module uart_simple #(
     input logic rst_ni,
 
     // Control signals
+    input  logic uart_en_i,
     input  logic tx_start_i,
     output logic tx_done_o,
     output logic rx_valid_o,
@@ -140,7 +141,7 @@ module uart_simple #(
       IDLE: begin
         clk_cnt_rst = 1'b1;
 
-        if (uart_rx_negedge || tx_start_i) begin
+        if ((uart_rx_negedge || tx_start_i) && uart_en_i) begin
           uart_nstate = START;
         end
       end
@@ -157,6 +158,7 @@ module uart_simple #(
             uart_nstate = IDLE;
           end
         end else if (clk_cnt == MaxCount && uart_mode) begin
+          clk_cnt_rst = 1'b1;
           uart_nstate = DATA;
         end
       end
@@ -191,7 +193,7 @@ module uart_simple #(
   assign bit_cnt_rst = clk_cnt_rst;
   assign rx_shifter_en = uart_busy_o && !uart_mode && !rx_valid_o;
   assign tx_shifter_en = uart_busy_o && uart_mode;
-  assign tx_shifter_load = tx_start_i && !uart_busy_o;
+  assign tx_shifter_load = tx_start_i && !uart_busy_o && uart_en_i;
 
 
 endmodule
