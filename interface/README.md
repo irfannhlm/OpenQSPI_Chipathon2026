@@ -128,25 +128,6 @@ __pycache__/
 - The **Log** panel keeps a timestamped history of every transaction for
   debugging; **Last Result** shows a clean summary of the most recent one.
 
-## Testing with an ESP32-S3 (before the real FPGA is ready)
-
-`src_main.cpp` and `platformio.ini` in this repo contain a PlatformIO/Arduino
-firmware that simulates the FPGA side, for bring-up testing:
-
-- **Write mode**: sends 1 ACK byte (`0xAA`) after receiving the 4 data bytes.
-  Sequence: `ADDR, DATA, DATA, DATA, DATA, ACK` (matches the final protocol spec).
-- **Read mode**: sends 1 ACK byte (`0xAA`), then 4 randomized data bytes.
-  Sequence: `ADDR, ACK, DATA, DATA, DATA, DATA` (matches the final protocol spec).
-
-It uses UART1 on the ESP32-S3 (default pins `RX=18`, `TX=17` — adjust in code
-to match your wiring) so the USB-CDC `Serial` console stays free for debug
-prints. Wire UART1 to a USB-UART adapter (or directly if your setup supports
-it) connected to the PC running this GUI.
-
-Since the GUI already knows what data it sent, write mode doesn't need the
-device to echo anything back for feedback — the **Last Result** panel shows
-the sent data (hex/binary/32-bit value) alongside the ACK the ESP32 returned.
-
 ## Known limitations / next steps
 
 - No automatic retry on timeout or malformed response.
