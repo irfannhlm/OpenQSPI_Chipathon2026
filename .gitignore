@@ -11,3 +11,5 @@ sim/**/*.log
 sim/**/*.err
 
 venv
+__pycache__/
+*.pyc
