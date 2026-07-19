@@ -121,8 +121,8 @@ class UartFpgaGui:
         fifo_tab = ttk.Frame(notebook)
         notebook.add(guide_tab, text="Guide")
         notebook.add(raw_tab, text="Raw Transaction")
-        notebook.add(cfg0_tab, text="QSPI Config (CFG0)")
-        notebook.add(ctrl_tab, text="Control (CTRL)")
+        notebook.add(cfg0_tab, text="QSPI Config")
+        notebook.add(ctrl_tab, text="Control & Status")
         notebook.add(setup_tab, text="Transaction Setup")
         notebook.add(fifo_tab, text="FIFO & Status")
 
