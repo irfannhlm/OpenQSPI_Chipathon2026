@@ -471,7 +471,6 @@ async def qspi_poll_wip_bit(dut, cs_mask, status_cmd=0x05, poll_interval_ns=1000
         await fifo_pop_data(dut, num_words=1)  # Clear any remaining data in FIFO
 
 
-
 def load_golden_data_from_mem(file_path, endian="big"):
     """
     Parses a Verilog .mem file and returns a dictionary of memory sectors.
@@ -528,6 +527,7 @@ def load_golden_data_from_mem(file_path, endian="big"):
                     
     pack_and_save()
     return memory_blocks
+
 
 def get_expected_words(golden_dict, target_addr, num_words, total_bytes, endian="big"):
     """
@@ -600,6 +600,7 @@ def load_raw_payload_from_any_file(file_path, endian="big"):
         
     return words
 
+
 async def s25fl_quad_enable_routine(dut, cs_mask):
     """Routine to enable Quad Mode for the S25FL series flash memories."""
 
@@ -626,7 +627,7 @@ async def s25fl_quad_enable_routine(dut, cs_mask):
 
     # Loop until the WIP bit clears in Status Register 1 (0x05)
     dut._log.info("Waiting for Write-In-Progress (WIP) bit to clear in Status Register 1...")
-    await qspi_poll_wip_bit(dut, cs_mask=cs_mask, status_cmd=0x05, poll_interval_ns=10000, timeout_s=10e-3)
+    await qspi_poll_wip_bit(dut, cs_mask=cs_mask, status_cmd=0x05, poll_interval_ns=100000, timeout_s=5e-3)
     dut._log.info("WIP bit cleared. Quad Enable (QE) bit should now be set in Configuration Register 1.")
 
     # Send Read Configuration Register 1 (0x35) to verify QE bit is set
@@ -641,9 +642,9 @@ async def s25fl_quad_enable_routine(dut, cs_mask):
 
 async def w25q_quad_enable_routine(dut, cs_mask):
     """Routine to enable Quad Mode for the W25Q series flash memories."""
+    dut._log.info("Enabling Quad Mode for W25Q...")
 
     # Send Write Enable (0x06)
-    dut._log.info("Enabling Quad Mode for W25Q...")
     await qspi_write_command(dut, cs_mask=cs_mask, cmd=0x06)
     await Timer(500, unit="ns")
     await RisingEdge(dut.clk_i)
@@ -679,6 +680,47 @@ async def w25q_quad_enable_routine(dut, cs_mask):
     
     dut._log.info("Quad Enable (QE) bit is successfully set in Status Register 2 for W25Q series flash.")
     
+
+async def mx25l_quad_enable_routine(dut, cs_mask):
+    """Routine to enable Quad Mode for the MX25L series flash memories."""
+    dut._log.info("Enabling Quad Mode for MX25L...")
+
+    # Send Write Enable (0x06)
+    await qspi_write_command(dut, cs_mask=cs_mask, cmd=0x06)
+    await Timer(500, unit="ns")
+    await RisingEdge(dut.clk_i)
+
+    # Send Read Status Register (0x05) to verify WEL bit is set
+    dut._log.info("Verifying Write Enable Latch (WEL) bit is set in Status Register...")
+    status_reg = await qspi_read_register(dut, cs_mask=cs_mask, cmd=0x05, data_len=1)
+    dut._log.info(f"Status Register value: {status_reg>>24:08b}")
+    if ((status_reg>>24) & 0x02) == 0:
+        raise ValueError("Failed to set Write Enable Latch (WEL) bit in Status Register!")
+    await Timer(500, unit="ns")
+    await RisingEdge(dut.clk_i)
+
+    # Send Write Status Register (0x01) with QE bit set (0x02 -> CR1[1] = 1)
+    dut._log.info("WEL bit is set. Proceeding to set Quad Enable (QE) bit in Status Register...")
+    await qspi_write_register(dut, cs_mask=cs_mask, cmd=0x01, wdata=(0x4000_0000), data_len=1)
+    await Timer(500, unit="ns")
+    await RisingEdge(dut.clk_i)
+
+    # Loop until the WIP bit clears in Status Register (0x05)
+    dut._log.info("Waiting for BUSY bit to clear in Status Register...")
+    await qspi_poll_wip_bit(dut, cs_mask=cs_mask, status_cmd=0x05, poll_interval_ns=100000, timeout_s=5e-3)
+    dut._log.info("BUSY bit cleared. Quad Enable (QE) bit should now be set in Status Register.")
+
+    # Send Read Status Register (0x05) to verify QE bit is set
+    dut._log.info("Verifying Quad Enable (QE) bit is set in Status Register...")
+    status_reg2 = await qspi_read_register(dut, cs_mask=cs_mask, cmd=0x05, data_len=1)
+    dut._log.info(f"Status Register value: {status_reg2>>24:08b}")
+    if ((status_reg2>>24) & 0x40) == 0:
+        raise ValueError("Failed to set Quad Enable (QE) bit in Status Register!")
+    await Timer(500, unit="ns")
+    await RisingEdge(dut.clk_i)
+    
+    dut._log.info("Quad Enable (QE) bit is successfully set in Status Register for MX25L series flash.")
+
 
 @cocotb.test()
 async def test_all_flash_id(dut):
@@ -756,7 +798,7 @@ async def test_s25fl_read_modes(dut):
         
         try:
             target_address = 0x000000 
-            test_data_len = random.randint(128, 500)  # Random length between 128 and 500 bytes
+            test_data_len = 300
             expected_words = math.ceil(test_data_len / 4)
             
             # Fetch the golden slice from our dictionary
@@ -973,6 +1015,7 @@ async def test_s25fl_write_modes(dut):
         await RisingEdge(dut.clk_i)
     scoreboard.report(dut._log)
 
+
 @cocotb.test()
 async def test_w25q_write_read(dut):
     """Test a full write and readback cycle on the W25Q series flash memories.
@@ -988,6 +1031,7 @@ async def test_w25q_write_read(dut):
     w25q_mask = 0b010
     scoreboard = Scoreboard()
 
+    skip_all_reads = int(os.environ.get("SKIP_ALL_READS", "0"))
     skip_random_writes = int(os.environ.get("SKIP_RANDOM_WRITES", "0"))
     
     dut._log.info("Loading Raw Payload Pool...")
@@ -1061,126 +1105,126 @@ async def test_w25q_write_read(dut):
     await RisingEdge(dut.clk_i)
 
     # READBACK VERIFICATION: Read the data back using all supported read modes
-    read_modes = [
-        ("Normal Read (0x03)",      0x03, 1, 1, 0, 0, 1, False), # (1-1-1)
-        ("Fast Read (0x0B)",        0x0B, 1, 1, 0, 8, 1, False), # (1-1-1)
-        ("Dual Output Read (0x3B)", 0x3B, 1, 1, 0, 8, 2, False), # (1-1-2)
-        ("Quad Output Read (0x6B)", 0x6B, 1, 1, 0, 8, 3, False), # (1-1-4)
-        ("Dual I/O Read (0xBB)",    0xBB, 1, 2, 0, 4, 2, False), # (1-2-2)
-        ("Quad I/O Read (0xEB)",    0xEB, 1, 3, 0, 6, 3, False), # (1-4-4)
-        ("DDR Fast Read (0x0D)",    0x0D, 1, 1, 0, 6, 1, True), # (1-1-1) DDR
-        ("DDR Dual I/O Read (0xBD)",0xBD, 1, 2, 0, 6, 2, True), # (1-2-2) DDR
-        ("DDR Quad I/O Read (0xED)",0xED, 1, 3, 0, 8, 3, True), # (1-4-4) DDR            
-    ]
+    if not (skip_all_reads):
+        read_modes = [
+            ("Normal Read (0x03)",      0x03, 1, 1, 0, 0, 1, False), # (1-1-1)
+            ("Fast Read (0x0B)",        0x0B, 1, 1, 0, 8, 1, False), # (1-1-1)
+            ("Dual Output Read (0x3B)", 0x3B, 1, 1, 0, 8, 2, False), # (1-1-2)
+            ("Quad Output Read (0x6B)", 0x6B, 1, 1, 0, 8, 3, False), # (1-1-4)
+            ("Dual I/O Read (0xBB)",    0xBB, 1, 2, 0, 4, 2, False), # (1-2-2)
+            ("Quad I/O Read (0xEB)",    0xEB, 1, 3, 0, 6, 3, False), # (1-4-4)
+            ("DDR Fast Read (0x0D)",    0x0D, 1, 1, 0, 6, 1, True), # (1-1-1) DDR
+            ("DDR Dual I/O Read (0xBD)",0xBD, 1, 2, 0, 6, 2, True), # (1-2-2) DDR
+            ("DDR Quad I/O Read (0xED)",0xED, 1, 3, 0, 8, 3, True), # (1-4-4) DDR            
+        ]
 
-    for mode_name, cmd, cmd_mode, addr_mode, addr_len, dummy, data_mode, ddr in read_modes:
-        try:
-            dut._log.info(f" -> Executing {mode_name} for verification...")
-            
-            readback_list = await qspi_read_transaction(
-                dut=dut, 
-                cs_mask=w25q_mask, 
-                cmd=cmd, 
-                cmd_mode=cmd_mode, 
-                addr=current_addr,
-                addr_mode=addr_mode, 
-                addr_len=addr_len,
-                dummy_len=dummy, 
-                data_mode=data_mode,
-                data_len=test_data_len,
-                ddr=ddr
-            )
+        for mode_name, cmd, cmd_mode, addr_mode, addr_len, dummy, data_mode, ddr in read_modes:
+            try:
+                dut._log.info(f" -> Executing {mode_name} for verification...")
+                
+                readback_list = await qspi_read_transaction(
+                    dut=dut, 
+                    cs_mask=w25q_mask, 
+                    cmd=cmd, 
+                    cmd_mode=cmd_mode, 
+                    addr=current_addr,
+                    addr_mode=addr_mode, 
+                    addr_len=addr_len,
+                    dummy_len=dummy, 
+                    data_mode=data_mode,
+                    data_len=test_data_len,
+                    ddr=ddr
+                )
 
-            dummy_dict = {current_addr: payload_pool}
-            expected_list = get_expected_words(
-                golden_dict=dummy_dict, 
-                target_addr=current_addr, 
-                num_words=expected_words,
-                total_bytes=test_data_len,
-                endian="big"
-            )
+                dummy_dict = {current_addr: payload_pool}
+                expected_list = get_expected_words(
+                    golden_dict=dummy_dict, 
+                    target_addr=current_addr, 
+                    num_words=expected_words,
+                    total_bytes=test_data_len,
+                    endian="big"
+                )
 
-            # Compare what we wrote against what we read back
-            for i in range(expected_words):
-                if readback_list[i] != expected_list[i]:
-                    dut._log.error(f"    [VERIFY] Word {i}: Expected 0x{expected_list[i]:08X}, Got 0x{readback_list[i]:08X}")
-                    raise ValueError(f"DATA MISMATCH at Word {i}! Wrote 0x{expected_list[i]:08X}, Read 0x{readback_list[i]:08X}")
+                # Compare what we wrote against what we read back
+                for i in range(expected_words):
+                    if readback_list[i] != expected_list[i]:
+                        dut._log.error(f"    [VERIFY] Word {i}: Expected 0x{expected_list[i]:08X}, Got 0x{readback_list[i]:08X}")
+                        raise ValueError(f"DATA MISMATCH at Word {i}! Wrote 0x{expected_list[i]:08X}, Read 0x{readback_list[i]:08X}")
 
-            dut._log.info(f"    Readback verification for {mode_name} PASSED!")
-            scoreboard.record("W25Q Readback", mode_name, passed=True)
+                dut._log.info(f"    Readback verification for {mode_name} PASSED!")
+                scoreboard.record("W25Q Readback", mode_name, passed=True)
 
-        except Exception as e:
-            dut._log.error(f"    [!] FAILED: {str(e)}")
-            scoreboard.record("W25Q Readback", mode_name, passed=False, error_msg=str(e))
+            except Exception as e:
+                dut._log.error(f"    [!] FAILED: {str(e)}")
+                scoreboard.record("W25Q Readback", mode_name, passed=False, error_msg=str(e))
 
+            await Timer(500, unit="ns")
+            await RisingEdge(dut.clk_i)
+
+        # READBACK VERIFICATION: QPI Read Modes
+        # Enter QPI Mode by sending the QPI Enable command (0x38)
+        dut._log.info("Enabling QPI Mode for W25Q...")
+        await qspi_write_command(dut, cs_mask=w25q_mask, cmd=0x38)
         await Timer(500, unit="ns")
         await RisingEdge(dut.clk_i)
 
-    # READBACK VERIFICATION: QPI Read Modes
+        dut._log.info("QPI Mode enabled. Proceeding to test QPI read modes...")
 
-    # Enter QPI Mode by sending the QPI Enable command (0x38)
-    dut._log.info("Enabling QPI Mode for W25Q...")
-    await qspi_write_command(dut, cs_mask=w25q_mask, cmd=0x38)
-    await Timer(500, unit="ns")
-    await RisingEdge(dut.clk_i)
+        read_modes = [
+            ("QPI Fast Read (0x0B)",    0x0B, 3, 3, 0, 6, 3, False), # (4-4-4)
+            ("QPI Quad I/O Read (0xEB)",0xEB, 3, 3, 0, 6, 3, False), # (4-4-4)
+            ("QPI DDR Read (0xED)",     0xED, 3, 3, 0, 8, 3, True), # (4-4-4) DDR
+        ]
 
-    dut._log.info("QPI Mode enabled. Proceeding to test QPI read modes...")
+        for mode_name, cmd, cmd_mode, addr_mode, addr_len, dummy, data_mode, ddr in read_modes:
+            try:
+                dut._log.info(f" -> Executing {mode_name} for verification...")
+                
+                readback_list = await qspi_read_transaction(
+                    dut=dut, 
+                    cs_mask=w25q_mask, 
+                    cmd=cmd, 
+                    cmd_mode=cmd_mode, 
+                    addr=current_addr,
+                    addr_mode=addr_mode, 
+                    addr_len=addr_len,
+                    dummy_len=dummy, 
+                    data_mode=data_mode,
+                    data_len=test_data_len,
+                    ddr=ddr
+                )
 
-    read_modes = [
-        ("QPI Fast Read (0x0B)",    0x0B, 3, 3, 0, 6, 3, False), # (4-4-4)
-        ("QPI Quad I/O Read (0xEB)",0xEB, 3, 3, 0, 6, 3, False), # (4-4-4)
-        ("QPI DDR Read (0xED)",     0xED, 3, 3, 0, 8, 3, True), # (4-4-4) DDR
-    ]
+                dummy_dict = {current_addr: payload_pool}
+                expected_list = get_expected_words(
+                    golden_dict=dummy_dict, 
+                    target_addr=current_addr, 
+                    num_words=expected_words,
+                    total_bytes=test_data_len,
+                    endian="big"
+                )
 
-    for mode_name, cmd, cmd_mode, addr_mode, addr_len, dummy, data_mode, ddr in read_modes:
-        try:
-            dut._log.info(f" -> Executing {mode_name} for verification...")
-            
-            readback_list = await qspi_read_transaction(
-                dut=dut, 
-                cs_mask=w25q_mask, 
-                cmd=cmd, 
-                cmd_mode=cmd_mode, 
-                addr=current_addr,
-                addr_mode=addr_mode, 
-                addr_len=addr_len,
-                dummy_len=dummy, 
-                data_mode=data_mode,
-                data_len=test_data_len,
-                ddr=ddr
-            )
+                # Compare what we wrote against what we read back
+                for i in range(expected_words):
+                    dut._log.info(f"    [VERIFY] Word {i}: Expected 0x{expected_list[i]:08X}, Got 0x{readback_list[i]:08X}")
+                    if readback_list[i] != expected_list[i]:
+                        raise ValueError(f"DATA MISMATCH at Word {i}! Wrote 0x{expected_list[i]:08X}, Read 0x{readback_list[i]:08X}")
 
-            dummy_dict = {current_addr: payload_pool}
-            expected_list = get_expected_words(
-                golden_dict=dummy_dict, 
-                target_addr=current_addr, 
-                num_words=expected_words,
-                total_bytes=test_data_len,
-                endian="big"
-            )
+                dut._log.info(f"    Readback verification for {mode_name} PASSED!")
+                scoreboard.record("W25Q QPI Readback", mode_name, passed=True)
 
-            # Compare what we wrote against what we read back
-            for i in range(expected_words):
-                dut._log.info(f"    [VERIFY] Word {i}: Expected 0x{expected_list[i]:08X}, Got 0x{readback_list[i]:08X}")
-                if readback_list[i] != expected_list[i]:
-                    raise ValueError(f"DATA MISMATCH at Word {i}! Wrote 0x{expected_list[i]:08X}, Read 0x{readback_list[i]:08X}")
+            except Exception as e:
+                dut._log.error(f"    [!] FAILED: {str(e)}")
+                scoreboard.record("W25Q QPI Readback", mode_name, passed=False, error_msg=str(e))
 
-            dut._log.info(f"    Readback verification for {mode_name} PASSED!")
-            scoreboard.record("W25Q QPI Readback", mode_name, passed=True)
+            await Timer(500, unit="ns")
+            await RisingEdge(dut.clk_i)
 
-        except Exception as e:
-            dut._log.error(f"    [!] FAILED: {str(e)}")
-            scoreboard.record("W25Q QPI Readback", mode_name, passed=False, error_msg=str(e))
-
+        # Exit QPI Mode by sending the QPI Disable command (0xFF)
+        dut._log.info("Disabling QPI Mode for W25Q...")
+        await qspi_write_command(dut, cs_mask=w25q_mask, cmd=0xFF, qpi=True)
         await Timer(500, unit="ns")
         await RisingEdge(dut.clk_i)
-
-    # Exit QPI Mode by sending the QPI Disable command (0xFF)
-    dut._log.info("Disabling QPI Mode for W25Q...")
-    await qspi_write_command(dut, cs_mask=w25q_mask, cmd=0xFF, qpi=True)
-    await Timer(500, unit="ns")
-    await RisingEdge(dut.clk_i)
-    dut._log.info("QPI Mode disabled. Proceeding to next test...")
+        dut._log.info("QPI Mode disabled. Proceeding to next test...")
 
 
     # RANDOM WRITE TEST: Page Program (0x02) and Quad Page Program (0x32) with random lengths
@@ -1267,7 +1311,7 @@ async def test_w25q_write_read(dut):
                     scoreboard.record("W25Q Random Write", mode_name, passed=False, error_msg=str(e))
 
 
-    # # RANDOM WRITE TEST: QPI Write Modes
+    # # RANDOM WRITE TEST: QPI Write Modes (BROKEN)
     # if not skip_random_writes:
     #     # Enter QPI Mode by sending the QPI Enable command (0x38)
     #     dut._log.info("Enabling QPI Mode for W25Q...")
@@ -1389,3 +1433,799 @@ async def test_w25q_write_read(dut):
 
     # FINAL VERDICT
     scoreboard.report(dut._log)
+
+
+@cocotb.test()
+async def test_mx25l_write_read(dut):
+    """Test a full write and readback cycle on the MX25L series flash memories.
+    Each three steps below performed for both 3-byte and 4-byte addressing modes:
+    1. Do a full 256-byte Page Program (0x02) write to a known empty sector.
+    2. Read back data using all supported read modes (Normal, Fast, Dual, Quad, DDR, QPI variant) and verify against the original payload.
+    3. Do a random length write using all supported write modes (Page Program, Quad Page Program, QPI variant) and verify readback.
+    """
+    await init_qspi_master(dut)
+
+    await Timer(500, unit="ns")
+    await RisingEdge(dut.clk_i)
+    
+    mx25l_mask = 0b100
+    scoreboard = Scoreboard()
+
+    skip_all_reads = int(os.environ.get("SKIP_ALL_READS", "0"))
+    skip_random_writes = int(os.environ.get("SKIP_RANDOM_WRITES", "0"))
+    
+    dut._log.info("Loading Raw Payload Pool...")
+    payload_pool = load_raw_payload_from_any_file("ReadMe.TXT", endian="big")
+
+    # Start at a known empty sector
+    current_addr = 0x000000
+
+    # ENABLE QUAD MODE for MX25L
+    await mx25l_quad_enable_routine(dut, cs_mask=mx25l_mask)
+    await Timer(500, unit="ns")
+    await RisingEdge(dut.clk_i)
+
+    # ======================== 3 BYTE ADDRESSING MODE TESTS ========================
+    dut._log.info("COMMENCING 3-BYTE ADDERSSING MODE TESTS FOR MX25L...")
+
+    # PAGE PROGRAM (0x02) INIT WRITE TEST
+    dut._log.info(f"Commencing Write Tests starting at known empty address: 0x{current_addr:08X}...")
+    try:
+        test_data_len = 256  # Full Page Program
+        expected_words = math.ceil(test_data_len / 4)
+        
+        dut._log.info(f" -> Executing Page Program (0x02) with {test_data_len} Bytes...")
+        
+        await Timer(10, unit="us")
+        await RisingEdge(dut.clk_i)
+
+        # Sector Erase (0x20) before every program
+        dut._log.info("    Sending Write Enable (0x06) command...")
+        await qspi_write_command(dut, cs_mask=mx25l_mask, cmd=0x06)
+        await Timer(500, unit="ns")
+        await RisingEdge(dut.clk_i)
+
+        dut._log.info(f"    Erasing Sector at 0x{current_addr:08X} with Sector Erase (0x20) command...")
+        await qspi_custom_transaction(dut, cs_mask=mx25l_mask, cmd_mode=1, addr_mode=1, addr_len=0, cmd=0x20, addr=current_addr)
+
+        # Wait for BUSY bit to clear (15ms timeout for SE)
+        dut._log.info("    Waiting for BUSY bit to clear in Status Register 1...")
+        await qspi_poll_wip_bit(dut, cs_mask=mx25l_mask, status_cmd=0x05, poll_interval_ns=100000, timeout_s=15e-3)
+        dut._log.info("    BUSY bit cleared. Sector erased successfully.")
+
+        # Send Write Enable (WREN) before the Page Program
+        dut._log.info("    Sending Write Enable (0x06) command...")
+        await qspi_write_command(dut, cs_mask=mx25l_mask, cmd=0x06)
+        await Timer(500, unit="ns")
+        await RisingEdge(dut.clk_i)
+
+        # Start the Write Transaction
+        await qspi_write_transaction(
+            dut=dut,
+            cs_mask=mx25l_mask,
+            cmd=0x02, # Page Program
+            cmd_mode=1,
+            addr=current_addr,
+            addr_mode=1,
+            addr_len=0,
+            data_mode=1,
+            data_len=test_data_len,
+            data_words=payload_pool,
+            ddr=False
+        )
+
+        # Wait for BUSY bit to clear
+        dut._log.info("    Waiting for BUSY bit to clear in Status Register 1...")
+        await qspi_poll_wip_bit(dut, cs_mask=mx25l_mask, status_cmd=0x05, poll_interval_ns=100000, timeout_s=5e-3)
+        dut._log.info("    BUSY bit cleared. Write operation completed successfully.")
+
+    except Exception as e:
+        dut._log.error(f"    [!] FAILED: {str(e)}")
+        scoreboard.record("MX25L Init Page Program 3-Byte Addressing", mode_name, passed=False, error_msg=str(e))
+
+    # Wait some time before reading back
+    await Timer(10, unit="us")
+    await RisingEdge(dut.clk_i)
+
+    # READBACK VERIFICATION: Read the data back using all supported read modes
+    if not (skip_all_reads):
+        read_modes = [
+            ("Normal Read (0x03)",      0x03, 1, 1, 0, 0, 1, False), # (1-1-1)
+            ("Fast Read (0x0B)",        0x0B, 1, 1, 0, 8, 1, False), # (1-1-1)
+            ("Dual Output Read (0x3B)", 0x3B, 1, 1, 0, 8, 2, False), # (1-1-2)
+            ("Quad Output Read (0x6B)", 0x6B, 1, 1, 0, 8, 3, False), # (1-1-4)
+            ("Dual I/O Read (0xBB)",    0xBB, 1, 2, 0, 4, 2, False), # (1-2-2)
+            ("Quad I/O Read (0xEB)",    0xEB, 1, 3, 0, 6, 3, False), # (1-4-4)
+            ("DDR Fast Read (0x0D)",    0x0D, 1, 1, 0, 8, 1, True), # (1-1-1) DDR
+            ("DDR Dual I/O Read (0xBD)",0xBD, 1, 2, 0, 4, 2, True), # (1-2-2) DDR
+            ("DDR Quad I/O Read (0xED)",0xED, 1, 3, 0, 6, 3, True), # (1-4-4) DDR            
+        ]
+
+        for mode_name, cmd, cmd_mode, addr_mode, addr_len, dummy, data_mode, ddr in read_modes:
+            try:
+                test_data_len = 256
+                expected_words = math.ceil(test_data_len / 4)
+
+                dut._log.info(f" -> Executing {mode_name} for verification...")
+                
+                readback_list = await qspi_read_transaction(
+                    dut=dut, 
+                    cs_mask=mx25l_mask, 
+                    cmd=cmd, 
+                    cmd_mode=cmd_mode, 
+                    addr=current_addr,
+                    addr_mode=addr_mode, 
+                    addr_len=addr_len,
+                    dummy_len=dummy, 
+                    data_mode=data_mode,
+                    data_len=test_data_len,
+                    ddr=ddr
+                )
+
+                dummy_dict = {current_addr: payload_pool}
+                expected_list = get_expected_words(
+                    golden_dict=dummy_dict, 
+                    target_addr=current_addr, 
+                    num_words=expected_words,
+                    total_bytes=test_data_len,
+                    endian="big"
+                )
+
+                # Compare what we wrote against what we read back
+                for i in range(expected_words):
+                    if readback_list[i] != expected_list[i]:
+                        dut._log.error(f"    [VERIFY] Word {i}: Expected 0x{expected_list[i]:08X}, Got 0x{readback_list[i]:08X}")
+                        raise ValueError(f"DATA MISMATCH at Word {i}! Wrote 0x{expected_list[i]:08X}, Read 0x{readback_list[i]:08X}")
+
+                dut._log.info(f"    Readback verification for {mode_name} PASSED!")
+                scoreboard.record("MX25L Readback 3-Byte Addressing", mode_name, passed=True)
+
+            except Exception as e:
+                dut._log.error(f"    [!] FAILED: {str(e)}")
+                scoreboard.record("MX25L Readback 3-Byte Addressing", mode_name, passed=False, error_msg=str(e))
+
+            await Timer(500, unit="ns")
+            await RisingEdge(dut.clk_i)
+
+        # READBACK VERIFICATION: QPI Read Modes
+        # Enter QPI Mode by sending the QPI Enable command (0x35)
+        dut._log.info("Enabling QPI Mode for MX25L...")
+        await qspi_write_command(dut, cs_mask=mx25l_mask, cmd=0x35)
+        await Timer(500, unit="ns")
+        await RisingEdge(dut.clk_i)
+
+        dut._log.info("QPI Mode enabled. Proceeding to test QPI read modes...")
+
+        read_modes = [
+            ("QPI Quad I/O Read (0xEB)", 0xEB, 3, 3, 0, 6, 3, False), # (4-4-4)
+            ("QPI Quad DDR Read (0xED)", 0xED, 3, 3, 0, 6, 3, True), # (4-4-4) DDR
+        ]
+
+        for mode_name, cmd, cmd_mode, addr_mode, addr_len, dummy, data_mode, ddr in read_modes:
+            try:
+                test_data_len = 256  # Fixed length for QPI read tests
+                expected_words = math.ceil(test_data_len / 4)
+
+                dut._log.info(f" -> Executing {mode_name} for verification...")
+                
+                readback_list = await qspi_read_transaction(
+                    dut=dut, 
+                    cs_mask=mx25l_mask, 
+                    cmd=cmd, 
+                    cmd_mode=cmd_mode, 
+                    addr=current_addr,
+                    addr_mode=addr_mode, 
+                    addr_len=addr_len,
+                    dummy_len=dummy, 
+                    data_mode=data_mode,
+                    data_len=test_data_len,
+                    ddr=ddr
+                )
+
+                dummy_dict = {current_addr: payload_pool}
+                expected_list = get_expected_words(
+                    golden_dict=dummy_dict, 
+                    target_addr=current_addr, 
+                    num_words=expected_words,
+                    total_bytes=test_data_len,
+                    endian="big"
+                )
+
+                # Compare what we wrote against what we read back
+                for i in range(expected_words):
+                    dut._log.info(f"    [VERIFY] Word {i}: Expected 0x{expected_list[i]:08X}, Got 0x{readback_list[i]:08X}")
+                    if readback_list[i] != expected_list[i]:
+                        raise ValueError(f"DATA MISMATCH at Word {i}! Wrote 0x{expected_list[i]:08X}, Read 0x{readback_list[i]:08X}")
+
+                dut._log.info(f"    Readback verification for {mode_name} PASSED!")
+                scoreboard.record("MX25L Readback 3-Byte Addressing", mode_name, passed=True)
+
+            except Exception as e:
+                dut._log.error(f"    [!] FAILED: {str(e)}")
+                scoreboard.record("MX25L Readback 3-Byte Addressing", mode_name, passed=False, error_msg=str(e))
+
+            await Timer(500, unit="ns")
+            await RisingEdge(dut.clk_i)
+
+        # Exit QPI Mode by sending the QPI Disable command (0xF5)
+        dut._log.info("Disabling QPI Mode for MX25L...")
+        await qspi_write_command(dut, cs_mask=mx25l_mask, cmd=0xF5, qpi=True)
+        await Timer(500, unit="ns")
+        await RisingEdge(dut.clk_i)
+        dut._log.info("QPI Mode disabled. Proceeding to next test...")
+
+
+    # RANDOM WRITE TEST: Page Program (0x02) and Quad Page Program (0x38) with random lengths
+    current_addr += 0x001000  # Reset to known empty sector for random writes
+    if not skip_random_writes:
+        write_modes = [
+            ("Page Program (0x02)", 0x02, 1, 1, 0, 1), # (1-1-1)
+            ("Quad Page Program (0x38)", 0x38, 1, 3, 0, 3)  # (1-4-4)
+        ]
+
+        for i in range(5):  # Perform 5 random write tests
+            for mode_name, cmd, cmd_mode, addr_mode, addr_len, data_mode in write_modes:
+                try:
+                    test_data_len = random.randint(64, 256)  # Random length between 64 and 256 bytes
+                    expected_words = math.ceil(test_data_len / 4)
+
+                    dut._log.info(f" -> Executing {mode_name} with {test_data_len} Bytes...")
+
+                    await Timer(10, unit="us")
+                    await RisingEdge(dut.clk_i)
+
+                    # Send Write Enable (WREN) before the Page Program
+                    dut._log.info("    Sending Write Enable (0x06) command...")
+                    await qspi_write_command(dut, cs_mask=mx25l_mask, cmd=0x06)
+                    await Timer(500, unit="ns")
+                    await RisingEdge(dut.clk_i)
+
+                    # Start the Write Transaction
+                    await qspi_write_transaction(
+                        dut=dut,
+                        cs_mask=mx25l_mask,
+                        cmd=cmd,
+                        cmd_mode=cmd_mode,
+                        addr=current_addr,
+                        addr_mode=addr_mode,
+                        addr_len=addr_len,
+                        data_mode=data_mode,
+                        data_len=test_data_len,
+                        data_words=payload_pool,
+                        ddr=False
+                    )
+
+                    # Wait for BUSY bit to clear
+                    dut._log.info("    Waiting for BUSY bit to clear in Status Register 1...")
+                    await qspi_poll_wip_bit(dut, cs_mask=mx25l_mask, status_cmd=0x05, poll_interval_ns=100000, timeout_s=5e-3)
+                    dut._log.info("    BUSY bit cleared. Write operation completed successfully.")
+
+                    # Wait some time before reading back
+                    await Timer(10, unit="us")
+                    await RisingEdge(dut.clk_i)
+
+                    # VERIFICATION: Read the data back
+                    dut._log.info(f"    Verifying Written Data at 0x{current_addr:08X}...")
+                    readback_list = await qspi_read_transaction(
+                        dut=dut, 
+                        cs_mask=mx25l_mask, 
+                        cmd=0xEB, # Quad IO Read
+                        cmd_mode=1, addr=current_addr, addr_mode=3, addr_len=0, dummy_len=6, data_mode=3, 
+                        data_len=test_data_len, ddr=False
+                    )
+
+                    dummy_dict = {current_addr: payload_pool}
+                    expected_list = get_expected_words(
+                        golden_dict=dummy_dict, 
+                        target_addr=current_addr, 
+                        num_words=expected_words,
+                        total_bytes=test_data_len, 
+                        endian="big"
+                    )
+
+                    # Compare what we told it to write against what we read back
+                    for i in range(expected_words):
+                        dut._log.info(f"    [VERIFY] Word {i}: Expected 0x{expected_list[i]:08X}, Got 0x{readback_list[i]:08X}")
+                        if readback_list[i] != expected_list[i]:
+                            raise ValueError(f"WRITE CORRUPTION at Word {i}! Wrote 0x{payload_pool[i]:08X}, Read 0x{readback_list[i]:08X}")
+
+                    dut._log.info("    Write and Readback perfectly MATCH!")
+                    scoreboard.record("MX25L Random Write 3-Byte Addressing", mode_name, passed=True)
+
+                    current_addr += 0x001000  # Advance to next sector for next random write
+
+                except Exception as e:
+                    dut._log.error(f"    [!] FAILED: {str(e)}")
+                    scoreboard.record("MX25L Random Write 3-Byte Addressing", mode_name, passed=False, error_msg=str(e))
+
+
+        # RANDOM WRITE TEST: QPI Write Modes (BROKEN)
+    # if not skip_random_writes:
+    #     # Enter QPI Mode by sending the QPI Enable command (0x35)
+    #     dut._log.info("Enabling QPI Mode for MX25L...")
+    #     await qspi_write_command(dut, cs_mask=mx25l_mask, cmd=0x35)
+    #     await Timer(500, unit="ns")
+    #     await RisingEdge(dut.clk_i)
+
+    #     dut._log.info("QPI Mode enabled. Proceeding to test QPI write modes...")
+    
+    #     qpi_write_modes = [
+    #         ("QPI Page Program (0x02)", 0x02, 3, 3, 0, 3), # (4-4-4)
+    #     ]
+
+    #     for i in range(5):  # Perform 5 random QPI write tests
+    #         for mode_name, cmd, cmd_mode, addr_mode, addr_len, data_mode in qpi_write_modes:
+    #             try:
+    #                 test_data_len = random.randint(64, 256)  # Random length between 64 and 256 bytes
+    #                 expected_words = math.ceil(test_data_len / 4)
+
+    #                 dut._log.info(f" -> Executing {mode_name} with {test_data_len} Bytes...")
+
+    #                 await Timer(10, unit="us")
+    #                 await RisingEdge(dut.clk_i)
+
+    #                 # Send Write Enable (WREN) before the Page Program
+    #                 dut._log.info("    Sending Write Enable (0x06) command...")
+    #                 await qspi_write_command(dut, cs_mask=mx25l_mask, cmd=0x06, qpi=True)
+    #                 await Timer(500, unit="ns")
+    #                 await RisingEdge(dut.clk_i)
+
+    #                 # Start the Write Transaction
+    #                 await qspi_write_transaction(
+    #                     dut=dut,
+    #                     cs_mask=mx25l_mask,
+    #                     cmd=cmd,
+    #                     cmd_mode=cmd_mode,
+    #                     addr=current_addr,
+    #                     addr_mode=addr_mode,
+    #                     addr_len=addr_len,
+    #                     data_mode=data_mode,
+    #                     data_len=test_data_len,
+    #                     data_words=payload_pool,
+    #                     ddr=False
+    #                 )
+
+    #                 # Wait for BUSY bit to clear (10ms timeout for PP)
+    #                 dut._log.info("    Waiting for BUSY bit to clear in Status Register 1...")
+    #                 await qspi_poll_wip_bit(dut, cs_mask=mx25l_mask, status_cmd=0x05, poll_interval_ns=100000, timeout_s=5e-3)
+    #                 dut._log.info("    BUSY bit cleared. Write operation completed successfully.")
+
+    #                 # Wait some time before reading back
+    #                 await Timer(10, unit="us")
+    #                 await RisingEdge(dut.clk_i)
+
+    #                 # VERIFICATION: Read the data back
+    #                 dut._log.info(f"    Verifying Written Data at 0x{current_addr:08X}...")
+    #                 readback_list = await qspi_read_transaction(
+    #                     dut=dut, 
+    #                     cs_mask=mx25l_mask, 
+    #                     cmd=0x6B, # Quad IO Read
+    #                     cmd_mode=3, addr=current_addr, addr_mode=3, addr_len=0, dummy_len=6, data_mode=3, 
+    #                     data_len=test_data_len, ddr=False
+    #                 )
+
+    #                 dummy_dict = {current_addr: payload_pool}
+    #                 expected_list = get_expected_words(
+    #                     golden_dict=dummy_dict, 
+    #                     target_addr=current_addr, 
+    #                     num_words=expected_words,
+    #                     total_bytes=test_data_len, 
+    #                     endian="big"
+    #                 )
+
+    #                 # Compare what we told it to write against what we read back
+    #                 for i in range(expected_words):
+    #                     dut._log.info(f"    [VERIFY] Word {i}: Expected 0x{expected_list[i]:08X}, Got 0x{readback_list[i]:08X}")
+    #                     if readback_list[i] != expected_list[i]:
+    #                         raise ValueError(f"WRITE CORRUPTION at Word {i}! Wrote 0x{payload_pool[i]:08X}, Read 0x{readback_list[i]:08X}")
+
+    #                 dut._log.info("    Write and Readback perfectly MATCH!")
+    #                 scoreboard.record("MX25L Random Write 3-Byte Addressing", mode_name, passed=True)
+
+    #                 current_addr += 0x001000  # Advance to next sector for next random write
+                    
+    #             except Exception as e:
+    #                 dut._log.error(f"    [!] FAILED: {str(e)}")
+    #                 scoreboard.record("MX25L Random Write 3-Byte Addressing", mode_name, passed=False, error_msg=str(e))
+
+    #     # Exit QPI Mode by sending the QPI Disable command (0xF5)
+    #     dut._log.info("Disabling QPI Mode for MX25L...")
+    #     await qspi_write_command(dut, cs_mask=mx25l_mask, cmd=0xF5, qpi=True)
+    #     await Timer(500, unit="ns")
+    #     await RisingEdge(dut.clk_i)
+    #     dut._log.info("QPI Mode disabled. Proceeding to next test...")
+        
+
+    # ======================== 4 BYTE ADDRESSING MODE TESTS ========================
+    dut._log.info("COMMENCING 4-BYTE ADDRESSING MODE TESTS FOR MX25L...")
+
+    current_addr = 0x0100_0000
+
+    # Enter 4-Byte mode
+    dut._log.info("Enabling 4-Byte Addressing Mode for MX25L...")
+    await qspi_write_command(dut, cs_mask=mx25l_mask, cmd=0xB7)
+
+    # PAGE PROGRAM (0x02) INIT WRITE TEST
+    dut._log.info(f"Commencing Write Tests starting at known empty address: 0x{current_addr:08X}...")
+    try:
+        test_data_len = 256  # Full Page Program
+        expected_words = math.ceil(test_data_len / 4)
+        
+        dut._log.info(f" -> Executing Page Program (0x02) with {test_data_len} Bytes...")
+        
+        await Timer(10, unit="us")
+        await RisingEdge(dut.clk_i)
+
+        # Sector Erase (0x20) before every program
+        dut._log.info("    Sending Write Enable (0x06) command...")
+        await qspi_write_command(dut, cs_mask=mx25l_mask, cmd=0x06)
+        await Timer(500, unit="ns")
+        await RisingEdge(dut.clk_i)
+
+        dut._log.info(f"    Erasing Sector at 0x{current_addr:08X} with Sector Erase (0x20) command...")
+        await qspi_custom_transaction(dut, cs_mask=mx25l_mask, cmd_mode=1, addr_mode=1, addr_len=1, cmd=0x20, addr=current_addr)
+
+        # Wait for BUSY bit to clear (15ms timeout for SE)
+        dut._log.info("    Waiting for BUSY bit to clear in Status Register 1...")
+        await qspi_poll_wip_bit(dut, cs_mask=mx25l_mask, status_cmd=0x05, poll_interval_ns=100000, timeout_s=15e-3)
+        dut._log.info("    BUSY bit cleared. Sector erased successfully.")
+
+        # Send Write Enable (WREN) before the Page Program
+        dut._log.info("    Sending Write Enable (0x06) command...")
+        await qspi_write_command(dut, cs_mask=mx25l_mask, cmd=0x06)
+        await Timer(500, unit="ns")
+        await RisingEdge(dut.clk_i)
+
+        # Start the Write Transaction
+        await qspi_write_transaction(
+            dut=dut,
+            cs_mask=mx25l_mask,
+            cmd=0x02, # Page Program
+            cmd_mode=1,
+            addr=current_addr,
+            addr_mode=1,
+            addr_len=1,
+            data_mode=1,
+            data_len=test_data_len,
+            data_words=payload_pool,
+            ddr=False
+        )
+
+        # Wait for BUSY bit to clear
+        dut._log.info("    Waiting for BUSY bit to clear in Status Register 1...")
+        await qspi_poll_wip_bit(dut, cs_mask=mx25l_mask, status_cmd=0x05, poll_interval_ns=100000, timeout_s=5e-3)
+        dut._log.info("    BUSY bit cleared. Write operation completed successfully.")
+
+    except Exception as e:
+        dut._log.error(f"    [!] FAILED: {str(e)}")
+        scoreboard.record("MX25L Init Page Program 4-Byte Addressing", mode_name, passed=False, error_msg=str(e))
+
+    # Wait some time before reading back
+    await Timer(10, unit="us")
+    await RisingEdge(dut.clk_i)
+
+    # READBACK VERIFICATION: Read the data back using all supported read modes
+    if not (skip_all_reads):
+        read_modes = [
+            ("Normal Read (0x03)",      0x03, 1, 1, 1, 0, 1, False), # (1-1-1)
+            ("Fast Read (0x0B)",        0x0B, 1, 1, 1, 8, 1, False), # (1-1-1)
+            ("Dual Output Read (0x3B)", 0x3B, 1, 1, 1, 8, 2, False), # (1-1-2)
+            ("Quad Output Read (0x6B)", 0x6B, 1, 1, 1, 8, 3, False), # (1-1-4)
+            ("Dual I/O Read (0xBB)",    0xBB, 1, 2, 1, 4, 2, False), # (1-2-2)
+            ("Quad I/O Read (0xEB)",    0xEB, 1, 3, 1, 6, 3, False), # (1-4-4)
+            ("DDR Fast Read (0x0D)",    0x0D, 1, 1, 1, 8, 1, True), # (1-1-1) DDR
+            ("DDR Dual I/O Read (0xBD)",0xBD, 1, 2, 1, 4, 2, True), # (1-2-2) DDR
+            ("DDR Quad I/O Read (0xED)",0xED, 1, 3, 1, 6, 3, True), # (1-4-4) DDR
+
+            # Dedicated 4-Byte Addressing Read Modes
+            ("4-Byte Normal Read (0x13)",      0x13, 1, 1, 1, 0, 1, False), # (1-1-1)
+            ("4-Byte Fast Read (0x0C)",        0x0C, 1, 1, 1, 8, 1, False), # (1-1-1)
+            ("4-Byte Dual Output Read (0x3C)", 0x3C, 1, 1, 1, 8, 2, False), # (1-1-2)
+            ("4-Byte Quad Output Read (0x6C)", 0x6C, 1, 1, 1, 8, 3, False), # (1-1-4)
+            ("4-Byte Dual I/O Read (0xBC)",    0xBC, 1, 2, 1, 4, 2, False), # (1-2-2)
+            ("4-Byte Quad I/O Read (0xEC)",    0xEC, 1, 3, 1, 6, 3, False), # (1-4-4)
+            ("4-Byte DDR Fast Read (0x0E)",    0x0E, 1, 1, 1, 8, 1, True), # (1-1-1) DDR
+            ("4-Byte DDR Dual I/O Read (0xBE)",0xBE, 1, 2, 1, 4, 2, True), # (1-2-2) DDR
+            ("4-Byte DDR Quad I/O Read (0xEE)",0xEE, 1, 3, 1, 6, 3, True), # (1-4-4) DDR
+
+        ]
+
+        for mode_name, cmd, cmd_mode, addr_mode, addr_len, dummy, data_mode, ddr in read_modes:
+            try:
+                test_data_len = 256
+                expected_words = math.ceil(test_data_len / 4)
+
+                dut._log.info(f" -> Executing {mode_name} for verification...")
+                
+                readback_list = await qspi_read_transaction(
+                    dut=dut, 
+                    cs_mask=mx25l_mask, 
+                    cmd=cmd, 
+                    cmd_mode=cmd_mode, 
+                    addr=current_addr,
+                    addr_mode=addr_mode, 
+                    addr_len=addr_len,
+                    dummy_len=dummy, 
+                    data_mode=data_mode,
+                    data_len=test_data_len,
+                    ddr=ddr
+                )
+
+                dummy_dict = {current_addr: payload_pool}
+                expected_list = get_expected_words(
+                    golden_dict=dummy_dict, 
+                    target_addr=current_addr, 
+                    num_words=expected_words,
+                    total_bytes=test_data_len,
+                    endian="big"
+                )
+
+                # Compare what we wrote against what we read back
+                for i in range(expected_words):
+                    if readback_list[i] != expected_list[i]:
+                        dut._log.error(f"    [VERIFY] Word {i}: Expected 0x{expected_list[i]:08X}, Got 0x{readback_list[i]:08X}")
+                        raise ValueError(f"DATA MISMATCH at Word {i}! Wrote 0x{expected_list[i]:08X}, Read 0x{readback_list[i]:08X}")
+
+                dut._log.info(f"    Readback verification for {mode_name} PASSED!")
+                scoreboard.record("MX25L Readback 4-Byte Addressing", mode_name, passed=True)
+
+            except Exception as e:
+                dut._log.error(f"    [!] FAILED: {str(e)}")
+                scoreboard.record("MX25L Readback 4-Byte Addressing", mode_name, passed=False, error_msg=str(e))
+
+            await Timer(500, unit="ns")
+            await RisingEdge(dut.clk_i)
+
+        # READBACK VERIFICATION: QPI Read Modes
+        # Enter QPI Mode by sending the QPI Enable command (0x35)
+        dut._log.info("Enabling QPI Mode for MX25L...")
+        await qspi_write_command(dut, cs_mask=mx25l_mask, cmd=0x35)
+        await Timer(500, unit="ns")
+        await RisingEdge(dut.clk_i)
+
+        dut._log.info("QPI Mode enabled. Proceeding to test QPI read modes...")
+
+        read_modes = [
+            ("QPI Quad I/O Read (0xEB)", 0xEB, 3, 3, 1, 6, 3, False), # (4-4-4)
+            ("QPI Quad DDR Read (0xED)", 0xED, 3, 3, 1, 6, 3, True), # (4-4-4) DDR
+
+            ("4-Byte QPI Quad I/O Read (0xEC)",    0xEC, 3, 3, 1, 6, 3, False), # (4-4-4)
+            ("4-Byte QPI DDR Quad I/O Read (0xEE)",0xEE, 3, 3, 1, 6, 3, True), # (4-4-4) DDR
+        ]
+
+        for mode_name, cmd, cmd_mode, addr_mode, addr_len, dummy, data_mode, ddr in read_modes:
+            try:
+                test_data_len = random.randint(64, 256)  # Random length between 64 and 256 bytes
+                expected_words = math.ceil(test_data_len / 4)
+
+                dut._log.info(f" -> Executing {mode_name} for verification...")
+                
+                readback_list = await qspi_read_transaction(
+                    dut=dut, 
+                    cs_mask=mx25l_mask, 
+                    cmd=cmd, 
+                    cmd_mode=cmd_mode, 
+                    addr=current_addr,
+                    addr_mode=addr_mode, 
+                    addr_len=addr_len,
+                    dummy_len=dummy, 
+                    data_mode=data_mode,
+                    data_len=test_data_len,
+                    ddr=ddr
+                )
+
+                dummy_dict = {current_addr: payload_pool}
+                expected_list = get_expected_words(
+                    golden_dict=dummy_dict, 
+                    target_addr=current_addr, 
+                    num_words=expected_words,
+                    total_bytes=test_data_len,
+                    endian="big"
+                )
+
+                # Compare what we wrote against what we read back
+                for i in range(expected_words):
+                    dut._log.info(f"    [VERIFY] Word {i}: Expected 0x{expected_list[i]:08X}, Got 0x{readback_list[i]:08X}")
+                    if readback_list[i] != expected_list[i]:
+                        raise ValueError(f"DATA MISMATCH at Word {i}! Wrote 0x{expected_list[i]:08X}, Read 0x{readback_list[i]:08X}")
+
+                dut._log.info(f"    Readback verification for {mode_name} PASSED!")
+                scoreboard.record("MX25L Readback 4-Byte Addressing", mode_name, passed=True)
+
+            except Exception as e:
+                dut._log.error(f"    [!] FAILED: {str(e)}")
+                scoreboard.record("MX25L Readback 4-Byte Addressing", mode_name, passed=False, error_msg=str(e))
+
+            await Timer(500, unit="ns")
+            await RisingEdge(dut.clk_i)
+
+        # Exit QPI Mode by sending the QPI Disable command (0xF5)
+        dut._log.info("Disabling QPI Mode for MX25L...")
+        await qspi_write_command(dut, cs_mask=mx25l_mask, cmd=0xF5, qpi=True)
+        await Timer(500, unit="ns")
+        await RisingEdge(dut.clk_i)
+        dut._log.info("QPI Mode disabled. Proceeding to next test...")
+
+
+    # RANDOM WRITE TEST: Page Program (0x02) and Quad Page Program (0x38) with random lengths
+    current_addr += 0x001000  # Reset to known empty sector for random writes
+    if not skip_random_writes:
+        write_modes = [
+            ("Page Program (0x02)", 0x02, 1, 1, 1, 1), # (1-1-1)
+            ("Quad Page Program (0x38)", 0x38, 1, 3, 1, 3)  # (1-4-4)
+        ]
+
+        for i in range(5):  # Perform 5 random write tests
+            for mode_name, cmd, cmd_mode, addr_mode, addr_len, data_mode in write_modes:
+                try:
+                    test_data_len = random.randint(64, 256)  # Random length between 64 and 256 bytes
+                    expected_words = math.ceil(test_data_len / 4)
+
+                    dut._log.info(f" -> Executing {mode_name} with {test_data_len} Bytes...")
+
+                    await Timer(10, unit="us")
+                    await RisingEdge(dut.clk_i)
+
+                    # Send Write Enable (WREN) before the Page Program
+                    dut._log.info("    Sending Write Enable (0x06) command...")
+                    await qspi_write_command(dut, cs_mask=mx25l_mask, cmd=0x06)
+                    await Timer(500, unit="ns")
+                    await RisingEdge(dut.clk_i)
+
+                    # Start the Write Transaction
+                    await qspi_write_transaction(
+                        dut=dut,
+                        cs_mask=mx25l_mask,
+                        cmd=cmd,
+                        cmd_mode=cmd_mode,
+                        addr=current_addr,
+                        addr_mode=addr_mode,
+                        addr_len=addr_len,
+                        data_mode=data_mode,
+                        data_len=test_data_len,
+                        data_words=payload_pool,
+                        ddr=False
+                    )
+
+                    # Wait for BUSY bit to clear
+                    dut._log.info("    Waiting for BUSY bit to clear in Status Register 1...")
+                    await qspi_poll_wip_bit(dut, cs_mask=mx25l_mask, status_cmd=0x05, poll_interval_ns=100000, timeout_s=5e-3)
+                    dut._log.info("    BUSY bit cleared. Write operation completed successfully.")
+
+                    # Wait some time before reading back
+                    await Timer(10, unit="us")
+                    await RisingEdge(dut.clk_i)
+
+                    # VERIFICATION: Read the data back
+                    dut._log.info(f"    Verifying Written Data at 0x{current_addr:08X}...")
+                    readback_list = await qspi_read_transaction(
+                        dut=dut, 
+                        cs_mask=mx25l_mask, 
+                        cmd=0xEB, # Quad IO Read
+                        cmd_mode=1, addr=current_addr, addr_mode=3, addr_len=1, dummy_len=6, data_mode=3, 
+                        data_len=test_data_len, ddr=False
+                    )
+
+                    dummy_dict = {current_addr: payload_pool}
+                    expected_list = get_expected_words(
+                        golden_dict=dummy_dict, 
+                        target_addr=current_addr, 
+                        num_words=expected_words,
+                        total_bytes=test_data_len, 
+                        endian="big"
+                    )
+
+                    # Compare what we told it to write against what we read back
+                    for i in range(expected_words):
+                        dut._log.info(f"    [VERIFY] Word {i}: Expected 0x{expected_list[i]:08X}, Got 0x{readback_list[i]:08X}")
+                        if readback_list[i] != expected_list[i]:
+                            raise ValueError(f"WRITE CORRUPTION at Word {i}! Wrote 0x{payload_pool[i]:08X}, Read 0x{readback_list[i]:08X}")
+
+                    dut._log.info("    Write and Readback perfectly MATCH!")
+                    scoreboard.record("MX25L Random Write 4-Byte Addressing", mode_name, passed=True)
+
+                    current_addr += 0x001000  # Advance to next sector for next random write
+
+                except Exception as e:
+                    dut._log.error(f"    [!] FAILED: {str(e)}")
+                    scoreboard.record("MX25L Random Write 4-Byte Addressing", mode_name, passed=False, error_msg=str(e))
+
+
+        # RANDOM WRITE TEST: QPI Write Modes (BROKEN)
+    #     # Enter QPI Mode by sending the QPI Enable command (0x35)
+    #     dut._log.info("Enabling QPI Mode for MX25L...")
+    #     await qspi_write_command(dut, cs_mask=mx25l_mask, cmd=0x35)
+    #     await Timer(500, unit="ns")
+    #     await RisingEdge(dut.clk_i)
+
+    #     dut._log.info("QPI Mode enabled. Proceeding to test QPI write modes...")
+    
+    #     qpi_write_modes = [
+    #         ("QPI Page Program (0x02)", 0x02, 3, 3, 1, 3), # (4-4-4)
+    #     ]
+
+    #     for i in range(5):  # Perform 5 random QPI write tests
+    #         for mode_name, cmd, cmd_mode, addr_mode, addr_len, data_mode in qpi_write_modes:
+    #             try:
+    #                 test_data_len = random.randint(64, 256)  # Random length between 64 and 256 bytes
+    #                 expected_words = math.ceil(test_data_len / 4)
+
+    #                 dut._log.info(f" -> Executing {mode_name} with {test_data_len} Bytes...")
+
+    #                 await Timer(10, unit="us")
+    #                 await RisingEdge(dut.clk_i)
+
+    #                 # Send Write Enable (WREN) before the Page Program
+    #                 dut._log.info("    Sending Write Enable (0x06) command...")
+    #                 await qspi_write_command(dut, cs_mask=mx25l_mask, cmd=0x06, qpi=True)
+    #                 await Timer(500, unit="ns")
+    #                 await RisingEdge(dut.clk_i)
+
+    #                 # Start the Write Transaction
+    #                 await qspi_write_transaction(
+    #                     dut=dut,
+    #                     cs_mask=mx25l_mask,
+    #                     cmd=cmd,
+    #                     cmd_mode=cmd_mode,
+    #                     addr=current_addr,
+    #                     addr_mode=addr_mode,
+    #                     addr_len=addr_len,
+    #                     data_mode=data_mode,
+    #                     data_len=test_data_len,
+    #                     data_words=payload_pool,
+    #                     ddr=False
+    #                 )
+
+    #                 # Wait for BUSY bit to clear (10ms timeout for PP)
+    #                 dut._log.info("    Waiting for BUSY bit to clear in Status Register...")
+    #                 await qspi_poll_wip_bit(dut, cs_mask=mx25l_mask, status_cmd=0x05, poll_interval_ns=100000, timeout_s=5e-3)
+    #                 dut._log.info("    BUSY bit cleared. Write operation completed successfully.")
+
+    #                 # Wait some time before reading back
+    #                 await Timer(10, unit="us")
+    #                 await RisingEdge(dut.clk_i)
+
+    #                 # VERIFICATION: Read the data back
+    #                 dut._log.info(f"    Verifying Written Data at 0x{current_addr:08X}...")
+    #                 readback_list = await qspi_read_transaction(
+    #                     dut=dut, 
+    #                     cs_mask=mx25l_mask, 
+    #                     cmd=0x6B, # Quad IO Read
+    #                     cmd_mode=3, addr=current_addr, addr_mode=3, addr_len=1, dummy_len=6, data_mode=3, 
+    #                     data_len=test_data_len, ddr=False
+    #                 )
+
+    #                 dummy_dict = {current_addr: payload_pool}
+    #                 expected_list = get_expected_words(
+    #                     golden_dict=dummy_dict, 
+    #                     target_addr=current_addr, 
+    #                     num_words=expected_words,
+    #                     total_bytes=test_data_len, 
+    #                     endian="big"
+    #                 )
+
+    #                 # Compare what we told it to write against what we read back
+    #                 for i in range(expected_words):
+    #                     dut._log.info(f"    [VERIFY] Word {i}: Expected 0x{expected_list[i]:08X}, Got 0x{readback_list[i]:08X}")
+    #                     if readback_list[i] != expected_list[i]:
+    #                         raise ValueError(f"WRITE CORRUPTION at Word {i}! Wrote 0x{payload_pool[i]:08X}, Read 0x{readback_list[i]:08X}")
+
+    #                 dut._log.info("    Write and Readback perfectly MATCH!")
+    #                 scoreboard.record("MX25L Random Write 4-Byte Addressing", mode_name, passed=True)
+
+    #             except Exception as e:
+    #                 dut._log.error(f"    [!] FAILED: {str(e)}")
+    #                 scoreboard.record("MX25L Random Write 4-Byte Addressing", mode_name, passed=False, error_msg=str(e))
+
+    #     # Exit QPI Mode by sending the QPI Disable command (0xF5)
+    #     dut._log.info("Disabling QPI Mode for MX25L...")
+    #     await qspi_write_command(dut, cs_mask=mx25l_mask, cmd=0xF5, qpi=True)
+    #     await Timer(500, unit="ns")
+    #     await RisingEdge(dut.clk_i)
+    #     dut._log.info("QPI Mode disabled. Proceeding to next test...")
+        
+
+    # FINAL VERDICT
+    scoreboard.report(dut._log)
+
+

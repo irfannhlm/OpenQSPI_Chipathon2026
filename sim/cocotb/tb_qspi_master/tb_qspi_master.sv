@@ -78,7 +78,9 @@ module tb_qspi_master #(
   logic [31:0] qspi_wdata, qspi_rdata;
   logic qspi_fifo_push, qspi_fifo_pop;
   qspi_master #(
+`ifndef GATELEVEL
       .CS_NUM(CS_NUM)
+`endif
   ) u_master (
       // Clock and reset
       .clk_i (clk_i),
