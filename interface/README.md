@@ -163,21 +163,6 @@ python uart_fpga_gui.py
 deactivate
 ```
 
-## Sharing this setup with your colleague
-
-Only `requirements.txt`, the `.py` source, and this `README.md` need to be in
-the repo. Your colleague then just runs steps 1-4 above on their own machine
-and gets the identical dependency versions — the `venv/` folder itself is
-never shared or committed, it's regenerated locally each time.
-
-Recommended `.gitignore` entries:
-
-```
-venv/
-__pycache__/
-*.pyc
-```
-
 ## GUI Tabs
 
 - **Guide** — scrollable in-app reference mirroring this README: feature
