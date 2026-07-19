@@ -11,8 +11,8 @@
 //                    [14:9] DUMMY_LEN [16:15] CMD_MODE (00: none, 01: single,
 //                    10: dual, 11: quad) [18:17] ADDR_MODE [20:19] DATA_MODE
 //                    [21] SCK_MODE [22] DATA_DIR [23] CRM [24] DDR [25] ENDIAN
-//                    [29:26] CSN_SEL (reserved, tied off in this single
-//                    chip-select wrapper)
+//                    [29:26] CSN_SEL (one-hot chip-select enable, low CS_NUM
+//                    bits used; active-high, selected line driven low on qspi_csn_o)
 //   0x08 QSPI_DLEN  [31:0] DATA_LEN
 //   0x0C QSPI_CMD   [7:0] CMD [15:8] MODE_BYTE
 //   0x10 QSPI_ADDR  [31:0] ADDR
@@ -28,7 +28,8 @@
 // reports an error via QSPI_CTRL.FIFO_ERR instead.
 
 module apb_qspi #(
-    parameter int FIFO_DEPTH = 16
+    parameter int FIFO_DEPTH = 16,
+    parameter int CS_NUM = 1  // number of chip selects
 ) (
     // clock and reset
     input logic clk_i,
@@ -44,7 +45,7 @@ module apb_qspi #(
     output logic pready_o,
 
     // QSPI interface
-    output logic qspi_csn_o,
+    output logic [CS_NUM-1:0] qspi_csn_o,
     output logic qspi_sck_o,
     input logic [3:0] qspi_i,
     output logic [3:0] qspi_o,
@@ -195,7 +196,7 @@ module apb_qspi #(
   end
 
   qspi_master #(
-      .CS_NUM(1)
+      .CS_NUM(CS_NUM)
   ) u_qspi_master (
       .clk_i (clk_i),
       .rst_ni(rst_ni),
@@ -220,7 +221,7 @@ module apb_qspi #(
       .qspi_cmd_mode_i (cfg0_q[16:15]),
       .qspi_addr_mode_i(cfg0_q[18:17]),
       .qspi_data_mode_i(cfg0_q[20:19]),
-      .qspi_csn_sel_i  (1'b1),
+      .qspi_csn_sel_i  (cfg0_q[26+:CS_NUM]),
       .qspi_sck_mode_i (cfg0_q[21]),
       .qspi_data_dir_i (cfg0_q[22]),
       .qspi_crm_i      (cfg0_q[23]),
