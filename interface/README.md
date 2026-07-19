@@ -15,10 +15,8 @@ plus an in-app reference guide.
   Sequence: `ADDR, DATA, DATA, DATA, DATA, ACK`.
 
 **Byte order:** all 32-bit register values are transmitted **high byte
-first** (big-endian). Both the Python GUI and the ESP32 test firmware
-reconstruct/log the 32-bit value this way
-(`int.from_bytes(data, byteorder="big")` in Python;
-`(data[0]<<24)|(data[1]<<16)|(data[2]<<8)|data[3]` in firmware).
+first** (big-endian). The Python GUI reconstruct/log the 32-bit value this way
+(`int.from_bytes(data, byteorder="big")`).
 
 **Write timing:** the ADDR byte and the 4 DATA bytes are sent in a single
 `write()` call (one UART/USB burst) rather than two separate calls, to avoid
