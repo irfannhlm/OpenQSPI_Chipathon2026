@@ -4,7 +4,7 @@
 // Author: Team Crispi - SSCS Chipathon 2026
 
 module qspi_master #(
-    parameter int CS_NUM = 1  // number of chip selects
+    parameter int CS_NUM = 3  // number of chip selects
 ) (
     // Clock and reset
     input logic clk_i,
@@ -137,7 +137,6 @@ module qspi_master #(
   logic byte_cnt_rst;
   wire byte_cnt_edge = (bit_cnt[2:0] == bit_cnt_limit && qspi_sck_negedge);
   wire last_byte = (byte_cnt == (qspi_data_len_i - 1));
-  wire last_word = ((byte_cnt >> 2) == ((qspi_data_len_i - 1) >> 2));
   always_ff @(posedge clk_i, negedge rst_ni) begin : byte_counter
     if (!rst_ni) begin
       byte_cnt <= 'd0;
