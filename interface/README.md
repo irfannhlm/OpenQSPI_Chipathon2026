@@ -234,9 +234,5 @@ triggered it, and the **Log** panel keeps a full timestamped history
 - No automatic retry on timeout or malformed response.
 - `QSPI_TIMEOUT`'s unit (clock cycles, SCK cycles, etc.) isn't confirmed yet
   — the GUI treats it as a raw 32-bit value until that's specified.
-- The ESP32-S3 test firmware only simulates `QSPI_CTRL` at address `0x00`
-  with random/echoed data; it doesn't model the other 7 registers, so full
-  end-to-end testing of `CFG0`/`CMD`/`ADDR`/`DLEN`/`DR`/`BCNT` still needs
-  the real FPGA (or an expanded test firmware, if useful before then).
 - No hardware flow control (RTS/CTS) configured — add if your board requires
   it.
