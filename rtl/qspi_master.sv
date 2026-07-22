@@ -56,6 +56,18 @@ module qspi_master #(
     output logic fifo_pop_o
 );
 
+  // Abort lock register
+  logic qspi_done, qspi_abort;
+  always_ff @(posedge clk_i, negedge rst_ni) begin : abort_lock
+    if (!rst_ni) begin
+      qspi_abort <= 1'b0;
+    end else if (qspi_abort_i) begin
+      qspi_abort <= 1'b1;  // lock abort until next transfer
+    end else if (qspi_done) begin
+      qspi_abort <= 1'b0;  // unlock abort after transfer is done
+    end
+  end
+
   // QSPI SCK GEN
   // clock counter
   logic [7:0] clk_cnt;
@@ -284,7 +296,8 @@ module qspi_master #(
     end else begin
       qspi_rdata_load <= rx_shifter_en && byte_cnt_edge && ~qspi_sck_pause;  // load every byte
       // ready every 4 bytes or at the end of data
-      qspi_rdata_valid <= rx_shifter_en && byte_cnt_edge && ((byte_cnt == (qspi_data_len_i-1)) || (byte_cnt[1:0] == 2'd3)) && ~qspi_sck_pause;
+      qspi_rdata_valid <= rx_shifter_en && byte_cnt_edge && ~qspi_sck_pause && ~qspi_abort &&
+                      ((byte_cnt == (qspi_data_len_i-1)) || (byte_cnt[1:0] == 2'd3));
     end
   end
   always_ff @(posedge clk_i, negedge rst_ni) begin : rx_data_reg
@@ -319,7 +332,6 @@ module qspi_master #(
 
 
   // CONTROL FSM
-  logic qspi_done;
   typedef enum logic [2:0] {
     IDLE,
     PREPARE,
@@ -348,18 +360,6 @@ module qspi_master #(
       crm_active <= 1'b0;
     end else if (qspi_done) begin
       crm_active <= qspi_crm_i;  // only lock CRM if first transfer is done
-    end
-  end
-
-  // Abort lock register
-  logic qspi_abort;
-  always_ff @(posedge clk_i, negedge rst_ni) begin : abort_lock
-    if (!rst_ni) begin
-      qspi_abort <= 1'b0;
-    end else if (qspi_abort_i) begin
-      qspi_abort <= 1'b1;  // lock abort until next transfer
-    end else if (qspi_done) begin
-      qspi_abort <= 1'b0;  // unlock abort after transfer is done
     end
   end
 
