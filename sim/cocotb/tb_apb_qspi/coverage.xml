@@ -1,0 +1,118 @@
+<top abs_name="top" size="86" coverage="73" cover_percentage="84.88">
+  <qspi size="86" coverage="73" cover_percentage="84.88" abs_name="top.qspi">
+    <cmd size="29" coverage="26" cover_percentage="89.66" abs_name="top.qspi.cmd" weight="1" at_least="1">
+      <bin0 bin="CLSR" hits="1" abs_name="top.qspi.cmd.bin0" />
+      <bin1 bin="DIOR" hits="4" abs_name="top.qspi.cmd.bin1" />
+      <bin2 bin="DIOR4" hits="1" abs_name="top.qspi.cmd.bin2" />
+      <bin3 bin="DOR" hits="4" abs_name="top.qspi.cmd.bin3" />
+      <bin4 bin="DOR4" hits="1" abs_name="top.qspi.cmd.bin4" />
+      <bin5 bin="FAST_READ" hits="4" abs_name="top.qspi.cmd.bin5" />
+      <bin6 bin="FAST_READ4" hits="1" abs_name="top.qspi.cmd.bin6" />
+      <bin7 bin="P4E" hits="0" abs_name="top.qspi.cmd.bin7" />
+      <bin8 bin="PP" hits="3" abs_name="top.qspi.cmd.bin8" />
+      <bin9 bin="QIOR" hits="4" abs_name="top.qspi.cmd.bin9" />
+      <bin10 bin="QIOR4" hits="1" abs_name="top.qspi.cmd.bin10" />
+      <bin11 bin="QOR" hits="7" abs_name="top.qspi.cmd.bin11" />
+      <bin12 bin="QOR4" hits="1" abs_name="top.qspi.cmd.bin12" />
+      <bin13 bin="QPP" hits="3" abs_name="top.qspi.cmd.bin13" />
+      <bin14 bin="RDCR" hits="5" abs_name="top.qspi.cmd.bin14" />
+      <bin15 bin="RDID" hits="2" abs_name="top.qspi.cmd.bin15" />
+      <bin16 bin="RDSR1" hits="386" abs_name="top.qspi.cmd.bin16" />
+      <bin17 bin="RDSR2" hits="1" abs_name="top.qspi.cmd.bin17" />
+      <bin18 bin="READ" hits="13" abs_name="top.qspi.cmd.bin18" />
+      <bin19 bin="READ4" hits="1" abs_name="top.qspi.cmd.bin19" />
+      <bin20 bin="REMS" hits="1" abs_name="top.qspi.cmd.bin20" />
+      <bin21 bin="RES" hits="1" abs_name="top.qspi.cmd.bin21" />
+      <bin22 bin="RESET" hits="1" abs_name="top.qspi.cmd.bin22" />
+      <bin23 bin="SE" hits="2" abs_name="top.qspi.cmd.bin23" />
+      <bin24 bin="WRDI" hits="1" abs_name="top.qspi.cmd.bin24" />
+      <bin25 bin="WREN" hits="10" abs_name="top.qspi.cmd.bin25" />
+      <bin26 bin="WRR" hits="1" abs_name="top.qspi.cmd.bin26" />
+      <bin27 bin="other" hits="0" abs_name="top.qspi.cmd.bin27" />
+      <bin28 bin="none" hits="0" abs_name="top.qspi.cmd.bin28" />
+    </cmd>
+    <cmd_lanes size="4" coverage="1" cover_percentage="25.0" abs_name="top.qspi.cmd_lanes" weight="1" at_least="1">
+      <bin0 bin="0" hits="0" abs_name="top.qspi.cmd_lanes.bin0" />
+      <bin1 bin="1" hits="460" abs_name="top.qspi.cmd_lanes.bin1" />
+      <bin2 bin="2" hits="0" abs_name="top.qspi.cmd_lanes.bin2" />
+      <bin3 bin="4" hits="0" abs_name="top.qspi.cmd_lanes.bin3" />
+    </cmd_lanes>
+    <addr_bytes size="3" coverage="3" cover_percentage="100.0" abs_name="top.qspi.addr_bytes" weight="1" at_least="1">
+      <bin0 bin="0" hits="409" abs_name="top.qspi.addr_bytes.bin0" />
+      <bin1 bin="3" hits="45" abs_name="top.qspi.addr_bytes.bin1" />
+      <bin2 bin="4" hits="6" abs_name="top.qspi.addr_bytes.bin2" />
+    </addr_bytes>
+    <addr_lanes size="4" coverage="4" cover_percentage="100.0" abs_name="top.qspi.addr_lanes" weight="1" at_least="1">
+      <bin0 bin="0" hits="409" abs_name="top.qspi.addr_lanes.bin0" />
+      <bin1 bin="1" hits="41" abs_name="top.qspi.addr_lanes.bin1" />
+      <bin2 bin="2" hits="5" abs_name="top.qspi.addr_lanes.bin2" />
+      <bin3 bin="4" hits="5" abs_name="top.qspi.addr_lanes.bin3" />
+    </addr_lanes>
+    <dir size="3" coverage="3" cover_percentage="100.0" abs_name="top.qspi.dir" weight="1" at_least="1">
+      <bin0 bin="none" hits="15" abs_name="top.qspi.dir.bin0" />
+      <bin1 bin="RD" hits="438" abs_name="top.qspi.dir.bin1" />
+      <bin2 bin="WR" hits="7" abs_name="top.qspi.dir.bin2" />
+    </dir>
+    <data_lanes size="4" coverage="4" cover_percentage="100.0" abs_name="top.qspi.data_lanes" weight="1" at_least="1">
+      <bin0 bin="0" hits="15" abs_name="top.qspi.data_lanes.bin0" />
+      <bin1 bin="1" hits="419" abs_name="top.qspi.data_lanes.bin1" />
+      <bin2 bin="2" hits="10" abs_name="top.qspi.data_lanes.bin2" />
+      <bin3 bin="4" hits="16" abs_name="top.qspi.data_lanes.bin3" />
+    </data_lanes>
+    <dlen size="7" coverage="7" cover_percentage="100.0" abs_name="top.qspi.dlen" weight="1" at_least="1">
+      <bin0 bin="0" hits="15" abs_name="top.qspi.dlen.bin0" />
+      <bin1 bin="1" hits="393" abs_name="top.qspi.dlen.bin1" />
+      <bin2 bin="2-4" hits="4" abs_name="top.qspi.dlen.bin2" />
+      <bin3 bin="5-8" hits="32" abs_name="top.qspi.dlen.bin3" />
+      <bin4 bin="9-32" hits="14" abs_name="top.qspi.dlen.bin4" />
+      <bin5 bin="33-256" hits="1" abs_name="top.qspi.dlen.bin5" />
+      <bin6 bin="&gt;256" hits="1" abs_name="top.qspi.dlen.bin6" />
+    </dlen>
+    <dummy size="4" coverage="4" cover_percentage="100.0" abs_name="top.qspi.dummy" weight="1" at_least="1">
+      <bin0 bin="0" hits="431" abs_name="top.qspi.dummy.bin0" />
+      <bin1 bin="1-7" hits="10" abs_name="top.qspi.dummy.bin1" />
+      <bin2 bin="8" hits="18" abs_name="top.qspi.dummy.bin2" />
+      <bin3 bin="&gt;8" hits="1" abs_name="top.qspi.dummy.bin3" />
+    </dummy>
+    <sck_mode size="2" coverage="2" cover_percentage="100.0" abs_name="top.qspi.sck_mode" weight="1" at_least="1">
+      <bin0 bin="0" hits="454" abs_name="top.qspi.sck_mode.bin0" />
+      <bin1 bin="1" hits="6" abs_name="top.qspi.sck_mode.bin1" />
+    </sck_mode>
+    <endian size="2" coverage="2" cover_percentage="100.0" abs_name="top.qspi.endian" weight="1" at_least="1">
+      <bin0 bin="0" hits="454" abs_name="top.qspi.endian.bin0" />
+      <bin1 bin="1" hits="6" abs_name="top.qspi.endian.bin1" />
+    </endian>
+    <aborted size="2" coverage="1" cover_percentage="50.0" abs_name="top.qspi.aborted" weight="1" at_least="1">
+      <bin0 bin="False" hits="460" abs_name="top.qspi.aborted.bin0" />
+      <bin1 bin="True" hits="0" abs_name="top.qspi.aborted.bin1" />
+    </aborted>
+    <mode_phase size="2" coverage="1" cover_percentage="50.0" abs_name="top.qspi.mode_phase" weight="1" at_least="1">
+      <bin0 bin="False" hits="460" abs_name="top.qspi.mode_phase.bin0" />
+      <bin1 bin="True" hits="0" abs_name="top.qspi.mode_phase.bin1" />
+    </mode_phase>
+    <dirXdata_lanes size="7" coverage="6" cover_percentage="85.71" abs_name="top.qspi.dirXdata_lanes" weight="1" at_least="1">
+      <bin0 bin="('none', 0)" hits="15" abs_name="top.qspi.dirXdata_lanes.bin0" />
+      <bin1 bin="('RD', 1)" hits="415" abs_name="top.qspi.dirXdata_lanes.bin1" />
+      <bin2 bin="('RD', 2)" hits="10" abs_name="top.qspi.dirXdata_lanes.bin2" />
+      <bin3 bin="('RD', 4)" hits="13" abs_name="top.qspi.dirXdata_lanes.bin3" />
+      <bin4 bin="('WR', 1)" hits="4" abs_name="top.qspi.dirXdata_lanes.bin4" />
+      <bin5 bin="('WR', 2)" hits="0" abs_name="top.qspi.dirXdata_lanes.bin5" />
+      <bin6 bin="('WR', 4)" hits="3" abs_name="top.qspi.dirXdata_lanes.bin6" />
+    </dirXdata_lanes>
+    <dirXdlen size="13" coverage="9" cover_percentage="69.23" abs_name="top.qspi.dirXdlen" weight="1" at_least="1">
+      <bin0 bin="('none', '0')" hits="15" abs_name="top.qspi.dirXdlen.bin0" />
+      <bin1 bin="('RD', '1')" hits="393" abs_name="top.qspi.dirXdlen.bin1" />
+      <bin2 bin="('RD', '2-4')" hits="3" abs_name="top.qspi.dirXdlen.bin2" />
+      <bin3 bin="('RD', '5-8')" hits="32" abs_name="top.qspi.dirXdlen.bin3" />
+      <bin4 bin="('RD', '9-32')" hits="8" abs_name="top.qspi.dirXdlen.bin4" />
+      <bin5 bin="('RD', '33-256')" hits="1" abs_name="top.qspi.dirXdlen.bin5" />
+      <bin6 bin="('RD', '&gt;256')" hits="1" abs_name="top.qspi.dirXdlen.bin6" />
+      <bin7 bin="('WR', '1')" hits="0" abs_name="top.qspi.dirXdlen.bin7" />
+      <bin8 bin="('WR', '2-4')" hits="1" abs_name="top.qspi.dirXdlen.bin8" />
+      <bin9 bin="('WR', '5-8')" hits="0" abs_name="top.qspi.dirXdlen.bin9" />
+      <bin10 bin="('WR', '9-32')" hits="6" abs_name="top.qspi.dirXdlen.bin10" />
+      <bin11 bin="('WR', '33-256')" hits="0" abs_name="top.qspi.dirXdlen.bin11" />
+      <bin12 bin="('WR', '&gt;256')" hits="0" abs_name="top.qspi.dirXdlen.bin12" />
+    </dirXdlen>
+  </qspi>
+</top>

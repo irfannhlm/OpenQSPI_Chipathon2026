@@ -69,7 +69,8 @@ module top #(
   logic [3:0] qspi_oe;  // output enable for qspi_o
 
   apb_qspi #(
-      .FIFO_DEPTH(16)
+      .FIFO_DEPTH(16),
+      .CS_NUM(CS_NUM)
   ) inst_apb_qspi (
       // clock and reset
       .clk_i (clk_i),

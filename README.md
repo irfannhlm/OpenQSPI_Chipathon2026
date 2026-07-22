@@ -15,3 +15,4 @@ To design a fully functional 32-bit Quad Serial Peripheral Interface (QSPI) mast
 - [QSPI Master Module](docs/qspi_master.md)
 - [APB Wrapped QSPI](docs/apb_qspi.md)
 - [QSPI CSR](docs/qspi_csr.md)
+- [UART FPGA GUI](docs/uart_fpga_gui.md)

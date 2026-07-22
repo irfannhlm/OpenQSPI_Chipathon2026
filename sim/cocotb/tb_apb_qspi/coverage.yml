@@ -1,0 +1,203 @@
+qspi:
+  cover_percentage: 84.88
+  coverage: 73
+  size: 86
+  type: <class 'cocotb_coverage.coverage.CoverItem'>
+qspi.aborted:
+  at_least: 1
+  bins:_hits:
+    false: 460
+    true: 0
+  cover_percentage: 50.0
+  coverage: 1
+  size: 2
+  type: <class 'cocotb_coverage.coverage.CoverPoint'>
+  weight: 1
+qspi.addr_bytes:
+  at_least: 1
+  bins:_hits:
+    0: 409
+    3: 45
+    4: 6
+  cover_percentage: 100.0
+  coverage: 3
+  size: 3
+  type: <class 'cocotb_coverage.coverage.CoverPoint'>
+  weight: 1
+qspi.addr_lanes:
+  at_least: 1
+  bins:_hits:
+    0: 409
+    1: 41
+    2: 5
+    4: 5
+  cover_percentage: 100.0
+  coverage: 4
+  size: 4
+  type: <class 'cocotb_coverage.coverage.CoverPoint'>
+  weight: 1
+qspi.cmd:
+  at_least: 1
+  bins:_hits:
+    CLSR: 1
+    DIOR: 4
+    DIOR4: 1
+    DOR: 4
+    DOR4: 1
+    FAST_READ: 4
+    FAST_READ4: 1
+    P4E: 0
+    PP: 3
+    QIOR: 4
+    QIOR4: 1
+    QOR: 7
+    QOR4: 1
+    QPP: 3
+    RDCR: 5
+    RDID: 2
+    RDSR1: 386
+    RDSR2: 1
+    READ: 13
+    READ4: 1
+    REMS: 1
+    RES: 1
+    RESET: 1
+    SE: 2
+    WRDI: 1
+    WREN: 10
+    WRR: 1
+    none: 0
+    other: 0
+  cover_percentage: 89.66
+  coverage: 26
+  size: 29
+  type: <class 'cocotb_coverage.coverage.CoverPoint'>
+  weight: 1
+qspi.cmd_lanes:
+  at_least: 1
+  bins:_hits:
+    0: 0
+    1: 460
+    2: 0
+    4: 0
+  cover_percentage: 25.0
+  coverage: 1
+  size: 4
+  type: <class 'cocotb_coverage.coverage.CoverPoint'>
+  weight: 1
+qspi.data_lanes:
+  at_least: 1
+  bins:_hits:
+    0: 15
+    1: 419
+    2: 10
+    4: 16
+  cover_percentage: 100.0
+  coverage: 4
+  size: 4
+  type: <class 'cocotb_coverage.coverage.CoverPoint'>
+  weight: 1
+qspi.dir:
+  at_least: 1
+  bins:_hits:
+    RD: 438
+    WR: 7
+    none: 15
+  cover_percentage: 100.0
+  coverage: 3
+  size: 3
+  type: <class 'cocotb_coverage.coverage.CoverPoint'>
+  weight: 1
+qspi.dirXdata_lanes:
+  at_least: 1
+  bins:_hits:
+    ('RD', 1): 415
+    ('RD', 2): 10
+    ('RD', 4): 13
+    ('WR', 1): 4
+    ('WR', 2): 0
+    ('WR', 4): 3
+    ('none', 0): 15
+  cover_percentage: 85.71
+  coverage: 6
+  size: 7
+  type: <class 'cocotb_coverage.coverage.CoverCross'>
+  weight: 1
+qspi.dirXdlen:
+  at_least: 1
+  bins:_hits:
+    ('RD', '1'): 393
+    ('RD', '2-4'): 3
+    ('RD', '33-256'): 1
+    ('RD', '5-8'): 32
+    ('RD', '9-32'): 8
+    ('RD', '>256'): 1
+    ('WR', '1'): 0
+    ('WR', '2-4'): 1
+    ('WR', '33-256'): 0
+    ('WR', '5-8'): 0
+    ('WR', '9-32'): 6
+    ('WR', '>256'): 0
+    ('none', '0'): 15
+  cover_percentage: 69.23
+  coverage: 9
+  size: 13
+  type: <class 'cocotb_coverage.coverage.CoverCross'>
+  weight: 1
+qspi.dlen:
+  at_least: 1
+  bins:_hits:
+    '0': 15
+    '1': 393
+    2-4: 4
+    33-256: 1
+    5-8: 32
+    9-32: 14
+    '>256': 1
+  cover_percentage: 100.0
+  coverage: 7
+  size: 7
+  type: <class 'cocotb_coverage.coverage.CoverPoint'>
+  weight: 1
+qspi.dummy:
+  at_least: 1
+  bins:_hits:
+    '0': 431
+    1-7: 10
+    '8': 18
+    '>8': 1
+  cover_percentage: 100.0
+  coverage: 4
+  size: 4
+  type: <class 'cocotb_coverage.coverage.CoverPoint'>
+  weight: 1
+qspi.endian:
+  at_least: 1
+  bins:_hits:
+    0: 454
+    1: 6
+  cover_percentage: 100.0
+  coverage: 2
+  size: 2
+  type: <class 'cocotb_coverage.coverage.CoverPoint'>
+  weight: 1
+qspi.mode_phase:
+  at_least: 1
+  bins:_hits:
+    false: 460
+    true: 0
+  cover_percentage: 50.0
+  coverage: 1
+  size: 2
+  type: <class 'cocotb_coverage.coverage.CoverPoint'>
+  weight: 1
+qspi.sck_mode:
+  at_least: 1
+  bins:_hits:
+    0: 454
+    1: 6
+  cover_percentage: 100.0
+  coverage: 2
+  size: 2
+  type: <class 'cocotb_coverage.coverage.CoverPoint'>
+  weight: 1

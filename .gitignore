@@ -15,3 +15,7 @@ venv
 # Vivado generated files
 !synth/vivado/**/*.xdc
 synth/vivado/**/**/
+
+
+__pycache__/
+*.pyc
