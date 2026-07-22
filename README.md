@@ -9,7 +9,7 @@ To design a fully functional 32-bit Quad Serial Peripheral Interface (QSPI) mast
 - Possible support of Dual Data Rate (DDR)
 
 # Main Architecture
-![APB QSPI Architecture](images/apb_qspi_arch.png)
+![APB QSPI Architecture](docs/images/apb_qspi_arch.png)
 
 # Documentations
 - [QSPI Master Module](docs/qspi_master.md)

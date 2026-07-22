@@ -1,6 +1,6 @@
 # QSPI Master Module ([`qspi_master.sv`](../rtl/qspi_master.sv))
 
-![Block Diagram](../images/qspi_master_arch.png)
+![Block Diagram](images/qspi_master_arch.png)
 
 ## Features
 - Full support of all single, dual, and quad modes
