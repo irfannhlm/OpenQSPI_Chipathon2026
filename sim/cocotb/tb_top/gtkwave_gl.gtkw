@@ -1,0 +1,60 @@
+[*]
+[*] GTKWave Analyzer v4.0.0-prealpha (7d7b4db) (w)1999-2022 BSI
+[*] Sat Jul 18 05:56:20 2026
+[*]
+[dumpfile] "/foss/designs/OpenQSPI_Chipathon2026/sim/cocotb/tb_top/sim_build/tb_top.fst"
+[dumpfile_mtime] "Sat Jul 18 05:45:51 2026"
+[dumpfile_size] 357904
+[savefile] "/foss/designs/OpenQSPI_Chipathon2026/sim/cocotb/tb_top/gtkwave_gl.gktw.gtkw"
+[timestart] 0
+[size] 1920 1163
+[pos] -27 -24
+*-24.900000 34900000 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+[treeopen] tb_top.
+[treeopen] tb_top.u_top.
+[sst_width] 297
+[signals_width] 142
+[sst_expanded] 1
+[sst_vpaned_height] 346
+@28
+tb_top.clk_i
+tb_top.rst_ni
+@800200
+-QSPI
+@28
+tb_top.qspi_csn
+tb_top.qspi_sck
+@800022
+tb_top.qspi_io[3:0]
+@28
+(0)tb_top.qspi_io[3:0]
+(1)tb_top.qspi_io[3:0]
+(2)tb_top.qspi_io[3:0]
+(3)tb_top.qspi_io[3:0]
+@1001200
+-group_end
+@1000200
+-QSPI
+@c00200
+-UART
+@28
+tb_top.uart_rx_i
+tb_top.uart_tx_o
+@1401200
+-UART
+@800201
+-APB
+@23
+tb_top.u_top.inst_apb_qspi.paddr_i[31:0]
+tb_top.u_top.inst_apb_qspi.pwdata_i[31:0]
+tb_top.u_top.inst_apb_qspi.prdata_o[31:0]
+@29
+tb_top.u_top.inst_apb_qspi.psel_i
+tb_top.u_top.inst_apb_qspi.penable_i
+tb_top.u_top.inst_apb_qspi.pready_o
+tb_top.u_top.inst_apb_qspi.pwrite_i
+tb_top.u_top.inst_apb_qspi.pslverr_o
+@1000201
+-APB
+[pattern_trace] 1
+[pattern_trace] 0

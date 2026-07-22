@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v4.0.0-prealpha (7d7b4db) (w)1999-2022 BSI
-[*] Fri Jul 17 20:36:34 2026
+[*] Wed Jul 22 16:34:54 2026
 [*]
 [dumpfile] "/foss/designs/OpenQSPI_Chipathon2026/sim/cocotb/tb_top/sim_build/tb_top.fst"
-[dumpfile_mtime] "Fri Jul 17 20:36:00 2026"
-[dumpfile_size] 7305
+[dumpfile_mtime] "Wed Jul 22 16:31:57 2026"
+[dumpfile_size] 67703
 [savefile] "/foss/designs/OpenQSPI_Chipathon2026/sim/cocotb/tb_top/gtkwave_rtl.gtkw"
-[timestart] 46690000
+[timestart] 3864200000
 [size] 1920 1163
 [pos] -1 -1
-*-22.799999 76520000 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+*-25.799997 4057420000 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 [markername] AA
 [markername] BB
 [markername] CC
@@ -38,9 +38,10 @@
 [markername] ZZ
 [treeopen] tb_top.
 [treeopen] tb_top.u_top.
+[treeopen] tb_top.u_top.inst_apb_qspi.
 [treeopen] tb_top.u_top.inst_uart_to_apb.
 [sst_width] 297
-[signals_width] 214
+[signals_width] 222
 [sst_expanded] 1
 [sst_vpaned_height] 346
 @28
@@ -51,8 +52,15 @@ tb_top.rst_ni
 @28
 tb_top.qspi_csn
 tb_top.qspi_sck
-@22
+@800022
 tb_top.qspi_io[3:0]
+@28
+(0)tb_top.qspi_io[3:0]
+(1)tb_top.qspi_io[3:0]
+(2)tb_top.qspi_io[3:0]
+(3)tb_top.qspi_io[3:0]
+@1001200
+-group_end
 @1000200
 -QSPI
 @800200
@@ -101,6 +109,8 @@ tb_top.u_top.prdata[31:0]
 tb_top.u_top.pwdata[31:0]
 @1000200
 -APB
+@c00200
+-UART to APB internals
 @28
 tb_top.u_top.inst_uart_to_apb.apb_mode
 tb_top.u_top.inst_uart_to_apb.apb_done
@@ -122,9 +132,65 @@ tb_top.u_top.inst_uart_to_apb.byte_cnt[4:0]
 (4)tb_top.u_top.inst_uart_to_apb.byte_cnt[4:0]
 @1401200
 -group_end
-@29
-tb_top.u_top.inst_uart_to_apb.byte_cnt_rst
 @28
+tb_top.u_top.inst_uart_to_apb.byte_cnt_rst
 tb_top.u_top.inst_uart_to_apb.fsm_cstate[1:0]
+@1401200
+-UART to APB internals
+@c00200
+-QSPI Master
+-QSPI Control
+@28
+tb_top.u_top.inst_apb_qspi.u_qspi_master.qspi_start_i
+tb_top.u_top.inst_apb_qspi.u_qspi_master.qspi_done_o
+tb_top.u_top.inst_apb_qspi.u_qspi_master.qspi_abort_i
+@24
+tb_top.u_top.inst_apb_qspi.u_qspi_master.clk_cnt[7:0]
+tb_top.u_top.inst_apb_qspi.u_qspi_master.bit_cnt[5:0]
+tb_top.u_top.inst_apb_qspi.u_qspi_master.byte_cnt[31:0]
+@1401200
+-QSPI Control
+@28
+tb_top.u_top.inst_apb_qspi.u_qspi_master.fifo_push_o
+tb_top.u_top.inst_apb_qspi.u_qspi_master.fifo_push
+tb_top.u_top.inst_apb_qspi.u_qspi_master.qspi_abort
+tb_top.u_top.inst_apb_qspi.u_qspi_master.qspi_cstate[2:0]
+tb_top.u_top.inst_apb_qspi.u_qspi_master.qspi_rdata_valid
+tb_top.u_top.inst_apb_qspi.u_qspi_master.qspi_rdata_load
+@c00200
+-QSPI RX/TX Data
+@22
+tb_top.u_top.inst_apb_qspi.u_qspi_master.qspi_cmd_i[7:0]
+tb_top.u_top.inst_apb_qspi.u_qspi_master.qspi_addr_i[31:0]
+tb_top.u_top.inst_apb_qspi.u_qspi_master.qspi_wdata_i[31:0]
+tb_top.u_top.inst_apb_qspi.u_qspi_master.qspi_rdata_o[31:0]
+@1401200
+-QSPI RX/TX Data
+@c00200
+-QSPI Config
+@24
+tb_top.u_top.inst_apb_qspi.u_qspi_master.qspi_addr_len_i
+tb_top.u_top.inst_apb_qspi.u_qspi_master.qspi_data_len_i[31:0]
+tb_top.u_top.inst_apb_qspi.u_qspi_master.qspi_dummy_len_i[5:0]
+tb_top.u_top.inst_apb_qspi.u_qspi_master.qspi_addr_mode_i[1:0]
+tb_top.u_top.inst_apb_qspi.u_qspi_master.qspi_cmd_mode_i[1:0]
+tb_top.u_top.inst_apb_qspi.u_qspi_master.qspi_data_mode_i[1:0]
+@1401200
+-QSPI Config
+-QSPI Master
+@800201
+-FIFO
+@29
+tb_top.u_top.inst_apb_qspi.fifo_empty
+tb_top.u_top.inst_apb_qspi.fifo_full
+tb_top.u_top.inst_apb_qspi.fifo_pop
+tb_top.u_top.inst_apb_qspi.fifo_push
+@23
+tb_top.u_top.inst_apb_qspi.fifo_data_i_mux[31:0]
+tb_top.u_top.inst_apb_qspi.fifo_data_o[31:0]
+@29
+tb_top.u_top.inst_apb_qspi.qspi_flush_pulse
+@1000201
+-FIFO
 [pattern_trace] 1
 [pattern_trace] 0
