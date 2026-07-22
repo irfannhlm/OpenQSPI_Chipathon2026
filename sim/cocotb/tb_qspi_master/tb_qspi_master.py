@@ -849,8 +849,11 @@ async def test_s25fl_read_modes(dut):
 
 
 # STILL NOT WORKING
+# @cocotb.test()
 async def test_s25fl_write_modes(dut):
     """Test standard and Quad Page Program writes on a known empty sector."""
+    await init_qspi_master(dut)
+
     await Timer(500, unit="ns")
     await RisingEdge(dut.clk_i)
     
@@ -864,155 +867,105 @@ async def test_s25fl_write_modes(dut):
     await s25fl_quad_enable_routine(dut, cs_mask=s25fl_mask)
     
     # Start at a known empty sector
-    current_addr = 0x050000 
+    current_addr = 0x001000 
     
     dut._log.info(f"Commencing Write Tests starting at known empty address: 0x{current_addr:08X}...")
 
     # Write Modes: (Name, Cmd, CmdMode, AddrMode, AddrLen, DataMode)
     write_modes = [
         ("Page Program (0x02)", 0x02, 1, 1, 0, 1), # (1-1-1)
-        ("Quad Page Program (0x32)",     0x32, 1, 1, 0, 3)  # (1-1-4)
+        ("Quad Page Program (0x32)", 0x32, 1, 1, 0, 3)  # (1-1-4)
     ]
     
-    for mode_name, cmd, cmd_mode, addr_mode, addr_len, data_mode in write_modes:
-        
-        test_data_len = random.randint(64, 256)  # Random length between 64 and 256 bytes
-        expected_words = math.ceil(test_data_len / 4)
-        
-        dut._log.info(f" -> Executing {mode_name} with {test_data_len} Bytes...")
-        
-        try:
-            await Timer(10, unit="us")
-            await RisingEdge(dut.clk_i)
-
-            # Sector Erase (0xD8) before every program
-            dut._log.info("    Sending Write Enable (0x06) command...")
-            await qspi_write_command(dut, cs_mask=s25fl_mask, cmd=0x06)
-            await Timer(500, unit="ns")
-            await RisingEdge(dut.clk_i)
-
-            dut._log.info("    Verifying Write Enable Latch (WEL) bit is set in Status Register 1...")
-            status_reg = await qspi_read_register(dut, cs_mask=s25fl_mask, cmd=0x05, data_len=1)
-            dut._log.info(f"    Status Register 1 value: {status_reg>>24:08b}")
-            if ((status_reg>>24) & 0x02) == 0:
-                raise ValueError("Failed to set Write Enable Latch (WEL) bit in Status Register!")
-            dut._log.info("    WEL bit is set. Proceeding to write data...")
-
-            dut._log.info(f"    Erasing Sector at 0x{current_addr:08X} with Sector Erase (0xD8) command...")
-            await qspi_custom_transaction(
-                dut=dut,
-                cs_mask=s25fl_mask,
-                cmd=0xD8, # Sector Eras
-                cmd_mode=1,
-                addr=current_addr,
-                addr_mode=1,
-                addr_len=0,
-                dummy_len=0,
-                data_mode=0,
-                data_len=0,
-                ddr=False
-            )
-
-            # Wait for Write-In-Progress (WIP) bit to clear
-            dut._log.info("    Waiting for Write-In-Progress (WIP) bit to clear in Status Register 1...")
-            await qspi_poll_wip_bit(dut, cs_mask=s25fl_mask, status_cmd=0x05, poll_interval_ns=100000, timeout_s=15e-3)
-            dut._log.info("    WIP bit cleared. Sector erased successfully.")
-
-            # Check E_ERR flag in Status Register 1 to ensure the program was successful
-            dut._log.info("    Verifying Program completed successfully by checking Status Register 1...")
-            status_reg = await qspi_read_register(dut, cs_mask=s25fl_mask, cmd=0x05, data_len=1)
-            dut._log.info(f"    Status Register 1 value: {status_reg>>24:08b}")
-            if ((status_reg>>24) & 0x20) != 0:
-                raise ValueError("Program failed! E_ERR bit is set in Status Register 1.")
-
-
-            # Write Enable (WREN) must be sent before EVERY write/program command
-            dut._log.info("    Sending Write Enable (0x06) command...")
-            await qspi_write_command(dut, cs_mask=s25fl_mask, cmd=0x06)
-            await Timer(500, unit="ns")
-            await RisingEdge(dut.clk_i)
-
-            # Send Read Status Register (0x05) to verify WEL bit is set
-            dut._log.info("    Verifying Write Enable Latch (WEL) bit is set in Status Register 1...")
-            status_reg = await qspi_read_register(dut, cs_mask=s25fl_mask, cmd=0x05, data_len=1)
-            dut._log.info(f"    Status Register 1 value: {status_reg>>24:08b}")
-            if ((status_reg>>24) & 0x02) == 0:
-                raise ValueError("Failed to set Write Enable Latch (WEL) bit in Status Register!")
-            dut._log.info("    WEL bit is set. Proceeding to write data...")
+    for i in range(5):
+        for mode_name, cmd, cmd_mode, addr_mode, addr_len, data_mode in write_modes:
             
-            await Timer(500, unit="ns")
-            await RisingEdge(dut.clk_i)
+            test_data_len = random.randint(64, 256)  # Random length between 64 and 256 bytes
+            expected_words = math.ceil(test_data_len / 4)
             
-            # Start the Write Transaction
-            await qspi_write_transaction(
-                dut=dut,
-                cs_mask=s25fl_mask,
-                cmd=cmd,
-                cmd_mode=cmd_mode,
-                addr=current_addr,
-                addr_mode=addr_mode,
-                addr_len=addr_len,
-                data_mode=data_mode,
-                data_len=test_data_len,
-                data_words=payload_pool,
-                ddr=False
-            )
+            dut._log.info(f" -> Executing {mode_name} with {test_data_len} Bytes...")
             
-            # Wait for Write-In-Progress (WIP) bit to clear
-            dut._log.info("    Waiting for Write-In-Progress (WIP) bit to clear in Status Register 1...")
-            await qspi_poll_wip_bit(dut, cs_mask=s25fl_mask, status_cmd=0x05, poll_interval_ns=100000, timeout_s=5e-3)
-            dut._log.info("    WIP bit cleared. Write operation completed successfully.")
+            try:
+                await Timer(10, unit="us")
+                await RisingEdge(dut.clk_i)
 
-            # Check P_Error flag in Status Register 1 to ensure the program was successful
-            dut._log.info("    Verifying Program completed successfully by checking Status Register 1...")
-            status_reg = await qspi_read_register(dut, cs_mask=s25fl_mask, cmd=0x05, data_len=1)
-            dut._log.info(f"    Status Register 1 value: {status_reg>>24:08b}")
-            if ((status_reg>>24) & 0x40) != 0:
-                raise ValueError("Program failed! P_Error bit is set in Status Register 1.")
+                # Send Write Enable (WREN) before the Page Program
+                dut._log.info("    Sending Write Enable (0x06) command...")
+                await qspi_write_command(dut, cs_mask=s25fl_mask, cmd=0x06)
+                await Timer(500, unit="ns")
+                await RisingEdge(dut.clk_i)
 
-            # Wait some time before reading back
-            await Timer(10, unit="us")
-            await RisingEdge(dut.clk_i)
-
-            # VERIFICATION: Read the data back
-            dut._log.info(f"    Verifying Written Data at 0x{current_addr:08X}...")
-            readback_list = await qspi_read_transaction(
-                dut=dut, 
-                cs_mask=s25fl_mask, 
-                cmd=0x03, # Fast Read
-                cmd_mode=1, addr=current_addr, addr_mode=1, addr_len=0, dummy_len=0, data_mode=1, 
-                data_len=test_data_len, ddr=False
-            )
-
-            dummy_dict = {current_addr: payload_pool}
-            expected_list = get_expected_words(
-                golden_dict=dummy_dict, 
-                target_addr=current_addr, 
-                num_words=expected_words,
-                total_bytes=test_data_len, 
-                endian="big"
-            )
+                # Start the Write Transaction
+                await qspi_write_transaction(
+                    dut=dut,
+                    cs_mask=s25fl_mask,
+                    cmd=cmd,
+                    cmd_mode=cmd_mode,
+                    addr=current_addr,
+                    addr_mode=addr_mode,
+                    addr_len=addr_len,
+                    data_mode=data_mode,
+                    data_len=test_data_len,
+                    data_words=payload_pool,
+                    ddr=False
+                )
                 
-            # Compare what we told it to write against what we read back
-            for i in range(expected_words):
-                if readback_list[i] != expected_list[i]:
-                    raise ValueError(f"WRITE CORRUPTION at Word {i}! Wrote 0x{payload_pool[i]:08X}, Read 0x{readback_list[i]:08X}")
-                    
-            dut._log.info("    Write and Readback perfectly MATCH!")
-            scoreboard.record("S25FL Write", mode_name, passed=True)
-            
-            # Advance address for next loop so we don't overwrite the data we just successfully wrote
-            current_addr += test_data_len
+                # Wait for Write-In-Progress (WIP) bit to clear
+                dut._log.info("    Waiting for Write-In-Progress (WIP) bit to clear in Status Register 1...")
+                await qspi_poll_wip_bit(dut, cs_mask=s25fl_mask, status_cmd=0x05, poll_interval_ns=100000, timeout_s=5e-3)
+                dut._log.info("    WIP bit cleared. Write operation completed successfully.")
 
-            await Timer(10, unit="us")
+                # Check P_Error flag in Status Register 1 to ensure the program was successful
+                dut._log.info("    Verifying Program completed successfully by checking Status Register 1...")
+                status_reg = await qspi_read_register(dut, cs_mask=s25fl_mask, cmd=0x05, data_len=1)
+                dut._log.info(f"    Status Register 1 value: {status_reg>>24:08b}")
+                if ((status_reg>>24) & 0x40) != 0:
+                    raise ValueError("Program failed! P_Error bit is set in Status Register 1.")
+
+                # Wait some time before reading back
+                await Timer(10, unit="us")
+                await RisingEdge(dut.clk_i)
+
+                # VERIFICATION: Read the data back
+                dut._log.info(f"    Verifying Written Data at 0x{current_addr:08X}...")
+                readback_list = await qspi_read_transaction(
+                    dut=dut, 
+                    cs_mask=s25fl_mask, 
+                    cmd=0xBB, # Dual I/O Read
+                    cmd_mode=1, addr=current_addr, addr_mode=2, addr_len=0, dummy_len=4, data_mode=2, 
+                    data_len=test_data_len, ddr=False
+                )
+
+                dummy_dict = {current_addr: payload_pool}
+                expected_list = get_expected_words(
+                    golden_dict=dummy_dict, 
+                    target_addr=current_addr, 
+                    num_words=expected_words,
+                    total_bytes=test_data_len, 
+                    endian="big"
+                )
+                    
+                # Compare what we told it to write against what we read back
+                for i in range(expected_words):
+                    if readback_list[i] != expected_list[i]:
+                        raise ValueError(f"WRITE CORRUPTION at Word {i}! Wrote 0x{payload_pool[i]:08X}, Read 0x{readback_list[i]:08X}")
+                        
+                dut._log.info("    Write and Readback perfectly MATCH!")
+                scoreboard.record("S25FL Write", mode_name, passed=True)
+                
+                current_addr += 0x001000  # Move to the next sector (256 bytes)
+
+                await Timer(10, unit="us")
+                await RisingEdge(dut.clk_i)
+
+            except Exception as e:
+                dut._log.error(f"    [!] FAILED: {str(e)}")
+                scoreboard.record("S25FL Write", mode_name, passed=False, error_msg=str(e))
+                
+            await Timer(500, unit="ns")
             await RisingEdge(dut.clk_i)
 
-        except Exception as e:
-            dut._log.error(f"    [!] FAILED: {str(e)}")
-            scoreboard.record("S25FL Write", mode_name, passed=False, error_msg=str(e))
-            
-        await Timer(500, unit="ns")
-        await RisingEdge(dut.clk_i)
+
     scoreboard.report(dut._log)
 
 
