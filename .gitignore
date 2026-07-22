@@ -11,3 +11,7 @@ sim/**/*.log
 sim/**/*.err
 
 venv
+
+# Vivado generated files
+!synth/vivado/**/*.xdc
+synth/vivado/**/**/
