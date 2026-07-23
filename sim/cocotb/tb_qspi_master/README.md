@@ -22,7 +22,7 @@ make
 ```
 
 ### Run the Gate-Level Simulation (GLS):
-> *Note: Could take up minutes*
+> *Note: GLS could take up minutes*
 ```bash
 make GATELEVEL=1
 ```
