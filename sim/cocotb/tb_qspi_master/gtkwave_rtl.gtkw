@@ -5,7 +5,7 @@
 [dumpfile] "/foss/designs/OpenQSPI_Chipathon2026/sim/cocotb/tb_qspi_master/qspi_waves.vcd"
 [dumpfile_mtime] "Sat Jul 18 17:00:33 2026"
 [dumpfile_size] 85300150
-[savefile] "/foss/designs/OpenQSPI_Chipathon2026/sim/cocotb/tb_qspi_master/gtkwave_config.gtkw"
+[savefile] "/foss/designs/OpenQSPI_Chipathon2026/sim/cocotb/tb_qspi_master/gtkwave_rtl.gtkw"
 [timestart] 0
 [size] 1920 1163
 [pos] -1 -1
