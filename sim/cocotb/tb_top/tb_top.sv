@@ -17,12 +17,12 @@ module tb_top #(
 );
 
   // QSPI interface
-  logic qspi_csn;
   logic qspi_sck;
+  wire [1:0] qspi_csn;
   wire [3:0] qspi_io;
   top #(
 `ifndef GATELEVEL
-      .CS_NUM(1),
+      .CS_NUM(2),
       .CLOCK_FREQ(CLOCK_FREQ),
       .BAUD_RATE(BAUD_RATE)
 `endif
@@ -48,19 +48,19 @@ module tb_top #(
 
   // MEMORY VERILOG MODELS
   // W25Q65NE (Winbond)
-  //   W25QxxNExxIx u_flash1 (
-  //       .CSn   (qspi_csn),
-  //       .CLK   (qspi_sck),
-  //       .DIO   (qspi_io[0]),
-  //       .DO    (qspi_io[1]),
-  //       .WPn   (qspi_io[2]),
-  //       .HOLDn (qspi_io[3]),
-  //       .RESETn(rst_ni)
-  //   );
+  W25QxxNExxIx u_flash1 (
+      .CSn   (qspi_csn[0]),
+      .CLK   (qspi_sck),
+      .DIO   (qspi_io[0]),
+      .DO    (qspi_io[1]),
+      .WPn   (qspi_io[2]),
+      .HOLDn (qspi_io[3]),
+      .RESETn(rst_ni)
+  );
   // MX25L51245G (Macronix)
   MX25L51245G u_flash2 (
       .SCLK(qspi_sck),
-      .CS(qspi_csn),
+      .CS(qspi_csn[1]),
       .SI(qspi_io[0]),
       .SO(qspi_io[1]),
       .WP(qspi_io[2]),

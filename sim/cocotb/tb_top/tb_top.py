@@ -109,7 +109,7 @@ async def uart_rx_monitor(dut, rx_queue):
         dut._log.error(f"UART RX CRASHED: {e}")
         await rx_queue.put(None)
 
-async def setup_dut(dut, flash_setup_time_ms=3):
+async def setup_dut(dut, flash_setup_time_us=3000):
     """Initialize standard signals and start the clock."""
     cocotb.start_soon(Clock(dut.clk_i, clock_period_ns, unit="ns").start())
 
@@ -127,8 +127,8 @@ async def setup_dut(dut, flash_setup_time_ms=3):
     cocotb.start_soon(uart_rx_monitor(dut, rx_queue))
 
     # Wait for flash setup time
-    cocotb.log.info(f"Waiting for flash setup time: {flash_setup_time_ms} ms...")
-    await Timer(flash_setup_time_ms, units="ms")
+    cocotb.log.info(f"Waiting for flash setup time: {flash_setup_time_us} us...")
+    await Timer(flash_setup_time_us, unit="us")
     await RisingEdge(dut.clk_i)
 
     return rx_queue
@@ -199,7 +199,7 @@ async def csr_write(dut, rx_queue, addr, data, verbose=True):
 # ==============================================================================
 # QSPI Helper Functions
 # ==============================================================================
-def build_cfg0(prescaler=0, addr_len=0, dummy_len=0, cmd_mode=0, addr_mode=0, data_mode=0, sck_mode=0, data_dir=0, crm=0, ddr=0, endian=0):
+def build_cfg0(prescaler=0, addr_len=0, dummy_len=0, cmd_mode=0, addr_mode=0, data_mode=0, sck_mode=0, data_dir=0, crm=0, ddr=0, endian=0, cs_num=0):
     """Packs fields into QSPI_CFG0 format."""
     cfg = 0
     cfg |= (prescaler & 0xFF) << 0
@@ -213,6 +213,8 @@ def build_cfg0(prescaler=0, addr_len=0, dummy_len=0, cmd_mode=0, addr_mode=0, da
     cfg |= (crm & 0x1) << 23
     cfg |= (ddr & 0x1) << 24
     cfg |= (endian & 0x1) << 25
+    cfg |= ((1<<cs_num) & 0x3) << 26
+
     return cfg
 
 async def qspi_wait_idle(dut, rx_queue, timeout_cycles=1000):
@@ -250,7 +252,7 @@ async def flash_poll_busy(dut, rx_queue, interval_us=100, timeout_us=2000):
 
                 return True
         
-        await Timer(interval_us, units="us")
+        await Timer(interval_us, unit="us")
         await RisingEdge(dut.clk_i)
     
     dut._log.error("Flash BUSY polling timeout!")
@@ -263,7 +265,7 @@ async def flash_poll_busy(dut, rx_queue, interval_us=100, timeout_us=2000):
 @cocotb.test()
 async def test_csr_read_write(dut):
     """Sanity test reading and writing to CSRs via UART."""
-    rx_queue = await setup_dut(dut, flash_setup_time_ms=0)
+    rx_queue = await setup_dut(dut, flash_setup_time_us=10)
 
     # Example CSR address and data
     test_addr = QSPI_TIMEOUT
@@ -276,28 +278,31 @@ async def test_csr_read_write(dut):
 
 @cocotb.test()
 async def test_qspi_rdid(dut):
-    """Test standard SPI Read ID (RDID 0x9F) sequence."""
+    """Test standard QSPI Read ID (RDID 0x9F) sequence."""
     rx_queue = await setup_dut(dut)
     dut._log.info("Starting SPI RDID (0x9F) Test...")
 
-    # Setup CFG0: Single CMD, Single Data, Direction=Read, No Address, No Dummies
-    cfg0 = build_cfg0(cmd_mode=1, data_mode=1, data_dir=0)
-    await csr_write(dut, rx_queue, QSPI_CFG0, cfg0)
+    for i in range(2):  # Test both flash chips (CS0 and CS1)
+        dut._log.info(f"Testing RDID for the flash chip (CS{i})...")
 
-    # Setup Command (0x9F) and Data Length (3 bytes for standard JEDEC ID)
-    await csr_write(dut, rx_queue, QSPI_CMD, 0x9F)
-    await csr_write(dut, rx_queue, QSPI_DLEN, 3)
+        # Setup CFG0: Single CMD, Single Data, Direction=Read, No Address, No Dummies
+        cfg0 = build_cfg0(cmd_mode=1, data_mode=1, data_dir=0, cs_num=i)
+        await csr_write(dut, rx_queue, QSPI_CFG0, cfg0)
 
-    # Pulse START in QSPI_CTRL
-    await csr_write(dut, rx_queue, QSPI_CTRL, 0x01) 
+        # Setup Command (0x9F) and Data Length (3 bytes for standard JEDEC ID)
+        await csr_write(dut, rx_queue, QSPI_CMD, 0x9F)
+        await csr_write(dut, rx_queue, QSPI_DLEN, 3)
 
-    # Wait for completion
-    await qspi_wait_idle(dut, rx_queue)
+        # Pulse START in QSPI_CTRL
+        await csr_write(dut, rx_queue, QSPI_CTRL, 0x01) 
 
-    # Pop data from FIFO
-    rdid_data = await csr_read(dut, rx_queue, QSPI_DR)
-    
-    dut._log.info(f"RDID Raw Data Received: 0x{rdid_data:08X}")
+        # Wait for completion
+        await qspi_wait_idle(dut, rx_queue)
+
+        # Pop data from FIFO
+        rdid_data = await csr_read(dut, rx_queue, QSPI_DR)
+        
+        dut._log.info(f"RDID Raw Data Received: 0x{rdid_data:08X}")
 
 
 @cocotb.test()

@@ -4,7 +4,7 @@
 
 
 module top #(
-    parameter int CS_NUM     = 1,
+    parameter int CS_NUM     = 2,
     parameter int CLOCK_FREQ = 50_000_000,
     parameter int BAUD_RATE  = 921_600
 ) (
