@@ -46,9 +46,8 @@ include $(shell cocotb-config --makefiles)/Makefile.sim
 copy_mem_files:
 	@mkdir -p ./sim_build
 	@cp -f ../../srcs/S25FL128S/*.mem ./ 2>/dev/null || true
+	@cp -f ../../srcs/W25QxxNE_Family_v1.0n/*.TXT ./ 2>/dev/null || true
 	@cp -f ../../srcs/MX25L51245G/*.TXT ./ 2>/dev/null || true
-	@cp -f ../../srcs/MX25L51245G/*.mem ./ 2>/dev/null || true
-	@cp -f ../../srcs/MX25L51245G/*.dat ./ 2>/dev/null || true
 	
 compile: copy_mem_files
 sim: copy_mem_files
