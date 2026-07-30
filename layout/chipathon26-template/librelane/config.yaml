@@ -28,6 +28,11 @@ DESIGN_NAME: chip_top
 VERILOG_FILES:
 - dir::../src/chip_top.sv
 - dir::../src/chip_core.sv
+- dir::../../../rtl/qspi_master.sv
+- dir::../../../rtl/fifo.sv
+- dir::../../../rtl/apb_qspi.sv
+- dir::../../../rtl/uart_simple.sv
+- dir::../../../rtl/uart_to_apb.sv
 
 # Enable plugin for better SystemVerilog support
 # USE_SLANG: True
@@ -57,7 +62,7 @@ IGNORE_DISCONNECTED_MODULES:
 # Clock
 CLOCK_PORT: clk_PAD
 CLOCK_NET: clk_pad/Y
-CLOCK_PERIOD: 40 # 25 MHz
+CLOCK_PERIOD: 20 # 50 MHz
 
 # Fix hold violations
 PL_RESIZER_HOLD_SLACK_MARGIN: 0.35

@@ -59,8 +59,8 @@
 `ifdef SLOT_WORKSHOP
 
 // Power/ground pads for core and I/O
-`define NUM_DVDD_PADS 4
-`define NUM_DVSS_PADS 4
+`define NUM_DVDD_PADS 1
+`define NUM_DVSS_PADS 1
 
 // Signal pads.  NUM_INPUT_PADS is 1 (not 0) to avoid the Yosys
 // zero-width-vector quirk on `input_PAD2CORE[-1:0]` which otherwise
@@ -68,7 +68,7 @@
 // The single input_pad is listed in slot_workshop.yaml as
 // inputs[0].pad near the SW corner.
 `define NUM_INPUT_PADS 1
-`define NUM_BIDIR_PADS 20
+`define NUM_BIDIR_PADS 9
 `define NUM_ANALOG_PADS 60
 
 `endif
