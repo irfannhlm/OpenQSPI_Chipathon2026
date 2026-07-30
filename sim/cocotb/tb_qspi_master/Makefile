@@ -15,6 +15,7 @@ VERILOG_SOURCES += $(PWD)/../../../rtl/fifo.sv
 VERILOG_SOURCES += $(PWD)/../../srcs/S25FL128S/s25fl128s.v
 VERILOG_SOURCES += $(PWD)/../../srcs/W25QxxNE_Family_v1.0n/W25QxxNExxIx_v1.0n.v
 VERILOG_SOURCES += $(PWD)/../../srcs/MX25L51245G/MX25L51245G.v
+VERILOG_SOURCES += $(PWD)/../../srcs/23LC1024/23LC1024.v
 
 TOPLEVEL = tb_qspi_master
 COCOTB_TEST_MODULES = tb_qspi_master # python testbench module

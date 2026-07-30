@@ -7,6 +7,7 @@ from cocotb.triggers import Timer, RisingEdge
 
 CLOCK_FREQ = 50e6  # 50 MHz
 STARTUP_TIME = 4e-3  # 4ms; exceeds the MX25L tVSL power-up gate
+TEST_FILE = "README.md"  # Example test payload file
 
 class Scoreboard:
     """Tracks passed/failed transactions to provide a summary at the end of the simulation."""
@@ -111,7 +112,7 @@ async def fifo_pop_data(dut, num_words=1):
     return fifo_data
 
 
-async def qspi_write_command(dut, cs_mask, cmd, qpi=False):
+async def qspi_write_command(dut, cs_mask, cmd, qpi=False, sdi=False):
     """
     Fires a standalone 8-bit command with NO address and NO data.
     Perfect for Write Enable (0x06), Write Disable (0x04), or Reset Enable (0x66).
@@ -121,7 +122,7 @@ async def qspi_write_command(dut, cs_mask, cmd, qpi=False):
 
     dut.qspi_csn_sel_i.value   = cs_mask
     dut.qspi_cmd_i.value       = cmd
-    dut.qspi_cmd_mode_i.value  = 3 if qpi else 1 # 4 Line QPI or 1 Line SPI
+    dut.qspi_cmd_mode_i.value  = 3 if qpi else 2 if sdi else 1 # 4 Line QPI or 2 Line SDI or 1 Line SPI
     dut.qspi_addr_mode_i.value = 0 # Skip Address
     dut.qspi_dummy_len_i.value = 0 # Skip Dummy
     dut.qspi_data_mode_i.value = 0 # Skip Data
@@ -734,9 +735,9 @@ async def test_all_flash_id(dut):
     
     # Flash Devices: (Name, CS Mask, Expected ID)
     flash_devices = [
-        ("S25FL128S", 0b001, 0x012018), # Manufacturer: 0x01, Memory Type: 0x20, Capacity: 0x18
-        ("W25Q65NE",  0b010, 0xEF8517), # Manufacturer: 0xEF, JEDEC ID: 0x8517
-        ("MX25L51245G", 0b100, 0xC2201A) # Manufacturer: 0xC2, Memory Type: 0x20, Capacity: 0x1A
+        ("S25FL128S", 0b0001, 0x012018), # Manufacturer: 0x01, Memory Type: 0x20, Capacity: 0x18
+        ("W25Q65NE",  0b0010, 0xEF8517), # Manufacturer: 0xEF, JEDEC ID: 0x8517
+        ("MX25L51245G", 0b0100, 0xC2201A) # Manufacturer: 0xC2, Memory Type: 0x20, Capacity: 0x1A
     ]
     
     for device_name, cs_mask, expected_id in flash_devices:
@@ -770,7 +771,7 @@ async def test_s25fl_read_modes(dut):
     await Timer(500, unit="ns")
     await RisingEdge(dut.clk_i)
     
-    s25fl_mask = 0b001
+    s25fl_mask = 0b0001
     scoreboard = Scoreboard()
 
     dut._log.info("Loading Golden Data from s25fl128s.mem...")
@@ -857,11 +858,11 @@ async def test_s25fl_write_modes(dut):
     await Timer(500, unit="ns")
     await RisingEdge(dut.clk_i)
     
-    s25fl_mask = 0b001
+    s25fl_mask = 0b0001
     scoreboard = Scoreboard()
     
     dut._log.info("Loading Raw Payload Pool...")
-    payload_pool = load_raw_payload_from_any_file("ReadMe.TXT", endian="big")
+    payload_pool = load_raw_payload_from_any_file(TEST_FILE, endian="big")
 
     # Enable Quad Mode for S25FL
     await s25fl_quad_enable_routine(dut, cs_mask=s25fl_mask)
@@ -981,14 +982,14 @@ async def test_w25q_write_read(dut):
     await Timer(500, unit="ns")
     await RisingEdge(dut.clk_i)
     
-    w25q_mask = 0b010
+    w25q_mask = 0b0010
     scoreboard = Scoreboard()
 
     skip_all_reads = int(os.environ.get("SKIP_ALL_READS", "0"))
     skip_random_writes = int(os.environ.get("SKIP_RANDOM_WRITES", "0"))
     
     dut._log.info("Loading Raw Payload Pool...")
-    payload_pool = load_raw_payload_from_any_file("ReadMe.TXT", endian="big")
+    payload_pool = load_raw_payload_from_any_file(TEST_FILE, endian="big")
 
     # Start at a known empty sector
     current_addr = 0x000000
@@ -1401,14 +1402,14 @@ async def test_mx25l_write_read(dut):
     await Timer(500, unit="ns")
     await RisingEdge(dut.clk_i)
     
-    mx25l_mask = 0b100
+    mx25l_mask = 0b0100
     scoreboard = Scoreboard()
 
     skip_all_reads = int(os.environ.get("SKIP_ALL_READS", "0"))
     skip_random_writes = int(os.environ.get("SKIP_RANDOM_WRITES", "0"))
     
     dut._log.info("Loading Raw Payload Pool...")
-    payload_pool = load_raw_payload_from_any_file("ReadMe.TXT", endian="big")
+    payload_pool = load_raw_payload_from_any_file(TEST_FILE, endian="big")
 
     # Start at a known empty sector
     current_addr = 0x000000
@@ -2182,3 +2183,282 @@ async def test_mx25l_write_read(dut):
     scoreboard.report(dut._log)
 
 
+@cocotb.test()
+async def test_m23lc_write_read(dut):
+    """Test a full write/readback cycle to the M23LC1024 PSRAM device using the QSPI interface.
+    Tests include all modes: SPI (1-1-1), SDI (2-2-2), SQI (4-4-4).
+    """
+
+    await init_qspi_master(dut)
+    dut.qspi_prescaler_i.value = 4 # Set prescaler to 4 for a slower clock during testing
+
+    await Timer(500, unit="ns")
+    await RisingEdge(dut.clk_i)
+    
+    m23lc_mask = 0b1000
+    scoreboard = Scoreboard()
+
+    dut._log.info("Loading Raw Payload Pool...")
+    payload_pool = load_raw_payload_from_any_file(TEST_FILE, endian="big")
+    
+    # Start at a known empty sector
+    current_addr = 0x000000
+
+    # ======================== SPI (1-1-1) TESTS ========================
+    dut._log.info("COMMENCING SPI (1-1-1) MODE TESTS FOR M23LC1024...")
+
+    # Initial write payload to known empty address
+    dut._log.info(f"Commencing Write Tests starting at known empty address: 0x{current_addr:08X}...")
+    try:
+        test_data_len = 256  # Full Page Program
+        expected_words = math.ceil(test_data_len / 4)
+        
+        dut._log.info(f" -> Executing Write (0x02) with {test_data_len} Bytes...")
+        
+        await Timer(10, unit="us")
+        await RisingEdge(dut.clk_i)
+
+        # Start the Write Transaction
+        await qspi_write_transaction(
+            dut=dut,
+            cs_mask=m23lc_mask,
+            cmd=0x02, # Write command for M23LC1024
+            cmd_mode=1,
+            addr=current_addr,
+            addr_mode=1,
+            addr_len=0,
+            data_mode=1,
+            data_len=test_data_len,
+            data_words=payload_pool,
+            ddr=False
+        )
+
+    except Exception as e:
+        dut._log.error(f"    [!] FAILED: {str(e)}")
+        scoreboard.record("SPI Write", "Write (0x02)", passed=False, error_msg=str(e))
+
+
+    # Wait some time before reading back
+    await Timer(10, unit="us")
+    await RisingEdge(dut.clk_i)
+
+    # Readback verification
+    for i in range(5):
+        test_data_len = random.randint(64, 256)  # Random length between 64 and 256 bytes
+        expected_words = math.ceil(test_data_len / 4)
+
+        dut._log.info(f" -> Executing Read (0x03) for verification with {test_data_len} Bytes...")
+        try:
+            readback_list = await qspi_read_transaction(
+                dut=dut, 
+                cs_mask=m23lc_mask, 
+                cmd=0x03, # Read command for M23LC1024
+                cmd_mode=1, addr=current_addr, addr_mode=1, addr_len=0, dummy_len=0, data_mode=1, 
+                data_len=test_data_len, ddr=False
+            )
+
+            dummy_dict = {current_addr: payload_pool}
+            expected_list = get_expected_words(
+                golden_dict=dummy_dict, 
+                target_addr=current_addr, 
+                num_words=expected_words,
+                total_bytes=test_data_len,
+                endian="big"
+            )
+
+            # Compare what we wrote against what we read back
+            for j in range(expected_words):
+                if readback_list[j] != expected_list[j]:
+                    dut._log.error(f"    [VERIFY] Word {j}: Expected 0x{expected_list[j]:08X}, Got 0x{readback_list[j]:08X}")
+                    raise ValueError(f"DATA MISMATCH at Word {j}! Wrote 0x{expected_list[j]:08X}, Read 0x{readback_list[j]:08X}")
+
+            dut._log.info("    Readback verification PASSED!")
+            scoreboard.record("SPI Readback", f"Read (0x03) - Iteration {i+1}", passed=True)
+
+        except Exception as e:
+            dut._log.error(f"    [!] FAILED: {str(e)}")
+            scoreboard.record("SPI Readback", f"Read (0x03) - Iteration {i+1}", passed=False, error_msg=str(e))
+
+
+    await Timer(500, unit="ns")
+    await RisingEdge(dut.clk_i)
+
+
+    # ======================== SDI (2-2-2) TESTS ========================
+    dut._log.info("COMMENCING SDI (2-2-2) MODE TESTS FOR M23LC1024...")
+    current_addr += 0x000100  # Continue at a known empty address
+
+    # Enter SDI Mode by sending the SDI Enable command (0x3B)
+    dut._log.info("Enabling SDI Mode for M23LC1024...")
+    await qspi_write_command(dut, cs_mask=m23lc_mask, cmd=0x3B)
+
+    # Initial write payload to known empty address
+    dut._log.info(f"Commencing Write Tests starting at known empty address: 0x{current_addr:08X}...")
+    try:
+        test_data_len = 256  # Full Page Program
+        expected_words = math.ceil(test_data_len / 4)
+        
+        dut._log.info(f" -> Executing Write (0x02) with {test_data_len} Bytes...")
+        
+        await Timer(10, unit="us")
+        await RisingEdge(dut.clk_i)
+
+        # Start the Write Transaction
+        await qspi_write_transaction(
+            dut=dut,
+            cs_mask=m23lc_mask,
+            cmd=0x02, # Write command for M23LC1024
+            cmd_mode=2,
+            addr=current_addr,
+            addr_mode=2,
+            addr_len=0,
+            data_mode=2,
+            data_len=test_data_len,
+            data_words=payload_pool,
+            ddr=False
+        )
+
+    except Exception as e:
+        dut._log.error(f"    [!] FAILED: {str(e)}")
+        scoreboard.record("SDI Write", "Write (0x02)", passed=False, error_msg=str(e))
+
+
+    # Wait some time before reading back
+    await Timer(10, unit="us")
+    await RisingEdge(dut.clk_i)
+
+    # Readback verification
+    for i in range(5):
+        test_data_len = random.randint(64, 256)  # Random length between 64 and 256 bytes
+        expected_words = math.ceil(test_data_len / 4)
+
+        dut._log.info(f" -> Executing Read (0x03) for verification with {test_data_len} Bytes...")
+        try:
+            readback_list = await qspi_read_transaction(
+                dut=dut, 
+                cs_mask=m23lc_mask, 
+                cmd=0x03, # Read command for M23LC1024
+                cmd_mode=2, addr=current_addr, addr_mode=2, addr_len=0, dummy_len=4, data_mode=2, 
+                data_len=test_data_len, ddr=False
+            )
+
+            dummy_dict = {current_addr: payload_pool}
+            expected_list = get_expected_words(
+                golden_dict=dummy_dict, 
+                target_addr=current_addr, 
+                num_words=expected_words,
+                total_bytes=test_data_len,
+                endian="big"
+            )
+
+            # Compare what we wrote against what we read back
+            for j in range(expected_words):
+                if readback_list[j] != expected_list[j]:
+                    dut._log.error(f"    [VERIFY] Word {j}: Expected 0x{expected_list[j]:08X}, Got 0x{readback_list[j]:08X}")
+                    raise ValueError(f"DATA MISMATCH at Word {j}! Wrote 0x{expected_list[j]:08X}, Read 0x{readback_list[j]:08X}")
+
+            dut._log.info("    Readback verification PASSED!")
+            scoreboard.record("SDI Readback", f"Read (0x03) - Iteration {i+1}", passed=True)
+
+        except Exception as e:
+            dut._log.error(f"    [!] FAILED: {str(e)}")
+            scoreboard.record("SDI Readback", f"Read (0x03) - Iteration {i+1}", passed=False, error_msg=str(e))
+
+    # Exit SDI Mode by sending the SDI Disable command (0xFF)
+    dut._log.info("Disabling SDI Mode for M23LC1024...")
+    await qspi_write_command(dut, cs_mask=m23lc_mask, cmd=0xFF, sdi=True)
+
+    await Timer(500, unit="ns")
+    await RisingEdge(dut.clk_i)
+
+
+    # ======================== SQI (4-4-4) TESTS ========================
+    dut._log.info("COMMENCING SQI (4-4-4) MODE TESTS FOR M23LC1024...")
+    current_addr += 0x000100  # Continue at a known empty address
+
+    # Enter SQI Mode by sending the SQI Enable command (0x38)
+    dut._log.info("Enabling SQI Mode for M23LC1024...")
+    await qspi_write_command(dut, cs_mask=m23lc_mask, cmd=0x38)
+
+    # Initial write payload to known empty address
+    dut._log.info(f"Commencing Write Tests starting at known empty address: 0x{current_addr:08X}...")
+    try:
+        test_data_len = 256  # Full Page Program
+        expected_words = math.ceil(test_data_len / 4)
+        
+        dut._log.info(f" -> Executing Write (0x02) with {test_data_len} Bytes...")
+        
+        await Timer(10, unit="us")
+        await RisingEdge(dut.clk_i)
+
+        # Start the Write Transaction
+        await qspi_write_transaction(
+            dut=dut,
+            cs_mask=m23lc_mask,
+            cmd=0x02, # Write command for M23LC1024
+            cmd_mode=3,
+            addr=current_addr,
+            addr_mode=3,
+            addr_len=0,
+            data_mode=3,
+            data_len=test_data_len,
+            data_words=payload_pool,
+            ddr=False
+        )
+
+    except Exception as e:
+        dut._log.error(f"    [!] FAILED: {str(e)}")
+        scoreboard.record("SDI Write", "Write (0x02)", passed=False, error_msg=str(e))
+
+
+    # Wait some time before reading back
+    await Timer(10, unit="us")
+    await RisingEdge(dut.clk_i)
+
+    # Readback verification
+    for i in range(5):
+        test_data_len = random.randint(64, 256)  # Random length between 64 and 256 bytes
+        expected_words = math.ceil(test_data_len / 4)
+
+        dut._log.info(f" -> Executing Read (0x03) for verification with {test_data_len} Bytes...")
+        try:
+            readback_list = await qspi_read_transaction(
+                dut=dut, 
+                cs_mask=m23lc_mask, 
+                cmd=0x03, # Read command for M23LC1024
+                cmd_mode=3, addr=current_addr, addr_mode=3, addr_len=0, dummy_len=2, data_mode=3, 
+                data_len=test_data_len, ddr=False
+            )
+
+            dummy_dict = {current_addr: payload_pool}
+            expected_list = get_expected_words(
+                golden_dict=dummy_dict, 
+                target_addr=current_addr, 
+                num_words=expected_words,
+                total_bytes=test_data_len,
+                endian="big"
+            )
+
+            # Compare what we wrote against what we read back
+            for j in range(expected_words):
+                if readback_list[j] != expected_list[j]:
+                    dut._log.error(f"    [VERIFY] Word {j}: Expected 0x{expected_list[j]:08X}, Got 0x{readback_list[j]:08X}")
+                    raise ValueError(f"DATA MISMATCH at Word {j}! Wrote 0x{expected_list[j]:08X}, Read 0x{readback_list[j]:08X}")
+
+            dut._log.info("    Readback verification PASSED!")
+            scoreboard.record("SQI Readback", f"Read (0x03) - Iteration {i+1}", passed=True)
+
+        except Exception as e:
+            dut._log.error(f"    [!] FAILED: {str(e)}")
+            scoreboard.record("SQI Readback", f"Read (0x03) - Iteration {i+1}", passed=False, error_msg=str(e))
+
+    # Exit SQI Mode by sending the SQI Disable command (0xFF)
+    dut._log.info("Disabling SQI Mode for M23LC1024...")
+    await qspi_write_command(dut, cs_mask=m23lc_mask, cmd=0xFF, qpi=True)
+
+    await Timer(500, unit="ns")
+    await RisingEdge(dut.clk_i)
+
+
+    # FINAL VERDICT
+    scoreboard.report(dut._log)

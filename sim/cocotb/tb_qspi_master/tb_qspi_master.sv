@@ -4,7 +4,7 @@
 
 `timescale 1ns / 1ps
 module tb_qspi_master #(
-    parameter int CS_NUM = 3  // number of chip selects
+    parameter int CS_NUM = 4  // number of chip selects
 ) (
     // Clock and reset
     input logic clk_i,
@@ -190,6 +190,16 @@ module tb_qspi_master #(
       .WP(qspi_io[2]),
       .RESET(1'b1),  // tied high for simulation
       .SIO3(qspi_io[3])
+  );
+  // 23LC1024 (Microchip)
+  M23LC1024 u_flash3 (
+      .SI_SIO0(qspi_io[0]),
+      .SO_SIO1(qspi_io[1]),
+      .SCK(qspi_sck),
+      .CS_N(qspi_csn[3]),
+      .SIO2(qspi_io[2]),
+      .HOLD_N_SIO3(qspi_io[3]),
+      .RESET(rst_ni)
   );
 
   // --- Waveform Generation ---
