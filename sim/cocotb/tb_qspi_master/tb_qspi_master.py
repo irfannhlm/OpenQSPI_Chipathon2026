@@ -2184,8 +2184,8 @@ async def test_mx25l_write_read(dut):
 
 
 @cocotb.test()
-async def test_m23lc_write_read(dut):
-    """Test a full write/readback cycle to the M23LC1024 PSRAM device using the QSPI interface.
+async def test_23lc_write_read(dut):
+    """Test a full write/readback cycle to the 23LC1024 PSRAM device using the QSPI interface.
     Tests include all modes: SPI (1-1-1), SDI (2-2-2), SQI (4-4-4).
     """
 
@@ -2205,7 +2205,7 @@ async def test_m23lc_write_read(dut):
     current_addr = 0x000000
 
     # ======================== SPI (1-1-1) TESTS ========================
-    dut._log.info("COMMENCING SPI (1-1-1) MODE TESTS FOR M23LC1024...")
+    dut._log.info("COMMENCING SPI (1-1-1) MODE TESTS FOR 23LC1024...")
 
     # Initial write payload to known empty address
     dut._log.info(f"Commencing Write Tests starting at known empty address: 0x{current_addr:08X}...")
@@ -2222,7 +2222,7 @@ async def test_m23lc_write_read(dut):
         await qspi_write_transaction(
             dut=dut,
             cs_mask=m23lc_mask,
-            cmd=0x02, # Write command for M23LC1024
+            cmd=0x02, # Write command for 23LC1024
             cmd_mode=1,
             addr=current_addr,
             addr_mode=1,
@@ -2252,7 +2252,7 @@ async def test_m23lc_write_read(dut):
             readback_list = await qspi_read_transaction(
                 dut=dut, 
                 cs_mask=m23lc_mask, 
-                cmd=0x03, # Read command for M23LC1024
+                cmd=0x03, # Read command for 23LC1024
                 cmd_mode=1, addr=current_addr, addr_mode=1, addr_len=0, dummy_len=0, data_mode=1, 
                 data_len=test_data_len, ddr=False
             )
@@ -2285,11 +2285,11 @@ async def test_m23lc_write_read(dut):
 
 
     # ======================== SDI (2-2-2) TESTS ========================
-    dut._log.info("COMMENCING SDI (2-2-2) MODE TESTS FOR M23LC1024...")
+    dut._log.info("COMMENCING SDI (2-2-2) MODE TESTS FOR 23LC1024...")
     current_addr += 0x000100  # Continue at a known empty address
 
     # Enter SDI Mode by sending the SDI Enable command (0x3B)
-    dut._log.info("Enabling SDI Mode for M23LC1024...")
+    dut._log.info("Enabling SDI Mode for 23LC1024...")
     await qspi_write_command(dut, cs_mask=m23lc_mask, cmd=0x3B)
 
     # Initial write payload to known empty address
@@ -2307,7 +2307,7 @@ async def test_m23lc_write_read(dut):
         await qspi_write_transaction(
             dut=dut,
             cs_mask=m23lc_mask,
-            cmd=0x02, # Write command for M23LC1024
+            cmd=0x02, # Write command for 23LC1024
             cmd_mode=2,
             addr=current_addr,
             addr_mode=2,
@@ -2337,7 +2337,7 @@ async def test_m23lc_write_read(dut):
             readback_list = await qspi_read_transaction(
                 dut=dut, 
                 cs_mask=m23lc_mask, 
-                cmd=0x03, # Read command for M23LC1024
+                cmd=0x03, # Read command for 23LC1024
                 cmd_mode=2, addr=current_addr, addr_mode=2, addr_len=0, dummy_len=4, data_mode=2, 
                 data_len=test_data_len, ddr=False
             )
@@ -2365,7 +2365,7 @@ async def test_m23lc_write_read(dut):
             scoreboard.record("SDI Readback", f"Read (0x03) - Iteration {i+1}", passed=False, error_msg=str(e))
 
     # Exit SDI Mode by sending the SDI Disable command (0xFF)
-    dut._log.info("Disabling SDI Mode for M23LC1024...")
+    dut._log.info("Disabling SDI Mode for 23LC1024...")
     await qspi_write_command(dut, cs_mask=m23lc_mask, cmd=0xFF, sdi=True)
 
     await Timer(500, unit="ns")
@@ -2373,11 +2373,11 @@ async def test_m23lc_write_read(dut):
 
 
     # ======================== SQI (4-4-4) TESTS ========================
-    dut._log.info("COMMENCING SQI (4-4-4) MODE TESTS FOR M23LC1024...")
+    dut._log.info("COMMENCING SQI (4-4-4) MODE TESTS FOR 23LC1024...")
     current_addr += 0x000100  # Continue at a known empty address
 
     # Enter SQI Mode by sending the SQI Enable command (0x38)
-    dut._log.info("Enabling SQI Mode for M23LC1024...")
+    dut._log.info("Enabling SQI Mode for 23LC1024...")
     await qspi_write_command(dut, cs_mask=m23lc_mask, cmd=0x38)
 
     # Initial write payload to known empty address
@@ -2395,7 +2395,7 @@ async def test_m23lc_write_read(dut):
         await qspi_write_transaction(
             dut=dut,
             cs_mask=m23lc_mask,
-            cmd=0x02, # Write command for M23LC1024
+            cmd=0x02, # Write command for 23LC1024
             cmd_mode=3,
             addr=current_addr,
             addr_mode=3,
@@ -2425,7 +2425,7 @@ async def test_m23lc_write_read(dut):
             readback_list = await qspi_read_transaction(
                 dut=dut, 
                 cs_mask=m23lc_mask, 
-                cmd=0x03, # Read command for M23LC1024
+                cmd=0x03, # Read command for 23LC1024
                 cmd_mode=3, addr=current_addr, addr_mode=3, addr_len=0, dummy_len=2, data_mode=3, 
                 data_len=test_data_len, ddr=False
             )
@@ -2453,7 +2453,7 @@ async def test_m23lc_write_read(dut):
             scoreboard.record("SQI Readback", f"Read (0x03) - Iteration {i+1}", passed=False, error_msg=str(e))
 
     # Exit SQI Mode by sending the SQI Disable command (0xFF)
-    dut._log.info("Disabling SQI Mode for M23LC1024...")
+    dut._log.info("Disabling SQI Mode for 23LC1024...")
     await qspi_write_command(dut, cs_mask=m23lc_mask, cmd=0xFF, qpi=True)
 
     await Timer(500, unit="ns")
