@@ -4,7 +4,7 @@
 // Author: Team Crispi - SSCS Chipathon 2026
 
 module qspi_master #(
-    parameter int CS_NUM = 3  // number of chip selects
+    parameter int CS_NUM = 2  // number of chip selects
 ) (
     // Clock and reset
     input logic clk_i,

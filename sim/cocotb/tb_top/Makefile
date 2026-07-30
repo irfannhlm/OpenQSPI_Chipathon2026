@@ -25,7 +25,7 @@ ifeq ($(GATELEVEL), 1)
     # --- Gate-Level Simulation (GLS) ---
     $(info *** RUNNING POST-SYNTHESIS GATE-LEVEL SIMULATION ***)
     
-    VERILOG_SOURCES += $(PWD)/../../../synth/yosys/top_netlist.v
+    VERILOG_SOURCES += $(PWD)/../../../synth/yosys/top_16fifo_2cs_nl.v
     VERILOG_SOURCES += /foss/pdks/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu7t5v0/verilog/gf180mcu_fd_sc_mcu7t5v0.v
     VERILOG_SOURCES += /foss/pdks/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu7t5v0/verilog/primitives.v
     
