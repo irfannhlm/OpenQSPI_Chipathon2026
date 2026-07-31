@@ -17,5 +17,8 @@ venv
 synth/vivado/**/**/
 
 
+# Librelane generated files
+layout/macros/**/runs
+
 __pycache__/
 *.pyc

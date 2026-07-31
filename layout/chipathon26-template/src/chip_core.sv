@@ -158,10 +158,14 @@ module chip_core #(
     // ---------------------------------------------------------
     // Pads 19:9: Unused Bidir Pads (Tie off safely)
     // ---------------------------------------------------------
-    assign bidir_out[NUM_BIDIR_PADS-1:9] = '0;
-    assign bidir_oe[NUM_BIDIR_PADS-1:9]  = '0; // Keep outputs disabled
-    assign bidir_ie[NUM_BIDIR_PADS-1:9]  = '0; // Keep inputs disabled
-
+    generate
+        if (NUM_BIDIR_PADS > 9) begin : gen_tie_off
+            assign bidir_out[NUM_BIDIR_PADS-1:9] = '0;
+            assign bidir_oe[NUM_BIDIR_PADS-1:9]  = '0; // Keep outputs disabled
+            assign bidir_ie[NUM_BIDIR_PADS-1:9]  = '0; // Keep inputs disabled
+        end
+    endgenerate
+    
     // ---------------------------------------------------------
     // Static Pad Electrical Configurations
     // ---------------------------------------------------------
