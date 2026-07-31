@@ -19,3 +19,4 @@ synth/vivado/**/**/
 
 __pycache__/
 *.pyc
+/archive_dawam
