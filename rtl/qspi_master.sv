@@ -68,6 +68,19 @@ module qspi_master #(
     end
   end
 
+  // Byte/bit target pre-calculation
+  logic [31:0] byte_target_data;
+  logic [ 5:0] bit_target_dummy;
+  always_ff @(posedge clk_i, negedge rst_ni) begin : target_precalc
+    if (!rst_ni) begin
+      byte_target_data <= 32'd0;
+      bit_target_dummy <= 6'd0;
+    end else if (qspi_start_i) begin
+      byte_target_data <= qspi_data_len_i - 1;  // last byte index
+      bit_target_dummy <= qspi_dummy_len_i - 1;  // last dummy bit index
+    end
+  end
+
   // QSPI SCK GEN
   // clock counter
   logic [7:0] clk_cnt;
@@ -126,6 +139,7 @@ module qspi_master #(
       default: bit_cnt_limit = 3'd7;
     endcase
   end
+
   logic [5:0] bit_cnt;  // same size as qspi_dummy_len_i
   logic bit_cnt_rst;
   logic bit_cnt_ddr;
@@ -148,7 +162,6 @@ module qspi_master #(
   logic [31:0] byte_cnt;
   logic byte_cnt_rst;
   wire byte_cnt_edge = (bit_cnt[2:0] == bit_cnt_limit && qspi_sck_negedge);
-  wire last_byte = (byte_cnt == (qspi_data_len_i - 1));
   always_ff @(posedge clk_i, negedge rst_ni) begin : byte_counter
     if (!rst_ni) begin
       byte_cnt <= 'd0;
@@ -291,15 +304,17 @@ module qspi_master #(
   logic qspi_rdata_rst, qspi_rdata_load, qspi_rdata_valid;
   always_ff @(posedge clk_i, negedge rst_ni) begin : rx_data_delay
     if (!rst_ni) begin
-      qspi_rdata_valid <= 'd0;
       qspi_rdata_load  <= 1'b0;
+      qspi_rdata_valid <= 1'b0;
     end else begin
-      qspi_rdata_load <= rx_shifter_en && byte_cnt_edge && ~qspi_sck_pause;  // load every byte
-      // ready every 4 bytes or at the end of data
-      qspi_rdata_valid <= rx_shifter_en && byte_cnt_edge && ~qspi_sck_pause && ~qspi_abort &&
-                      ((byte_cnt == (qspi_data_len_i-1)) || (byte_cnt[1:0] == 2'd3));
+      // load every byte
+      qspi_rdata_load <= rx_shifter_en && byte_cnt_edge && !qspi_sck_pause;
+      // rdata valid when last byte or every 4 bytes
+      qspi_rdata_valid <=  rx_shifter_en && byte_cnt_edge && !qspi_sck_pause && !qspi_abort
+                            && (byte_cnt == byte_target_data || (byte_cnt[1:0] == 2'd3));
     end
   end
+
   always_ff @(posedge clk_i, negedge rst_ni) begin : rx_data_reg
     if (!rst_ni) begin
       rx_data <= 'd0;
@@ -561,7 +576,7 @@ module qspi_master #(
 
         if (qspi_sck_negedge) begin
           // count mode bits as dummy bits
-          if (bit_cnt == (qspi_dummy_len_i - 1)) begin
+          if (bit_cnt == bit_target_dummy) begin
             if (qspi_data_mode_i != 'd0) begin
               tx_shifter_in_sel = 2'd3;  // select data byte
               tx_shifter_preset = 1'b1;  // preset first data byte into shifter
@@ -612,7 +627,7 @@ module qspi_master #(
         cphase_mode = 2'b00;  // disable output for DUMMY phase
 
         if (qspi_sck_negedge) begin
-          if (bit_cnt == (qspi_dummy_len_i - 1)) begin
+          if (bit_cnt == bit_target_dummy) begin
             cnt_rst = 1'b1;  // reset counters for next phase
             if (qspi_data_mode_i != 'd0) begin
               tx_shifter_in_sel = 2'd3;  // select data byte
@@ -651,7 +666,7 @@ module qspi_master #(
           qspi_sck_rst = 1'b1;  // reset SCK to idle state
           qspi_nstate  = DONE;  // go to done state if abort is asserted
         end else if (byte_cnt_edge) begin
-          if (last_byte) begin
+          if (byte_cnt == byte_target_data) begin
             qspi_wdata_ready = qspi_data_dir_i;  // pop out any remainding data if just one word
             if (byte_cnt[1:0] == 2'd0) begin
               qspi_rdata_rst = ~qspi_data_dir_i;  // reset rx data register for next read

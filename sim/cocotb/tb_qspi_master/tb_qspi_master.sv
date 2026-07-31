@@ -4,7 +4,8 @@
 
 `timescale 1ns / 1ps
 module tb_qspi_master #(
-    parameter int CS_NUM = 4  // number of chip selects
+    parameter int CS_NUM = 4,  // number of chip selects
+    parameter int FIFO_DEPTH = 16  // depth of the data FIFO
 ) (
     // Clock and reset
     input logic clk_i,
@@ -53,7 +54,7 @@ module tb_qspi_master #(
   logic fifo_push, fifo_pop, fifo_full, fifo_empty;
   fifo #(
       .DATA_WIDTH(32),
-      .DEPTH(16)
+      .DEPTH(FIFO_DEPTH)
   ) u_fifo (
       // clock and reset
       .clk_i  (clk_i),

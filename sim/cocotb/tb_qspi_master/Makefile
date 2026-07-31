@@ -20,6 +20,9 @@ VERILOG_SOURCES += $(PWD)/../../srcs/23LC1024/23LC1024.v
 TOPLEVEL = tb_qspi_master
 COCOTB_TEST_MODULES = tb_qspi_master # python testbench module
 
+FIFO_DEPTH ?= 16
+COMPILE_ARGS += -P $(TOPLEVEL).FIFO_DEPTH=$(FIFO_DEPTH)
+
 export SKIP_ALL_READS ?= 0
 export SKIP_RANDOM_WRITES ?= 0
 
@@ -36,7 +39,6 @@ ifeq ($(GATELEVEL), 1)
 else
     # --- Standard RTL Simulation ---
     $(info *** RUNNING STANDARD RTL SIMULATION ***)
-	COMPILE_ARGS += -P $(TOPLEVEL).BAUD_RATE=$(TEST_BAUD) -P $(TOPLEVEL).CLOCK_FREQ=$(CLOCK_FREQ)
 	VERILOG_SOURCES += $(PWD)/../../../rtl/qspi_master.sv
 endif
 
