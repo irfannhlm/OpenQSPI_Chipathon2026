@@ -46,8 +46,8 @@ SIGNOFF_SDC_FILE: dir::a09_chipathon26_top.sdc
 FALLBACK_SDC: dir::a09_chipathon26_top.sdc
 
 # Core sizing
-# FP_SIZING: absolute
-# DIE_AREA:  [0, 0, 700, 700]
+FP_SIZING: absolute
+DIE_AREA:  [0, 0, 500, 500]
 
 # Power / ground nets
 VDD_NETS:
@@ -82,7 +82,7 @@ GRT_DESIGN_REPAIR_MAX_SLEW_PCT: 30
 GRT_DESIGN_REPAIR_MAX_CAP_PCT: 30
 
 # Target density for placement
-# PL_TARGET_DENSITY_PCT: 65
+PL_TARGET_DENSITY_PCT: 65
 GRT_ALLOW_CONGESTION: true
 RT_MAX_LAYER: Metal4
 
@@ -105,8 +105,3 @@ PDN_ENABLE_PINS: True
 
 PDN_CORE_VERTICAL_LAYER: Metal2
 PDN_CORE_HORIZONTAL_LAYER: Metal3
-
-# Do not error on magic DRC violations
-# Note: Passing magic DRC is not required for the submission.
-# However, it is recommended to fix or carefully review all violations.
-ERROR_ON_MAGIC_DRC: True

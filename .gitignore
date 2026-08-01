@@ -12,13 +12,6 @@ sim/**/*.err
 
 venv
 
-# Vivado generated files
-!synth/vivado/**/*.xdc
-synth/vivado/**/**/
-
-
-# Librelane generated files
-layout/macros/**/runs
 
 __pycache__/
 *.pyc

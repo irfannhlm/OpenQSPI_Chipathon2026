@@ -70,7 +70,7 @@ module a09_chipathon26_top #(
   // APB_QSPI INSTANCE
   // QSPI interface
   apb_qspi #(
-      .FIFO_DEPTH(12),
+      .FIFO_DEPTH(8),
       .CS_NUM(CS_NUM)
   ) inst_apb_qspi (
       // clock and reset
