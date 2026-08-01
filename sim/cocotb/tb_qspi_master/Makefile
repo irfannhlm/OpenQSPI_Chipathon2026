@@ -20,7 +20,7 @@ VERILOG_SOURCES += $(PWD)/../../srcs/23LC1024/23LC1024.v
 TOPLEVEL = tb_qspi_master
 COCOTB_TEST_MODULES = tb_qspi_master # python testbench module
 
-FIFO_DEPTH ?= 16
+FIFO_DEPTH ?= 8
 COMPILE_ARGS += -P $(TOPLEVEL).FIFO_DEPTH=$(FIFO_DEPTH)
 
 export SKIP_ALL_READS ?= 0
