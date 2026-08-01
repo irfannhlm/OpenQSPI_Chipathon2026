@@ -68,36 +68,9 @@ module uart_to_apb #(
 
   // APB MASTER CONTROL LOGIC
 
-  // address decoder
-  logic [NUM_SLAVES-1:0] psel;
-  logic [31:0] paddr;
-  generate
-    for (genvar i = 0; i < NUM_SLAVES; i++) begin : gen_addr_decode
-      localparam logic [31:0] BASE = SLAVE_BASE[i*32+:32];
-      localparam logic [31:0] SIZE = SLAVE_SIZE[i*32+:32];
-      localparam logic [31:0] MASK = ~(SIZE - 1);  // convert size to mask
-      assign psel[i] = ((paddr & MASK) == BASE);
-    end
-  endgenerate
-  assign psel_o  = psel;
-  assign paddr_o = paddr;
-
-  // read mux
-  logic [31:0] rdata;
-  logic pready;
-  always_comb begin
-    rdata  = 'd0;
-    pready = 1'b1;
-    for (int i = 0; i < NUM_SLAVES; i++) begin
-      if (psel_o[i]) begin
-        rdata  = prdata_i[i*32+:32];
-        pready = pready_i[i];
-      end
-    end
-  end
-
   // apb control register
-  logic apb_handshake, apb_start, apb_error;
+  logic psel, pready;
+  logic apb_handshake, apb_req, apb_error;
   assign apb_handshake = (psel && penable_o && pready);
   always_ff @(posedge clk_i, negedge rst_ni) begin : apb_control_reg
     if (!rst_ni) begin
@@ -105,7 +78,7 @@ module uart_to_apb #(
       apb_error <= 1'b0;
     end else begin
       // penable control
-      if (apb_start) begin
+      if (psel) begin
         penable_o <= 1'b1;
       end else if (apb_handshake) begin
         penable_o <= 1'b0;
@@ -114,10 +87,36 @@ module uart_to_apb #(
       // apb error flag
       if (apb_handshake && pslverr_i) begin
         apb_error <= 1'b1;
-      end else if (apb_start) begin
+      end else if (apb_req) begin
         apb_error <= 1'b0;
       end
 
+    end
+  end
+  assign psel = apb_req;
+
+  // address decoder
+  logic [31:0] paddr;
+  generate
+    for (genvar i = 0; i < NUM_SLAVES; i++) begin : gen_addr_decode
+      localparam logic [31:0] BASE = SLAVE_BASE[i*32+:32];
+      localparam logic [31:0] SIZE = SLAVE_SIZE[i*32+:32];
+      localparam logic [31:0] MASK = ~(SIZE - 1);  // convert size to mask
+      assign psel_o[i] = psel && ((paddr & MASK) == BASE);
+    end
+  endgenerate
+  assign paddr_o = paddr;
+
+  // read mux
+  logic [31:0] rdata;
+  always_comb begin
+    rdata  = 'd0;
+    pready = 1'b1;
+    for (int i = 0; i < NUM_SLAVES; i++) begin
+      if (psel_o[i]) begin
+        rdata  = prdata_i[i*32+:32];
+        pready = pready_i[i];
+      end
     end
   end
 
@@ -243,7 +242,7 @@ module uart_to_apb #(
     wdata_en = 1'b0;
     rdata_en = 1'b0;
 
-    apb_start = 1'b0;
+    apb_req = 1'b0;
     tx_start = 1'b0;
 
     uart_en = 1'b1;  // enable UART by default
@@ -282,8 +281,8 @@ module uart_to_apb #(
       ACK: begin  // send ACK byte
         if (!apb_done) begin
           uart_en = (apb_handshake) ? 1'b1 : 1'b0;  // disable UART while waiting for APB
-          apb_start = (apb_handshake) ? 1'b0 : 1'b1;  // start APB transaction if not already started
           tx_start = (apb_handshake) ? 1'b1 : 1'b0;  // start UART transmission of ACK byte at handshake
+          apb_req = 1'b1;  // request APB transaction
         end else begin
           if (tx_done) begin
             if (apb_mode) begin  // write mode

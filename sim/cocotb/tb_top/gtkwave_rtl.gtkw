@@ -1,15 +1,15 @@
 [*]
 [*] GTKWave Analyzer v4.0.0-prealpha (7d7b4db) (w)1999-2022 BSI
-[*] Wed Jul 22 16:34:54 2026
+[*] Sat Aug  1 10:17:56 2026
 [*]
-[dumpfile] "/foss/designs/OpenQSPI_Chipathon2026/sim/cocotb/tb_top/sim_build/tb_top.fst"
-[dumpfile_mtime] "Wed Jul 22 16:31:57 2026"
-[dumpfile_size] 67703
-[savefile] "/foss/designs/OpenQSPI_Chipathon2026/sim/cocotb/tb_top/gtkwave_rtl.gtkw"
-[timestart] 3864200000
+[dumpfile] "/foss/designs/chipathon26/OpenQSPI_Chipathon2026/sim/cocotb/tb_top/sim_build/tb_top.fst"
+[dumpfile_mtime] "Sat Aug  1 10:15:12 2026"
+[dumpfile_size] 49528
+[savefile] "/foss/designs/chipathon26/OpenQSPI_Chipathon2026/sim/cocotb/tb_top/gtkwave_rtl.gtkw"
+[timestart] 0
 [size] 1920 1163
 [pos] -1 -1
-*-25.799997 4057420000 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+*-31.199997 3532980001 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
 [markername] AA
 [markername] BB
 [markername] CC
@@ -50,7 +50,6 @@ tb_top.rst_ni
 @800200
 -QSPI
 @28
-tb_top.qspi_csn
 tb_top.qspi_sck
 @800022
 tb_top.qspi_io[3:0]
@@ -95,7 +94,7 @@ tb_top.u_top.inst_uart_to_apb.uart_inst.rx_shift_reg[7:0]
 -UART Internals
 @1000200
 -UART
-@800200
+@c00200
 -APB
 @28
 tb_top.u_top.psel
@@ -107,22 +106,23 @@ tb_top.u_top.pslverr
 tb_top.u_top.paddr[31:0]
 tb_top.u_top.prdata[31:0]
 tb_top.u_top.pwdata[31:0]
-@1000200
+@1401200
 -APB
-@c00200
+@800201
 -UART to APB internals
-@28
+@29
+tb_top.u_top.inst_uart_to_apb.apb_req
 tb_top.u_top.inst_uart_to_apb.apb_mode
 tb_top.u_top.inst_uart_to_apb.apb_done
-@22
+@23
 tb_top.u_top.inst_uart_to_apb.addr_reg[31:0]
 tb_top.u_top.inst_uart_to_apb.wdata_reg[31:0]
 tb_top.u_top.inst_uart_to_apb.rdata_reg[31:0]
-@28
+@29
 tb_top.u_top.inst_uart_to_apb.uart_done
 tb_top.u_top.inst_uart_to_apb.rdata_en
 tb_top.u_top.inst_uart_to_apb.wdata_en
-@c00024
+@c00025
 tb_top.u_top.inst_uart_to_apb.byte_cnt[4:0]
 @28
 (0)tb_top.u_top.inst_uart_to_apb.byte_cnt[4:0]
@@ -130,12 +130,12 @@ tb_top.u_top.inst_uart_to_apb.byte_cnt[4:0]
 (2)tb_top.u_top.inst_uart_to_apb.byte_cnt[4:0]
 (3)tb_top.u_top.inst_uart_to_apb.byte_cnt[4:0]
 (4)tb_top.u_top.inst_uart_to_apb.byte_cnt[4:0]
-@1401200
+@1401201
 -group_end
-@28
+@29
 tb_top.u_top.inst_uart_to_apb.byte_cnt_rst
 tb_top.u_top.inst_uart_to_apb.fsm_cstate[1:0]
-@1401200
+@1000201
 -UART to APB internals
 @c00200
 -QSPI Master
@@ -155,7 +155,6 @@ tb_top.u_top.inst_apb_qspi.u_qspi_master.fifo_push_o
 tb_top.u_top.inst_apb_qspi.u_qspi_master.fifo_push
 tb_top.u_top.inst_apb_qspi.u_qspi_master.qspi_abort
 tb_top.u_top.inst_apb_qspi.u_qspi_master.qspi_cstate[2:0]
-tb_top.u_top.inst_apb_qspi.u_qspi_master.qspi_rdata_valid
 tb_top.u_top.inst_apb_qspi.u_qspi_master.qspi_rdata_load
 @c00200
 -QSPI RX/TX Data
@@ -178,19 +177,19 @@ tb_top.u_top.inst_apb_qspi.u_qspi_master.qspi_data_mode_i[1:0]
 @1401200
 -QSPI Config
 -QSPI Master
-@800201
+@c00200
 -FIFO
-@29
+@28
 tb_top.u_top.inst_apb_qspi.fifo_empty
 tb_top.u_top.inst_apb_qspi.fifo_full
 tb_top.u_top.inst_apb_qspi.fifo_pop
 tb_top.u_top.inst_apb_qspi.fifo_push
-@23
+@22
 tb_top.u_top.inst_apb_qspi.fifo_data_i_mux[31:0]
 tb_top.u_top.inst_apb_qspi.fifo_data_o[31:0]
-@29
+@28
 tb_top.u_top.inst_apb_qspi.qspi_flush_pulse
-@1000201
+@1401200
 -FIFO
 [pattern_trace] 1
 [pattern_trace] 0
