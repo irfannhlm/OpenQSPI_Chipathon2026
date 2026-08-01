@@ -47,7 +47,7 @@ FALLBACK_SDC: dir::a09_chipathon26_top.sdc
 
 # Core sizing
 FP_SIZING: absolute
-DIE_AREA:  [0, 0, 500, 500]
+DIE_AREA:  [0, 0, 700, 700]
 
 # Power / ground nets
 VDD_NETS:

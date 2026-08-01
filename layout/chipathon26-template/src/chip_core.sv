@@ -40,70 +40,23 @@ module chip_core #(
     inout  wire [NUM_ANALOG_PADS-1:0] analog    // Analog
 );
 
-    // UART TO APB INSTANCE
-    // APB master interface
-    logic [31:0] paddr;
-    logic [31:0] pwdata;
-    logic pwrite;
-    logic penable;
-    logic psel;
-    logic [31:0] prdata;
-    logic pready;
-    logic pslverr;
-    // UART interface
-    logic uart_rx_i;
-    logic uart_tx_o;
-    uart_to_apb #(
-        // UART parameters
-        .CLOCK_FREQ(50_000_000),  // 50 MHz
-        .BAUD_RATE (921_600)      // 921600 bps
-    ) inst_uart_to_apb (
+    wire uart_rx_i, uart_tx_o;
+    wire [1:0] qspi_csn_o;
+    wire qspi_sck_o;
+    wire [3:0] qspi_i, qspi_o, qspi_oe;
+    a09_chipathon26_top #() a09_inst (
+    `ifdef USE_POWER_PINS
+        .VDD(VDD),
+        .VSS(VSS),
+    `endif
+
         // Clock and reset
-        .clk_i (clk),
+        .clk_i(clk),
         .rst_ni(rst_n),
 
         // UART interface
         .uart_rx_i(uart_rx_i),
         .uart_tx_o(uart_tx_o),
-
-        // APB master interface
-        .paddr_o  (paddr),
-        .pwdata_o (pwdata),
-        .pwrite_o (pwrite),
-        .penable_o(penable),
-
-        .psel_o(psel),
-        .prdata_i(prdata),
-        .pready_i(pready),
-        .pslverr_i(pslverr)
-
-    );
-
-
-    // APB_QSPI INSTANCE
-    // QSPI interface
-    logic [3:0] qspi_i;
-    logic [3:0] qspi_o;
-    logic [3:0] qspi_oe;  // output enable for qspi_o
-    logic [1:0] qspi_csn_o;
-    logic qspi_sck_o;
-    apb_qspi #(
-        .FIFO_DEPTH(16),
-        .CS_NUM(2)
-    ) inst_apb_qspi (
-        // clock and reset
-        .clk_i (clk),
-        .rst_ni(rst_n),
-
-        // APB interface
-        .psel_i(psel),
-        .penable_i(penable),
-        .pwrite_i(pwrite),
-        .paddr_i(paddr),
-        .pwdata_i(pwdata),
-        .prdata_o(prdata),
-        .pready_o(pready),
-        .pslverr_o(pslverr),
 
         // QSPI interface
         .qspi_csn_o(qspi_csn_o),
@@ -115,57 +68,46 @@ module chip_core #(
 
 
     // =========================================================
-    // PAD MAPPING (Physical Pin Assignments)
+    // PAD MAPPING (Use EAST PADs for UART and QSPI)
     // =========================================================
-
-    // ---------------------------------------------------------
-    // Pad 0: UART RX (Input)
-    // ---------------------------------------------------------
-    assign uart_rx_i    = bidir_in[0];
-    assign bidir_out[0] = 1'b0;        // Drive 0 (ignored)
-    assign bidir_oe[0]  = 1'b0;        // Output Enable = 0 (Input Mode)
-    assign bidir_ie[0]  = 1'b1;        // Input Enable = 1
-
-    // ---------------------------------------------------------
-    // Pad 1: UART TX (Output)
-    // ---------------------------------------------------------
-    assign bidir_out[1] = uart_tx_o;
-    assign bidir_oe[1]  = 1'b1;        // Output Enable = 1 (Output Mode)
-    assign bidir_ie[1]  = 1'b0;        // Input Enable = 0
-
-    // ---------------------------------------------------------
-    // Pad 2: QSPI SCK (Output)
-    // ---------------------------------------------------------
-    assign bidir_out[2] = qspi_sck_o;
-    assign bidir_oe[2]  = 1'b1;
-    assign bidir_ie[2]  = 1'b0;
-
-    // ---------------------------------------------------------
-    // Pads 4:3: QSPI CSN[1:0] (Outputs)
-    // ---------------------------------------------------------
-    assign bidir_out[4:3] = qspi_csn_o[1:0];
-    assign bidir_oe[4:3]  = 2'b11;
-    assign bidir_ie[4:3]  = 2'b00;
-
-    // ---------------------------------------------------------
-    // Pads 8:5: QSPI IO[3:0] (Bidirectional / Tri-State)
-    // ---------------------------------------------------------
-    assign qspi_i         = bidir_in[8:5];
-    assign bidir_out[8:5] = qspi_o[3:0];
-    assign bidir_oe[8:5]  = qspi_oe[3:0]; 
-    assign bidir_ie[8:5]  = ~qspi_oe[3:0];
-
-    // ---------------------------------------------------------
-    // Pads 19:9: Unused Bidir Pads (Tie off safely)
-    // ---------------------------------------------------------
     generate
-        if (NUM_BIDIR_PADS > 9) begin : gen_tie_off
-            assign bidir_out[NUM_BIDIR_PADS-1:9] = '0;
-            assign bidir_oe[NUM_BIDIR_PADS-1:9]  = '0; // Keep outputs disabled
-            assign bidir_ie[NUM_BIDIR_PADS-1:9]  = '0; // Keep inputs disabled
+        for (genvar i = 0; i < NUM_BIDIR_PADS; i++) begin : gen_pad_defaults
+            if (i == 11) begin
+                // Pad 11: UART RX (Input)
+                assign bidir_out[i] = 1'b0;
+                assign bidir_oe[i]  = 1'b0;
+                assign bidir_ie[i]  = 1'b1;
+                assign uart_rx_i = bidir_in[i];
+            end else if (i == 10) begin
+                // Pad 10: UART TX (Output)
+                assign bidir_out[i] = uart_tx_o;
+                assign bidir_oe[i]  = 1'b1;
+                assign bidir_ie[i]  = 1'b0;
+            end else if (i == 9) begin
+                // Pad 9: QSPI SCK (Output)
+                assign bidir_out[i] = qspi_sck_o;
+                assign bidir_oe[i]  = 1'b1;
+                assign bidir_ie[i]  = 1'b0;
+            end else if (i >= 7 && i <= 8) begin
+                // Pads 8:7: QSPI CSN[1:0] (Outputs)
+                assign bidir_out[i] = qspi_csn_o[i-7];
+                assign bidir_oe[i]  = 1'b1;
+                assign bidir_ie[i]  = 1'b0;
+            end else if (i >= 3 && i <= 6) begin
+                // Pads 6:3: QSPI IO[3:0] (Bidirectional)
+                assign bidir_out[i] = qspi_o[i-3];
+                assign bidir_oe[i]  = qspi_oe[i-3];
+                assign bidir_ie[i]  = ~qspi_oe[i-3];
+                assign qspi_i[i-3] = bidir_in[i];
+            end else begin
+                // Unused pads -> Grounded and Disabled
+                assign bidir_out[i] = 1'b0;
+                assign bidir_oe[i]  = 1'b0;
+                assign bidir_ie[i]  = 1'b0;
+            end
         end
     endgenerate
-    
+
     // ---------------------------------------------------------
     // Static Pad Electrical Configurations
     // ---------------------------------------------------------

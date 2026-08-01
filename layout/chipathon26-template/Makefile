@@ -10,7 +10,7 @@ PDK_TAG ?= 1.8.0
 MACRO ?= a09_chipathon26_top
 
 AVAILABLE_SLOTS = 1x1 0p5x1 1x0p5 0p5x0p5 workshop
-DEFAULT_SLOT = 1x1
+DEFAULT_SLOT = workshop
 
 # Slot can be any of AVAILABLE_SLOTS
 SLOT ?= $(DEFAULT_SLOT)

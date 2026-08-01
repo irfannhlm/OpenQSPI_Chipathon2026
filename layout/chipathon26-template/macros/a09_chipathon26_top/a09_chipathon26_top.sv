@@ -5,6 +5,7 @@
 module a09_chipathon26_top #(
     parameter int CLOCK_FREQ = 50_000_000,  // 50 MHz
     parameter int BAUD_RATE  = 921_600,     // 921600 bps
+    parameter int FIFO_DEPTH = 8,           // Depth of the FIFO
     parameter int CS_NUM     = 2            // Number of chip selects for QSPI
 ) (
 `ifdef USE_POWER_PINS
@@ -70,7 +71,7 @@ module a09_chipathon26_top #(
   // APB_QSPI INSTANCE
   // QSPI interface
   apb_qspi #(
-      .FIFO_DEPTH(8),
+      .FIFO_DEPTH(FIFO_DEPTH),
       .CS_NUM(CS_NUM)
   ) inst_apb_qspi (
       // clock and reset
