@@ -1,7 +1,7 @@
-read_verilog -sv ../../rtl/uart_simple.sv
-hierarchy -check -top uart_simple
+read_verilog -sv ../../rtl/qspi_master.sv
+hierarchy -check -top qspi_master
 
-synth -top uart_simple
+synth -top qspi_master
 
 dfflibmap -liberty /foss/pdks/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu7t5v0/lib/gf180mcu_fd_sc_mcu7t5v0__tt_025C_3v30.lib
 
@@ -9,6 +9,6 @@ abc -liberty /foss/pdks/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu7t5v0/lib/gf180mcu_
 
 clean
 
-write_verilog uart_simple_netlist.v
+write_verilog qspi_master_2cs_nl.v
 
 stat -liberty /foss/pdks/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu7t5v0/lib/gf180mcu_fd_sc_mcu7t5v0__tt_025C_3v30.lib

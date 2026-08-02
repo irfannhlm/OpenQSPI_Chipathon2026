@@ -9,6 +9,6 @@ abc -liberty /foss/pdks/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu7t5v0/lib/gf180mcu_
 
 clean
 
-write_verilog top_netlist.v
+write_verilog top_16fifo_2cs_nl.v
 
 stat -liberty /foss/pdks/gf180mcuD/libs.ref/gf180mcu_fd_sc_mcu7t5v0/lib/gf180mcu_fd_sc_mcu7t5v0__tt_025C_3v30.lib

@@ -20,7 +20,7 @@
 |          |                  | `[23]`    | CRM       | RW         | Continuous Read Mode.                                                                               |
 |          |                  | `[24]`    | DDR       | RW         | Double Data Rate control.                                                                           |
 |          |                  | `[25]`    | ENDIAN    | RW         | Endianness configuration.                                                                           |
-|          |                  | `[29:26]` | CSN_SEL   | -          | Reserved (Tied off in this single chip-select wrapper).                                             |
+|          |                  | `[27:26]` | CSN_SEL   | RW         | One-hot chip-select enable.                                                                         |
 | **0x08** | **QSPI_DLEN**    | `[31:0]`  | DATA_LEN  | RW         | Total data length for transfer.                                                                     |
 | **0x0C** | **QSPI_CMD**     | `[7:0]`   | CMD       | RW         | SPI Command byte.                                                                                   |
 |          |                  | `[15:8]`  | MODE_BYTE | RW         | SPI Mode byte.                                                                                      |

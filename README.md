@@ -4,15 +4,15 @@ To design a fully functional 32-bit Quad Serial Peripheral Interface (QSPI) mast
 # Target Specification
 - Open-source, modular, and synthesizable
 - Compatible with commercial flash memories
-- Full support of single, dual, and quad modes (fast, IO, QPI)
+- Full support of single, dual, quad, and DDR modes (fast, IO, QPI)
 - 50MHz target frequency (200Mbps at quad DDR)
-- Possible support of Dual Data Rate (DDR)
 
 # Main Architecture
-![APB QSPI Architecture](images/apb_qspi_arch.png)
+![APB QSPI Architecture](docs/images/apb_qspi_arch.png)
 
 # Documentations
 - [QSPI Master Module](docs/qspi_master.md)
 - [APB Wrapped QSPI](docs/apb_qspi.md)
 - [QSPI CSR](docs/qspi_csr.md)
 - [UART FPGA GUI](docs/uart_fpga_gui.md)
+- [Design Testbench](docs/testbench.md)

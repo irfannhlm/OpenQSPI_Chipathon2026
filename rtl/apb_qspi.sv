@@ -43,6 +43,7 @@ module apb_qspi #(
     input logic [31:0] pwdata_i,
     output logic [31:0] prdata_o,
     output logic pready_o,
+    output logic pslverr_o,
 
     // QSPI interface
     output logic [CS_NUM-1:0] qspi_csn_o,
@@ -51,6 +52,8 @@ module apb_qspi #(
     output logic [3:0] qspi_o,
     output logic [3:0] qspi_oe  // output enable for qspi_o
 );
+
+  assign pslverr_o = 1'b0;  // no error reporting implemented
 
   // Register byte offsets
   localparam logic [7:0] ADDR_CTRL = 8'h00;
@@ -70,10 +73,10 @@ module apb_qspi #(
   logic [31:0] cmd_q;
   logic [31:0] addr_q;
   logic [31:0] timeout_q;
-  logic        done_q;
-  logic        busy_q;
-  logic        timeout_status_q;
-  logic [ 3:0] fifo_err_q;
+  logic done_q;
+  logic busy_q;
+  logic timeout_status_q;
+  logic [3:0] fifo_err_q;
 
   wire data_dir_w = cfg0_q[22];  // 0: read, 1: write
 
@@ -94,20 +97,20 @@ module apb_qspi #(
 
   assign pready_o = !(apb_access && stall_for_busy);
 
-  wire apb_wr_done = apb_access && pwrite_i && pready_o;
-  wire apb_rd_done = apb_access && !pwrite_i && pready_o;
+  wire         apb_wr_done = apb_access && pwrite_i && pready_o;
+  wire         apb_rd_done = apb_access && !pwrite_i && pready_o;
 
-  wire qspi_start_pulse = apb_wr_done && (reg_addr == ADDR_CTRL) && pwdata_i[0];
-  wire qspi_abort_pulse = apb_wr_done && (reg_addr == ADDR_CTRL) && pwdata_i[1];
-  wire qspi_flush_pulse = apb_wr_done && (reg_addr == ADDR_CTRL) && pwdata_i[9];
-  wire ctrl_err_clear = apb_wr_done && (reg_addr == ADDR_CTRL) && (pwdata_i[8:5] != 4'd0);
-  wire ctrl_done_clear = apb_wr_done && (reg_addr == ADDR_CTRL) && pwdata_i[2];
-  wire ctrl_timeout_clear = apb_wr_done && (reg_addr == ADDR_CTRL) && pwdata_i[4];
+  wire         qspi_start_pulse = apb_wr_done && (reg_addr == ADDR_CTRL) && pwdata_i[0];
+  wire         qspi_abort_pulse = apb_wr_done && (reg_addr == ADDR_CTRL) && pwdata_i[1];
+  wire         qspi_flush_pulse = apb_wr_done && (reg_addr == ADDR_CTRL) && pwdata_i[9];
+  wire         ctrl_err_clear = apb_wr_done && (reg_addr == ADDR_CTRL) && (pwdata_i[8:5] != 4'd0);
+  wire         ctrl_done_clear = apb_wr_done && (reg_addr == ADDR_CTRL) && pwdata_i[2];
+  wire         ctrl_timeout_clear = apb_wr_done && (reg_addr == ADDR_CTRL) && pwdata_i[4];
 
   // QSPI_DR access, gated by DATA_DIR; wrong-direction / full / empty never stalls,
   // it completes immediately and is reported through FIFO_ERR instead
-  wire apb_dr_write_access = apb_wr_done && (reg_addr == ADDR_DR);
-  wire apb_dr_read_access = apb_rd_done && (reg_addr == ADDR_DR);
+  wire         apb_dr_write_access = apb_wr_done && (reg_addr == ADDR_DR);
+  wire         apb_dr_read_access = apb_rd_done && (reg_addr == ADDR_DR);
 
   // qspi_master <-> apb_qspi wires
   logic [31:0] qm_rdata;
@@ -125,8 +128,8 @@ module apb_qspi #(
   logic        fifo_pop;
   logic [31:0] fifo_data_i_mux;
 
-  wire apb_dr_push_strobe = apb_dr_write_access && data_dir_w && !fifo_full;
-  wire apb_dr_pop_strobe = apb_dr_read_access && !data_dir_w && !fifo_empty;
+  wire         apb_dr_push_strobe = apb_dr_write_access && data_dir_w && !fifo_full;
+  wire         apb_dr_pop_strobe = apb_dr_read_access && !data_dir_w && !fifo_empty;
 
   assign fifo_push = data_dir_w ? apb_dr_push_strobe : qm_fifo_push;
   assign fifo_pop = data_dir_w ? qm_fifo_pop : apb_dr_pop_strobe;
@@ -182,8 +185,7 @@ module apb_qspi #(
   // Readback mux
   always_comb begin : prdata_mux
     case (reg_addr)
-      ADDR_CTRL:
-      prdata_o = {22'd0, 1'b0, fifo_err_q, timeout_status_q, busy_q, done_q, 2'b00};
+      ADDR_CTRL:    prdata_o = {22'd0, 1'b0, fifo_err_q, timeout_status_q, busy_q, done_q, 2'b00};
       ADDR_CFG0:    prdata_o = cfg0_q;
       ADDR_DLEN:    prdata_o = dlen_q;
       ADDR_CMD:     prdata_o = cmd_q;
