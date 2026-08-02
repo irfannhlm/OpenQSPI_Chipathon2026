@@ -56,6 +56,7 @@ TIMEOUT_ADDR = 0x1C   # QSPI_TIMEOUT -- TIMEOUT_VAL[31:0] RW (units not yet conf
 UI_FONT = ("Segoe UI", 9)
 UI_FONT_BOLD = ("Segoe UI", 9, "bold")
 MONO_FONT = ("Consolas", 9)
+MONO_FONT_LG = ("Consolas", 10)  # slightly larger for the primary "Last Result" panel
 MUTED_COLOR = "#5a5a5a"
 RESULT_COLOR = "#0055aa"
 ACCESS_COLORS = {
@@ -121,8 +122,8 @@ class UartFpgaGui:
         fifo_tab = ttk.Frame(notebook)
         notebook.add(guide_tab, text="Guide")
         notebook.add(raw_tab, text="Raw Transaction")
-        notebook.add(cfg0_tab, text="QSPI Config")
-        notebook.add(ctrl_tab, text="Control & Status")
+        notebook.add(cfg0_tab, text="QSPI Config (CFG0)")
+        notebook.add(ctrl_tab, text="Control (CTRL)")
         notebook.add(setup_tab, text="Transaction Setup")
         notebook.add(fifo_tab, text="FIFO & Status")
 
@@ -136,7 +137,7 @@ class UartFpgaGui:
         result_frame = ttk.LabelFrame(self.root, text="Last Result")
         result_frame.pack(fill="x", padx=10, pady=5)
         self.result_var = tk.StringVar(value="-")
-        ttk.Label(result_frame, textvariable=self.result_var, font=("Consolas", 10),
+        ttk.Label(result_frame, textvariable=self.result_var, font=MONO_FONT_LG,
                   justify="left").pack(anchor="w", padx=5, pady=5)
 
         log_frame = ttk.LabelFrame(self.root, text="Log")
@@ -146,7 +147,7 @@ class UartFpgaGui:
         log_toolbar.pack(fill="x", padx=5, pady=(5, 0))
         ttk.Button(log_toolbar, text="Clear Log", command=self.clear_log).pack(side="right")
 
-        self.log_text = scrolledtext.ScrolledText(log_frame, height=15, font=("Consolas", 9))
+        self.log_text = scrolledtext.ScrolledText(log_frame, height=15, font=MONO_FONT)
         self.log_text.pack(fill="both", expand=True, padx=5, pady=5)
 
     # ------------------------------------------------------------- Guide ---
@@ -181,18 +182,18 @@ class UartFpgaGui:
         row = [0]  # mutable counter shared by helpers below
 
         def title(text, size=12):
-            ttk.Label(inner, text=text, font=("Segoe UI", size, "bold")).grid(
+            ttk.Label(inner, text=text, font=(UI_FONT[0], size, "bold")).grid(
                 row=row[0], column=0, sticky="w", padx=10, pady=(14, 4))
             row[0] += 1
 
         def body(text):
-            ttk.Label(inner, text=text, wraplength=700, justify="left").grid(
+            ttk.Label(inner, text=text, font=UI_FONT, wraplength=700, justify="left").grid(
                 row=row[0], column=0, sticky="w", padx=20, pady=(0, 4))
             row[0] += 1
 
         def bullet(text):
-            ttk.Label(inner, text=f"\u2022 {text}", wraplength=680, justify="left").grid(
-                row=row[0], column=0, sticky="w", padx=25, pady=1)
+            ttk.Label(inner, text=f"\u2022 {text}", font=UI_FONT, wraplength=680,
+                      justify="left").grid(row=row[0], column=0, sticky="w", padx=25, pady=1)
             row[0] += 1
 
         def table(columns, col_widths, rows_data):
@@ -875,81 +876,74 @@ class UartFpgaGui:
 
     # ------------------------------------------------------ Transaction Setup ---
     def _build_setup_tab(self, parent):
-        row = 0
-
-        dlen_frame = ttk.LabelFrame(
-            parent, text=f"QSPI_DLEN (0x{DLEN_ADDR:02X}) -- DATA_LEN[31:0] RW  (\u2192 qspi_data_len_i)")
-        dlen_frame.grid(row=row, column=0, padx=5, pady=8, sticky="we")
-        ttk.Label(dlen_frame, text="Data length in bytes (hex):").grid(
-            row=0, column=0, padx=5, pady=5, sticky="w")
+        dlen_frame = self._reg_frame(
+            parent, DLEN_ADDR, "QSPI_DLEN", "RW",
+            "Number of data bytes for the transaction \u2192 qspi_data_len_i.")
+        ttk.Label(dlen_frame, text="Data length in bytes (hex):", font=UI_FONT).grid(
+            row=1, column=0, padx=8, pady=5, sticky="w")
         self.dlen_var = tk.StringVar(value="00000000")
         ttk.Entry(dlen_frame, textvariable=self.dlen_var, width=12).grid(
-            row=0, column=1, padx=5, pady=5, sticky="w")
+            row=1, column=1, padx=8, pady=5, sticky="w")
         dlen_write_btn = ttk.Button(dlen_frame, text="Write", command=self.write_dlen)
-        dlen_write_btn.grid(row=0, column=2, padx=5, pady=5)
+        dlen_write_btn.grid(row=1, column=2, padx=5, pady=5)
         dlen_read_btn = ttk.Button(dlen_frame, text="Read", command=self.read_dlen)
-        dlen_read_btn.grid(row=0, column=3, padx=5, pady=5)
+        dlen_read_btn.grid(row=1, column=3, padx=5, pady=5)
         self.dlen_result_var = tk.StringVar(value="-")
-        ttk.Label(dlen_frame, textvariable=self.dlen_result_var, font=("Consolas", 9),
-                  foreground="#0055aa").grid(row=1, column=0, columnspan=4, padx=5, pady=(0, 5), sticky="w")
-        row += 1
+        ttk.Label(dlen_frame, textvariable=self.dlen_result_var, font=MONO_FONT,
+                  foreground=RESULT_COLOR).grid(row=2, column=0, columnspan=4, padx=8, pady=(0, 8), sticky="w")
 
-        cmd_frame = ttk.LabelFrame(
-            parent, text=f"QSPI_CMD (0x{CMD_ADDR:02X}) -- CMD[7:0] + MODE_BYTE[15:8] RW")
-        cmd_frame.grid(row=row, column=0, padx=5, pady=8, sticky="we")
-        ttk.Label(cmd_frame, text="CMD opcode (hex byte):").grid(
-            row=0, column=0, padx=5, pady=5, sticky="w")
+        cmd_frame = self._reg_frame(
+            parent, CMD_ADDR, "QSPI_CMD", "RW",
+            "Command opcode plus XIP mode byte, packed into one register.")
+        ttk.Label(cmd_frame, text="CMD opcode (hex byte):", font=UI_FONT).grid(
+            row=1, column=0, padx=8, pady=5, sticky="w")
         self.cmd_byte_var = tk.StringVar(value="00")
         ttk.Entry(cmd_frame, textvariable=self.cmd_byte_var, width=6).grid(
-            row=0, column=1, padx=5, pady=5, sticky="w")
-        ttk.Label(cmd_frame, text="MODE_BYTE / XIP (hex byte):").grid(
-            row=0, column=2, padx=5, pady=5, sticky="w")
+            row=1, column=1, padx=8, pady=5, sticky="w")
+        ttk.Label(cmd_frame, text="MODE_BYTE / XIP (hex byte):", font=UI_FONT).grid(
+            row=1, column=2, padx=8, pady=5, sticky="w")
         self.mode_byte_var = tk.StringVar(value="00")
         ttk.Entry(cmd_frame, textvariable=self.mode_byte_var, width=6).grid(
-            row=0, column=3, padx=5, pady=5, sticky="w")
+            row=1, column=3, padx=8, pady=5, sticky="w")
         cmd_write_btn = ttk.Button(cmd_frame, text="Write", command=self.write_cmd)
-        cmd_write_btn.grid(row=0, column=4, padx=5, pady=5)
+        cmd_write_btn.grid(row=1, column=4, padx=5, pady=5)
         cmd_read_btn = ttk.Button(cmd_frame, text="Read", command=self.read_cmd)
-        cmd_read_btn.grid(row=0, column=5, padx=5, pady=5)
+        cmd_read_btn.grid(row=1, column=5, padx=5, pady=5)
         self.cmd_result_var = tk.StringVar(value="-")
-        ttk.Label(cmd_frame, textvariable=self.cmd_result_var, font=("Consolas", 9),
-                  foreground="#0055aa").grid(row=1, column=0, columnspan=6, padx=5, pady=(0, 5), sticky="w")
-        row += 1
+        ttk.Label(cmd_frame, textvariable=self.cmd_result_var, font=MONO_FONT,
+                  foreground=RESULT_COLOR).grid(row=2, column=0, columnspan=6, padx=8, pady=(0, 8), sticky="w")
 
-        qaddr_frame = ttk.LabelFrame(
-            parent, text=f"QSPI_ADDR (0x{QADDR_ADDR:02X}) -- ADDR[31:0] RW  (\u2192 qspi_addr_i, "
-                         f"target device address)")
-        qaddr_frame.grid(row=row, column=0, padx=5, pady=8, sticky="we")
-        ttk.Label(qaddr_frame, text="Target address (hex):").grid(
-            row=0, column=0, padx=5, pady=5, sticky="w")
+        qaddr_frame = self._reg_frame(
+            parent, QADDR_ADDR, "QSPI_ADDR", "RW",
+            "Target device address for the transaction \u2192 qspi_addr_i.")
+        ttk.Label(qaddr_frame, text="Target address (hex):", font=UI_FONT).grid(
+            row=1, column=0, padx=8, pady=5, sticky="w")
         self.qaddr_var = tk.StringVar(value="00000000")
         ttk.Entry(qaddr_frame, textvariable=self.qaddr_var, width=12).grid(
-            row=0, column=1, padx=5, pady=5, sticky="w")
+            row=1, column=1, padx=8, pady=5, sticky="w")
         qaddr_write_btn = ttk.Button(qaddr_frame, text="Write", command=self.write_qaddr)
-        qaddr_write_btn.grid(row=0, column=2, padx=5, pady=5)
+        qaddr_write_btn.grid(row=1, column=2, padx=5, pady=5)
         qaddr_read_btn = ttk.Button(qaddr_frame, text="Read", command=self.read_qaddr)
-        qaddr_read_btn.grid(row=0, column=3, padx=5, pady=5)
+        qaddr_read_btn.grid(row=1, column=3, padx=5, pady=5)
         self.qaddr_result_var = tk.StringVar(value="-")
-        ttk.Label(qaddr_frame, textvariable=self.qaddr_result_var, font=("Consolas", 9),
-                  foreground="#0055aa").grid(row=1, column=0, columnspan=4, padx=5, pady=(0, 5), sticky="w")
-        row += 1
+        ttk.Label(qaddr_frame, textvariable=self.qaddr_result_var, font=MONO_FONT,
+                  foreground=RESULT_COLOR).grid(row=2, column=0, columnspan=4, padx=8, pady=(0, 8), sticky="w")
 
-        timeout_frame = ttk.LabelFrame(
-            parent, text=f"QSPI_TIMEOUT (0x{TIMEOUT_ADDR:02X}) -- TIMEOUT_VAL[31:0] RW  "
-                         f"(\u2192 qspi_timeout_i, live-sampled during busy-stall)")
-        timeout_frame.grid(row=row, column=0, padx=5, pady=8, sticky="we")
-        ttk.Label(timeout_frame, text="Timeout value (hex, units TBD):").grid(
-            row=0, column=0, padx=5, pady=5, sticky="w")
+        timeout_frame = self._reg_frame(
+            parent, TIMEOUT_ADDR, "QSPI_TIMEOUT", "RW",
+            "Timeout value \u2192 qspi_timeout_i, live-sampled during busy-stall. Units not yet confirmed.")
+        ttk.Label(timeout_frame, text="Timeout value (hex, units TBD):", font=UI_FONT).grid(
+            row=1, column=0, padx=8, pady=5, sticky="w")
         self.timeout_var = tk.StringVar(value="00000000")
         ttk.Entry(timeout_frame, textvariable=self.timeout_var, width=12).grid(
-            row=0, column=1, padx=5, pady=5, sticky="w")
+            row=1, column=1, padx=8, pady=5, sticky="w")
         timeout_write_btn = ttk.Button(timeout_frame, text="Write", command=self.write_timeout)
-        timeout_write_btn.grid(row=0, column=2, padx=5, pady=5)
+        timeout_write_btn.grid(row=1, column=2, padx=5, pady=5)
         timeout_read_btn = ttk.Button(timeout_frame, text="Read", command=self.read_timeout)
-        timeout_read_btn.grid(row=0, column=3, padx=5, pady=5)
+        timeout_read_btn.grid(row=1, column=3, padx=5, pady=5)
         self.timeout_result_var = tk.StringVar(value="-")
-        ttk.Label(timeout_frame, textvariable=self.timeout_result_var, font=("Consolas", 9),
-                  foreground="#0055aa").grid(row=1, column=0, columnspan=4, padx=5, pady=(0, 5), sticky="w")
+        ttk.Label(timeout_frame, textvariable=self.timeout_result_var, font=MONO_FONT,
+                  foreground=RESULT_COLOR).grid(row=2, column=0, columnspan=4, padx=8, pady=(0, 8), sticky="w")
 
         self._action_buttons.extend([
             dlen_write_btn, dlen_read_btn, cmd_write_btn, cmd_read_btn,
@@ -998,30 +992,30 @@ class UartFpgaGui:
 
     # ----------------------------------------------------------- FIFO & Status ---
     def _build_fifo_tab(self, parent):
-        dr_frame = ttk.LabelFrame(
-            parent, text=f"QSPI_DR (0x{DR_ADDR:02X}) -- TX/RX FIFO data word "
-                         f"(direction gated by CFG0.DATA_DIR)")
-        dr_frame.grid(row=0, column=0, padx=5, pady=8, sticky="we")
-        ttk.Label(dr_frame, text="Data word (hex):").grid(row=0, column=0, padx=5, pady=5, sticky="w")
+        dr_frame = self._reg_frame(
+            parent, DR_ADDR, "QSPI_DR", "RW",
+            "TX/RX FIFO data word, direction gated by CFG0.DATA_DIR.")
+        ttk.Label(dr_frame, text="Data word (hex):", font=UI_FONT).grid(
+            row=1, column=0, padx=8, pady=5, sticky="w")
         self.dr_var = tk.StringVar(value="00000000")
         ttk.Entry(dr_frame, textvariable=self.dr_var, width=12).grid(
-            row=0, column=1, padx=5, pady=5, sticky="w")
+            row=1, column=1, padx=8, pady=5, sticky="w")
         dr_push_btn = ttk.Button(dr_frame, text="Push to TX FIFO (Write)", command=self.push_dr)
-        dr_push_btn.grid(row=0, column=2, padx=5, pady=5)
+        dr_push_btn.grid(row=1, column=2, padx=5, pady=5)
         dr_pop_btn = ttk.Button(dr_frame, text="Pop from RX FIFO (Read)", command=self.pop_dr)
-        dr_pop_btn.grid(row=0, column=3, padx=5, pady=5)
+        dr_pop_btn.grid(row=1, column=3, padx=5, pady=5)
         self.dr_result_var = tk.StringVar(value="-")
-        ttk.Label(dr_frame, textvariable=self.dr_result_var, font=("Consolas", 9),
-                  foreground="#0055aa").grid(row=1, column=0, columnspan=4, padx=5, pady=(0, 5), sticky="w")
+        ttk.Label(dr_frame, textvariable=self.dr_result_var, font=MONO_FONT,
+                  foreground=RESULT_COLOR).grid(row=2, column=0, columnspan=4, padx=8, pady=(0, 8), sticky="w")
 
-        bcnt_frame = ttk.LabelFrame(
-            parent, text=f"QSPI_BCNT (0x{BCNT_ADDR:02X}) -- BYTE_CNT[31:0] RO  (\u2192 qspi_byte_cnt_o)")
-        bcnt_frame.grid(row=1, column=0, padx=5, pady=8, sticky="we")
+        bcnt_frame = self._reg_frame(
+            parent, BCNT_ADDR, "QSPI_BCNT", "RO",
+            "Bytes transferred so far \u2192 qspi_byte_cnt_o.")
         bcnt_read_btn = ttk.Button(bcnt_frame, text="Read Byte Count", command=self.read_bcnt)
-        bcnt_read_btn.grid(row=0, column=0, padx=5, pady=5, sticky="w")
+        bcnt_read_btn.grid(row=1, column=0, padx=8, pady=5, sticky="w")
         self.bcnt_result_var = tk.StringVar(value="-")
-        ttk.Label(bcnt_frame, textvariable=self.bcnt_result_var, font=("Consolas", 9),
-                  foreground="#0055aa").grid(row=1, column=0, padx=5, pady=(0, 5), sticky="w")
+        ttk.Label(bcnt_frame, textvariable=self.bcnt_result_var, font=MONO_FONT,
+                  foreground=RESULT_COLOR).grid(row=2, column=0, padx=8, pady=(0, 8), sticky="w")
 
         self._action_buttons.extend([dr_push_btn, dr_pop_btn, bcnt_read_btn])
 
