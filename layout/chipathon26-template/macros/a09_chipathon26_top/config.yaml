@@ -47,7 +47,7 @@ FALLBACK_SDC: dir::a09_chipathon26_top.sdc
 
 # Core sizing
 FP_SIZING: absolute
-DIE_AREA:  [0, 0, 700, 700]
+DIE_AREA:  [0, 0, 550, 550]
 
 # Power / ground nets
 VDD_NETS:
@@ -82,7 +82,7 @@ GRT_DESIGN_REPAIR_MAX_SLEW_PCT: 30
 GRT_DESIGN_REPAIR_MAX_CAP_PCT: 30
 
 # Target density for placement
-PL_TARGET_DENSITY_PCT: 65
+# PL_TARGET_DENSITY_PCT: 65
 GRT_ALLOW_CONGESTION: true
 RT_MAX_LAYER: Metal4
 
