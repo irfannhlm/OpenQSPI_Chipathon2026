@@ -34,4 +34,4 @@ make WAVES=1 GATELEVEL=1
 make TESTCASE=test_qspi_program_read
 ```
 
-## [Back to `testbench.md`](../../../docs/testbench.md)
+## [Back to README](../../../README.md)

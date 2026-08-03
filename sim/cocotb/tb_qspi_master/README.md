@@ -42,4 +42,4 @@ make TESTCASE=test_mx25l_write_read SKIP_ALL_READS=1
 ```
 
 
-## [Back to `testbench.md`](../../../docs/testbench.md)
+## [Back to README](../../../README.md)

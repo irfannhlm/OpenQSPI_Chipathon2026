@@ -135,4 +135,4 @@ still models the old semantics — irrelevant until CRM tests exist.
   between tests doesn't re-trigger power-up.
 
 
-## [Back to `testbench.md`](../../../docs/testbench.md)
+## [Back to README](../../../README.md)
