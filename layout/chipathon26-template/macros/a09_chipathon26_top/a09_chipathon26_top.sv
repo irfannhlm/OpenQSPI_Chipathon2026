@@ -4,7 +4,7 @@
 
 module a09_chipathon26_top #(
     parameter int CLOCK_FREQ = 50_000_000,  // 50 MHz
-    parameter int BAUD_RATE  = 921_600,     // 921600 bps
+    parameter int BAUD_RATE  = 2_000_000,   // 2 Mbps
     parameter int FIFO_DEPTH = 8,           // Depth of the FIFO
     parameter int CS_NUM     = 2            // Number of chip selects for QSPI
 ) (
