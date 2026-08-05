@@ -11,6 +11,8 @@
 
 `default_nettype none
 
+`include "pad_map.svh"
+
 module chip_core #(
     parameter NUM_INPUT_PADS,
     parameter NUM_BIDIR_PADS,
@@ -72,38 +74,50 @@ module chip_core #(
     // =========================================================
     generate
         for (genvar i = 0; i < NUM_BIDIR_PADS; i++) begin : gen_pad_defaults
-            if (i == 11) begin
-                // Pad 11: UART RX (Input)
+            if (i == `PAD_UART_RX) begin
+                // Pad PAD_UART_RX: UART RX (Input)
                 assign bidir_out[i] = 1'b0;
                 assign bidir_oe[i]  = 1'b0;
                 assign bidir_ie[i]  = 1'b1;
                 assign uart_rx_i = bidir_in[i];
-            end else if (i == 10) begin
-                // Pad 10: UART TX (Output)
+                assign bidir_pu[i]  = 1'b0;
+                assign bidir_pd[i]  = 1'b0;
+            end else if (i == `PAD_UART_TX) begin
+                // Pad PAD_UART_TX: UART TX (Output)
                 assign bidir_out[i] = uart_tx_o;
                 assign bidir_oe[i]  = 1'b1;
                 assign bidir_ie[i]  = 1'b0;
-            end else if (i == 9) begin
-                // Pad 9: QSPI SCK (Output)
+                assign bidir_pu[i]  = 1'b0;
+                assign bidir_pd[i]  = 1'b0;
+            end else if (i == `PAD_QSPI_SCK) begin
+                // Pad PAD_QSPI_SCK: QSPI SCK (Output)
                 assign bidir_out[i] = qspi_sck_o;
                 assign bidir_oe[i]  = 1'b1;
                 assign bidir_ie[i]  = 1'b0;
-            end else if (i >= 7 && i <= 8) begin
-                // Pads 8:7: QSPI CSN[1:0] (Outputs)
-                assign bidir_out[i] = qspi_csn_o[i-7];
+                assign bidir_pu[i]  = 1'b0;
+                assign bidir_pd[i]  = 1'b0;
+            end else if (i == `PAD_QSPI_CSN0 || i == `PAD_QSPI_CSN1) begin
+                // Pads PAD_QSPI_CSN0 and PAD_QSPI_CSN1: QSPI CSN[1:0] (Outputs)
+                assign bidir_out[i] = qspi_csn_o[i - `PAD_QSPI_CSN0];
                 assign bidir_oe[i]  = 1'b1;
                 assign bidir_ie[i]  = 1'b0;
-            end else if (i >= 3 && i <= 6) begin
-                // Pads 6:3: QSPI IO[3:0] (Bidirectional)
-                assign bidir_out[i] = qspi_o[i-3];
-                assign bidir_oe[i]  = qspi_oe[i-3];
-                assign bidir_ie[i]  = ~qspi_oe[i-3];
-                assign qspi_i[i-3] = bidir_in[i];
+                assign bidir_pu[i]  = 1'b0;
+                assign bidir_pd[i]  = 1'b0;
+            end else if (i >= `PAD_QSPI_IO0 && i <= `PAD_QSPI_IO3) begin
+                // Pads PAD_QSPI_IO3:PAD_QSPI_IO0: QSPI IO[3:0] (Bidirectional)
+                assign bidir_out[i] = qspi_o[i - `PAD_QSPI_IO0];
+                assign bidir_oe[i]  = qspi_oe[i - `PAD_QSPI_IO0];
+                assign bidir_ie[i]  = ~qspi_oe[i - `PAD_QSPI_IO0];
+                assign qspi_i[i - `PAD_QSPI_IO0] = bidir_in[i];
+                assign bidir_pu[i]  = 1'b1; // enable pullup (simulation only)
+                assign bidir_pd[i]  = 1'b0;
             end else begin
                 // Unused pads -> Grounded and Disabled
                 assign bidir_out[i] = 1'b0;
                 assign bidir_oe[i]  = 1'b0;
                 assign bidir_ie[i]  = 1'b0;
+                assign bidir_pu[i]  = 1'b0;
+                assign bidir_pd[i]  = 1'b0;
             end
         end
     endgenerate
@@ -113,9 +127,6 @@ module chip_core #(
     // ---------------------------------------------------------
     assign bidir_cs = '0; // 0 = CMOS input thresholds
     assign bidir_sl = '0; // 0 = Fast slew rate (critical for 50MHz QSPI!)
-    assign bidir_pu = '0; // No pull-ups (rely on external PCB pull-ups)
-    assign bidir_pd = '0; // No pull-downs
-    
     assign input_pu = '0; // Disable pull-ups on pure inputs
     assign input_pd = '0;
 

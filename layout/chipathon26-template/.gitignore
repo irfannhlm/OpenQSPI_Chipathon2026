@@ -1,9 +1,18 @@
+# except final layout files
+
 runs/
 __pycache__/
 gf180mcu/
 gf180_drc.lyrdb
 sim_build/
-final/
+final/*
+
+macros/**/final/*
+!macros/**/final/gds/
+!macros/**/final/gds/*
+!macros/**/final/pnl/
+!macros/**/final/pnl/**
+
 img/
 *.lyrdb
 .ipynb_checkpoints/

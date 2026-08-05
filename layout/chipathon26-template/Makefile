@@ -85,7 +85,7 @@ sim-gl: ## Run gate-level simulation with cocotb (after copy-final)
 .PHONY: sim-gl
 
 sim-view: ## View simulation waveforms in GTKWave
-	gtkwave cocotb/sim_build/chip_top.fst
+	gtkwave cocotb/sim_build/chip_top_tb.fst
 .PHONY: sim-view
 
 render-image: ## Render an image from the final layout (after copy-final)
