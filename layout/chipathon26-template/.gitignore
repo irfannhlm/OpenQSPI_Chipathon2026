@@ -12,6 +12,7 @@ macros/**/final/*
 !macros/**/final/gds/*
 !macros/**/final/pnl/
 !macros/**/final/pnl/**
+!macros/**/final/metrics.json
 
 img/
 *.lyrdb
