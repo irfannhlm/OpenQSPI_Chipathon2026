@@ -34,16 +34,6 @@ def get_baud_div(dut):
         clock_freq = int(os.environ.get("CLOCK_FREQ", "50000000"))
         baud_rate = int(os.environ.get("TEST_BAUD", "921600"))
         return clock_freq // baud_rate
-
-async def generic_pulse_monitor(clk, signal, event):
-    """
-    A generic background monitor that never misses a clock cycle.
-    It triggers the provided Python Event whenever the target signal goes HIGH.
-    """
-    while True:
-        await RisingEdge(clk)
-        if signal.value == 1:
-            event.set()
     
 async def uart_send_byte(dut, byte_val):
     """Simulates a PC sending a byte to the DUT's RX pin."""
@@ -108,6 +98,7 @@ async def uart_rx_monitor(dut, rx_queue):
     except Exception as e:
         dut._log.error(f"UART RX CRASHED: {e}")
         await rx_queue.put(None)
+
 
 async def setup_dut(dut, flash_setup_time_us=3000):
     """Initialize standard signals and start the clock."""
