@@ -195,11 +195,11 @@ async def qspi_wait_idle(dut, rx_queue, timeout_cycles=1000):
     cocotb.log.error("QSPI core wait timeout!")
     return False
 
-async def flash_poll_busy(dut, rx_queue, interval_us=100, timeout_us=2000):
+async def flash_poll_busy(dut, rx_queue, prescaler=0, interval_us=100, timeout_us=2000):
     """Polls the flash's status register until the BUSY bit clears."""
     cocotb.log.info("Polling flash status register for BUSY bit...")
     # Setup CFG0 for Read Status Register (0x05)
-    cfg0 = build_cfg0(cmd_mode=1, data_mode=1, data_dir=0)
+    cfg0 = build_cfg0(cmd_mode=1, data_mode=1, data_dir=0, prescaler=prescaler)
     await csr_write(dut, rx_queue, QSPI_CFG0, cfg0)
     await csr_write(dut, rx_queue, QSPI_CMD, 0x05)  # Read Status Register
     await csr_write(dut, rx_queue, QSPI_DLEN, 0xFFFF_FFFF) # Do unlimited read

@@ -73,7 +73,6 @@ module chip_top_tb (
 `ifdef SDF_ANNOTATE
   initial begin
     #1 $sdf_annotate(`SDF_FILE0, i_chip_top);
-    #1 $sdf_annotate(`SDF_FILE1, i_chip_top.i_chip_core.a09_inst);
   end
 `endif
 endmodule

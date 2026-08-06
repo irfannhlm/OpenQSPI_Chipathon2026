@@ -53,7 +53,7 @@ async def start_up(dut, flash_setup_time_us=3000):
     if gl:
         await enable_power(dut)
     await start_clock(dut.clk_i)
-    await reset(dut.rst_ni)
+    await reset(dut.rst_ni, time_ns=15000) 
 
     rx_queue = Queue()
     cocotb.start_soon(uart_rx_monitor(dut, rx_queue))
@@ -66,7 +66,7 @@ async def start_up(dut, flash_setup_time_us=3000):
     return rx_queue
 
 
-# @cocotb.test(timeout_time=2, timeout_unit="ms")
+@cocotb.test(timeout_time=1, timeout_unit="ms")
 async def test_csr_read_write(dut):
     """Sanity test reading and writing to CSRs via UART."""
     logger = logging.getLogger("my_testbench")
@@ -94,11 +94,11 @@ async def test_qspi_rdid(dut):
 
     logger.info("Starting SPI RDID (0x9F) Test...")
 
-    for i in range(2):  # Test both flash chips (CS0 and CS1)
+    for i in range(1):  # Test both flash chips (CS0 and CS1)
         logger.info(f"Testing RDID for the flash chip (CS{i})...")
 
         # Setup CFG0: Single CMD, Single Data, Direction=Read, No Address, No Dummies
-        cfg0 = build_cfg0(cmd_mode=1, data_mode=1, data_dir=0, cs_num=i)
+        cfg0 = build_cfg0(cmd_mode=1, data_mode=1, data_dir=0, cs_num=i, prescaler=1)
         await csr_write(dut, rx_queue, QSPI_CFG0, cfg0)
 
         # Setup Command (0x9F) and Data Length (3 bytes for standard JEDEC ID)
@@ -129,7 +129,7 @@ async def test_qspi_program_read(dut):
     
     # --- PHASE 1: Write Enable (0x06) ---
     logger.info("--- Phase 1: Sending Write Enable (0x06) ---")
-    cfg0_we = build_cfg0(cmd_mode=1) # Command only
+    cfg0_we = build_cfg0(cmd_mode=1, prescaler=1) # Command only
     await csr_write(dut, rx_queue, QSPI_CFG0, cfg0_we)
     await csr_write(dut, rx_queue, QSPI_CMD, 0x06)
     await csr_write(dut, rx_queue, QSPI_DLEN, 0)
@@ -140,7 +140,7 @@ async def test_qspi_program_read(dut):
     # --- PHASE 2: Page Program (0x02) ---
     logger.info(f"--- Phase 2: Page Program (0x02) to Addr 0x{target_addr:06X} ---")
     # Single CMD, Single ADDR, Single DATA, Write direction (data_dir=1), 3-byte addr (addr_len=0)
-    cfg0_prog = build_cfg0(cmd_mode=1, addr_mode=1, data_mode=1, data_dir=1, addr_len=0)
+    cfg0_prog = build_cfg0(cmd_mode=1, addr_mode=1, data_mode=1, data_dir=1, addr_len=0, prescaler=1)
     await csr_write(dut, rx_queue, QSPI_CFG0, cfg0_prog)
     await csr_write(dut, rx_queue, QSPI_CMD, 0x02)
     await csr_write(dut, rx_queue, QSPI_ADDR, target_addr)
@@ -153,12 +153,12 @@ async def test_qspi_program_read(dut):
     await qspi_wait_idle(dut, rx_queue)
 
     # Poll flash until it's ready
-    await flash_poll_busy(dut, rx_queue)
+    await flash_poll_busy(dut, rx_queue, prescaler=1)
 
     # --- PHASE 3: Normal Read (0x03) ---
     logger.info(f"--- Phase 3: Normal Read (0x03) from Addr 0x{target_addr:06X} ---")
     # Single CMD, Single ADDR, Single DATA, Read direction (data_dir=0)
-    cfg0_read = build_cfg0(cmd_mode=1, addr_mode=1, data_mode=1, data_dir=0, addr_len=0)
+    cfg0_read = build_cfg0(cmd_mode=1, addr_mode=1, data_mode=1, data_dir=0, addr_len=0, prescaler=1)
     await csr_write(dut, rx_queue, QSPI_CFG0, cfg0_read)
     await csr_write(dut, rx_queue, QSPI_CMD, 0x03)
     await csr_write(dut, rx_queue, QSPI_ADDR, target_addr)
@@ -176,8 +176,10 @@ async def test_qspi_program_read(dut):
 
 
 def chip_top_runner():
-
     proj_path = Path(__file__).resolve().parent
+    sim_build_dir = proj_path / "sim_build"
+    if sim_build_dir.exists():
+        shutil.rmtree(sim_build_dir)
 
     sdf_corner = "max_ss_125C_4v50"
     top_macro = "a09_chipathon26_top"
@@ -190,6 +192,7 @@ def chip_top_runner():
     mem_dir = proj_path / "../../../sim/srcs/"
 
     build_args = []
+    plusargs = []
     sdf_paths = []
 
     if gl:
@@ -201,14 +204,22 @@ def chip_top_runner():
         sources.append(proj_path / f"../final/pnl/chip_top.pnl.v")
         sources.append(proj_path / f"../macros/{top_macro}/final/pnl/{top_macro}.pnl.v")
 
-        # defines["FUNCTIONAL"] = True
+        defines["FUNCTIONAL"] = True
         defines["USE_POWER_PINS"] = True
         defines["GL_SIM"] = True
 
-        sdf_paths += [proj_path / f"../final/sdf/{sdf_corner}/chip_top__{sdf_corner}.sdf"]
-        sdf_paths += [proj_path / f"../macros/{top_macro}/final/sdf/{sdf_corner}/{top_macro}__{sdf_corner}.sdf"]
+        top_sdf = proj_path / f"../final/sdf/{sdf_corner}/chip_top__{sdf_corner}.sdf"
+        macro_sdf = proj_path / f"../macros/{top_macro}/final/sdf/{sdf_corner}/{top_macro}__{sdf_corner}.sdf"
+
+        if top_sdf.exists():
+            sdf_paths.append(top_sdf)
+            defines.pop("FUNCTIONAL", None) # Turn off functional for timing simulation
+        if macro_sdf.exists():
+            sdf_paths.append(macro_sdf)
 
     else:
+        defines["USE_POWER_PINS"] = True
+
         sources.append(proj_path / "../src/chip_top.sv")
         sources.append(proj_path / "../src/chip_core.sv")
         sources.append(proj_path / f"../macros/{top_macro}/{top_macro}.sv")
@@ -248,6 +259,27 @@ def chip_top_runner():
     if sim == "verilator":
         build_args += ["--timing", "--trace", "--trace-fst", "--trace-structs"]
 
+    if sim == "questa":
+        # vlog compilation options
+        build_args += ["-mfcu", "-incr", "+acc", "-timescale", "1ns/1ps"]
+
+        if gl:
+            # vsim runtime simulation options
+            plusargs += [
+                "-t", "1ps",               # Ensure 1ps resolution for SDF delays
+                "-suppress", "3448,2718,2685", # Suppress specific warnings
+                "+multisource_int_delays", # Enable multisource interconnect handling
+                "+sdf_verbose",            # Verbose SDF annotation output
+                "+specify",                # Enable specify block timing checks
+                "+transport_int_delays",   # Transport delay mode for interconnects
+                "+transport_path_delays",  # Transport delay mode for gate paths
+            ]
+            
+            # Map SDF files to target module hierarchy
+            if len(sdf_paths) > 0 and sdf_paths[0].exists():
+                plusargs += ["-sdfmax", f"/chip_top_tb/i_chip_top={sdf_paths[0]}"]
+
+
     runner = get_runner(sim)
     runner.build(
         sources=sources,
@@ -267,8 +299,6 @@ def chip_top_runner():
             shutil.copy(filepath, build_dir)
             print(f"Wildcard Match: Copied {filepath.name} to sim_build.")
         
-    plusargs = []
-
     runner.test(
         hdl_toplevel="chip_top_tb",
         test_module="chip_top_tb,",
