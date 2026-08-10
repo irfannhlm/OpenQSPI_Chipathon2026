@@ -70,11 +70,11 @@ module chip_core #(
 
 
     // =========================================================
-    // PAD MAPPING (Use EAST PADs for UART and QSPI)
+    // PAD MAPPING
     // =========================================================
     generate
         assign uart_rx_i = input_in[`PAD_UART_RX];
-        for (genvar i = 0; i < NUM_BIDIR_PADS; i++) begin : gen_pad_defaults
+        for (genvar i = 0; i < NUM_BIDIR_PADS; i++) begin : gen_pad
             // if (i == `PAD_UART_RX) begin : pad_uart_rx
             //     // Pad PAD_UART_RX: UART RX (Input)
             //     assign bidir_out[i] = 1'b0;

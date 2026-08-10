@@ -56,6 +56,10 @@ librelane-macro-openroad: ## Open the last run in OpenROAD
 	librelane macros/${MACRO}/config.yaml --pdk ${PDK} --pdk-root ${PDK_ROOT} --manual-pdk --last-run --flow OpenInOpenROAD
 .PHONY: librelane-macro-openroad
 
+librelane-macro-klayout: ## Open the last run in Klayout
+	librelane macros/${MACRO}/config.yaml --pdk ${PDK} --pdk-root ${PDK_ROOT} --manual-pdk --last-run --flow OpenInKLayout
+.PHONY: librelane-macro-klayout
+
 librelane-nodrc: ## Run LibreLane flow without DRC checks
 	librelane librelane/slots/slot_${SLOT}.yaml librelane/config.yaml --save-views-to $(MAKEFILE_DIR)/final --pdk ${PDK} --pdk-root ${PDK_ROOT} --manual-pdk --skip KLayout.Antenna --skip KLayout.DRC --skip Magic.DRC
 .PHONY: librelane-nodrc
