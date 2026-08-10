@@ -3,7 +3,7 @@
 
 
 module a09_chipathon26_top #(
-    parameter int CLOCK_FREQ = 50_000_000,  // 50 MHz
+    parameter int CLOCK_FREQ = 40_000_000,  // 40 MHz
     parameter int BAUD_RATE  = 2_000_000,   // 2 Mbps
     parameter int FIFO_DEPTH = 8,           // Depth of the FIFO
     parameter int CS_NUM     = 2            // Number of chip selects for QSPI
@@ -29,6 +29,12 @@ module a09_chipathon26_top #(
     output logic [3:0] qspi_oe  // output enable for qspi_o
 );
 
+  // Pipeline reset signal
+  logic rst_n;
+  always_ff @(posedge clk_i) begin : rst_reg
+    rst_n <= rst_ni;
+  end
+
   // UART TO APB INSTANCE
   // APB master interface
   logic [31:0] paddr;
@@ -48,7 +54,7 @@ module a09_chipathon26_top #(
   ) inst_uart_to_apb (
       // Clock and reset
       .clk_i (clk_i),
-      .rst_ni(rst_ni),
+      .rst_ni(rst_n),
 
       // UART interface
       .uart_rx_i(uart_rx_i),
@@ -76,7 +82,7 @@ module a09_chipathon26_top #(
   ) inst_apb_qspi (
       // clock and reset
       .clk_i (clk_i),
-      .rst_ni(rst_ni),
+      .rst_ni(rst_n),
 
       // APB interface
       .psel_i(psel),

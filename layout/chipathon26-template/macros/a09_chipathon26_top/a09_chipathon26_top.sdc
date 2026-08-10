@@ -1,6 +1,9 @@
 current_design $::env(DESIGN_NAME)
 set_units -time ns
 
+# Reset signal as false path
+set_false_path -from [get_ports rst_ni]
+
 # Fetch the Clock Port from config.yaml
 set clock_port [lindex $::env(CLOCK_PORT) 0]
 set clock_net [lindex $::env(CLOCK_NET) 0]
