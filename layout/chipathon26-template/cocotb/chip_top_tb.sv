@@ -67,7 +67,8 @@ module chip_top_tb (
       .RESET(rst_ni)
   );
 
-  assign bidir_PAD[`PAD_UART_RX] = uart_rx_i;
+  // assign bidir_PAD[`PAD_UART_RX] = uart_rx_i;
+  assign input_PAD[`PAD_UART_RX] = uart_rx_i;
   assign uart_tx_o = bidir_PAD[`PAD_UART_TX];
 
 `ifdef SDF_ANNOTATE

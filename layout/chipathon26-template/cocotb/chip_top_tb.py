@@ -52,7 +52,7 @@ async def start_up(dut, flash_setup_time_us=3000):
     await set_defaults(dut)
     if gl:
         await enable_power(dut)
-    await start_clock(dut.clk_i)
+    await start_clock(dut.clk_i, freq=CLOCK_FREQ)
     await reset(dut.rst_ni, time_ns=15000) 
 
     rx_queue = Queue()
@@ -181,7 +181,7 @@ def chip_top_runner():
     if sim_build_dir.exists():
         shutil.rmtree(sim_build_dir)
 
-    sdf_corner = "max_ss_125C_4v50"
+    sdf_corner = "max_ss_125C_3v00"
     top_macro = "a09_chipathon26_top"
 
     sources = []

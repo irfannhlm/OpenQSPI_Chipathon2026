@@ -73,37 +73,38 @@ module chip_core #(
     // PAD MAPPING (Use EAST PADs for UART and QSPI)
     // =========================================================
     generate
+        assign uart_rx_i = input_in[`PAD_UART_RX];
         for (genvar i = 0; i < NUM_BIDIR_PADS; i++) begin : gen_pad_defaults
-            if (i == `PAD_UART_RX) begin
-                // Pad PAD_UART_RX: UART RX (Input)
-                assign bidir_out[i] = 1'b0;
-                assign bidir_oe[i]  = 1'b0;
-                assign bidir_ie[i]  = 1'b1;
-                assign uart_rx_i = bidir_in[i];
-                assign bidir_pu[i]  = 1'b0;
-                assign bidir_pd[i]  = 1'b0;
-            end else if (i == `PAD_UART_TX) begin
+            // if (i == `PAD_UART_RX) begin : pad_uart_rx
+            //     // Pad PAD_UART_RX: UART RX (Input)
+            //     assign bidir_out[i] = 1'b0;
+            //     assign bidir_oe[i]  = 1'b0;
+            //     assign bidir_ie[i]  = 1'b1;
+            //     assign uart_rx_i = bidir_in[i];
+            //     assign bidir_pu[i]  = 1'b0;
+            //     assign bidir_pd[i]  = 1'b0;
+            if (i == `PAD_UART_TX) begin : pad_uart_tx
                 // Pad PAD_UART_TX: UART TX (Output)
                 assign bidir_out[i] = uart_tx_o;
                 assign bidir_oe[i]  = 1'b1;
                 assign bidir_ie[i]  = 1'b0;
                 assign bidir_pu[i]  = 1'b0;
                 assign bidir_pd[i]  = 1'b0;
-            end else if (i == `PAD_QSPI_SCK) begin
+            end else if (i == `PAD_QSPI_SCK) begin : pad_qspi_sck
                 // Pad PAD_QSPI_SCK: QSPI SCK (Output)
                 assign bidir_out[i] = qspi_sck_o;
                 assign bidir_oe[i]  = 1'b1;
                 assign bidir_ie[i]  = 1'b0;
                 assign bidir_pu[i]  = 1'b0;
                 assign bidir_pd[i]  = 1'b0;
-            end else if (i == `PAD_QSPI_CSN0 || i == `PAD_QSPI_CSN1) begin
+            end else if (i == `PAD_QSPI_CSN0 || i == `PAD_QSPI_CSN1) begin : pad_qspi_csn
                 // Pads PAD_QSPI_CSN0 and PAD_QSPI_CSN1: QSPI CSN[1:0] (Outputs)
                 assign bidir_out[i] = qspi_csn_o[i - `PAD_QSPI_CSN0];
                 assign bidir_oe[i]  = 1'b1;
                 assign bidir_ie[i]  = 1'b0;
                 assign bidir_pu[i]  = 1'b0;
                 assign bidir_pd[i]  = 1'b0;
-            end else if (i >= `PAD_QSPI_IO0 && i <= `PAD_QSPI_IO3) begin
+            end else if (i >= `PAD_QSPI_IO0 && i <= `PAD_QSPI_IO3) begin : pad_qspi_io
                 // Pads PAD_QSPI_IO3:PAD_QSPI_IO0: QSPI IO[3:0] (Bidirectional)
                 assign bidir_out[i] = qspi_o[i - `PAD_QSPI_IO0];
                 assign bidir_oe[i]  = qspi_oe[i - `PAD_QSPI_IO0];
@@ -111,7 +112,7 @@ module chip_core #(
                 assign qspi_i[i - `PAD_QSPI_IO0] = bidir_in[i];
                 assign bidir_pu[i]  = 1'b1; // enable pullup (simulation only)
                 assign bidir_pd[i]  = 1'b0;
-            end else begin
+            end else begin : pad_unused
                 // Unused pads -> Grounded and Disabled
                 assign bidir_out[i] = 1'b0;
                 assign bidir_oe[i]  = 1'b0;

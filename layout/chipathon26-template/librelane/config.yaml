@@ -3,6 +3,9 @@ meta:
   flow: Chip
   substituting_steps:
 
+    # IllegalOverlap bug with PDN halo
+    Checker.IllegalOverlap: null
+
     # Disable KLayout DRC
     #KLayout.DRC: null
     #Checker.KLayoutDRC: null
@@ -47,6 +50,41 @@ VDD_NETS:
 GND_NETS:
 - VSS
 
+# add 3v3 corners
+DEFAULT_CORNER: max_ss_125C_3v00 # default use worst corner
+STA_CORNERS:
+  - nom_tt_025C_3v30
+  - min_ff_n40C_3v60
+  - max_ss_125C_3v00
+  - nom_tt_025C_5v00
+  - min_ff_n40C_5v50
+  - max_ss_125C_4v50
+LIB:
+  nom_tt_025C_3v30:
+    - "pdk_dir::libs.ref/gf180mcu_fd_sc_mcu7t5v0/lib/gf180mcu_fd_sc_mcu7t5v0__tt_025C_3v30.lib"
+    - "pdk_dir::libs.ref/gf180mcu_fd_io/lib/gf180mcu_fd_io__tt_025C_3v30.lib"
+    - "pdk_dir::libs.ref/gf180mcu_fd_io/lib/gf180mcu_ws_io__tt_025C_5v00.lib"
+  min_ff_n40C_3v60:
+    - "pdk_dir::libs.ref/gf180mcu_fd_sc_mcu7t5v0/lib/gf180mcu_fd_sc_mcu7t5v0__ff_n40C_3v60.lib"
+    - "pdk_dir::libs.ref/gf180mcu_fd_io/lib/gf180mcu_fd_io__ff_n40C_3v63.lib"
+    - "pdk_dir::libs.ref/gf180mcu_fd_io/lib/gf180mcu_ws_io__ff_n40C_5v50.lib"
+  max_ss_125C_3v00:
+    - "pdk_dir::libs.ref/gf180mcu_fd_sc_mcu7t5v0/lib/gf180mcu_fd_sc_mcu7t5v0__ss_125C_3v00.lib"
+    - "pdk_dir::libs.ref/gf180mcu_fd_io/lib/gf180mcu_fd_io__ss_125C_2v97.lib"
+    - "pdk_dir::libs.ref/gf180mcu_fd_io/lib/gf180mcu_ws_io__ss_125C_4v50.lib"
+  nom_tt_025C_5v00:
+    - "pdk_dir::libs.ref/gf180mcu_fd_sc_mcu7t5v0/lib/gf180mcu_fd_sc_mcu7t5v0__tt_025C_5v00.lib"
+    - "pdk_dir::libs.ref/gf180mcu_fd_io/lib/gf180mcu_fd_io__tt_025C_5v00.lib"
+    - "pdk_dir::libs.ref/gf180mcu_fd_io/lib/gf180mcu_ws_io__tt_025C_5v00.lib"
+  min_ff_n40C_5v50:
+    - "pdk_dir::libs.ref/gf180mcu_fd_sc_mcu7t5v0/lib/gf180mcu_fd_sc_mcu7t5v0__ff_n40C_5v50.lib"
+    - "pdk_dir::libs.ref/gf180mcu_fd_io/lib/gf180mcu_fd_io__ff_n40C_5v50.lib"
+    - "pdk_dir::libs.ref/gf180mcu_fd_io/lib/gf180mcu_ws_io__ff_n40C_5v50.lib"
+  max_ss_125C_4v50:
+    - "pdk_dir::libs.ref/gf180mcu_fd_sc_mcu7t5v0/lib/gf180mcu_fd_sc_mcu7t5v0__ss_125C_4v50.lib"
+    - "pdk_dir::libs.ref/gf180mcu_fd_io/lib/gf180mcu_fd_io__ss_125C_4v50.lib"
+    - "pdk_dir::libs.ref/gf180mcu_fd_io/lib/gf180mcu_ws_io__ss_125C_4v50.lib"
+
 # We need to add gf180mcu_fd_io__bi_24t
 # due to the unused Y output for output only pads
 IGNORE_DISCONNECTED_MODULES:
@@ -57,7 +95,7 @@ IGNORE_DISCONNECTED_MODULES:
 # Clock
 CLOCK_PORT: clk_PAD
 CLOCK_NET: clk_pad/Y
-CLOCK_PERIOD: 20 # 50 MHz
+CLOCK_PERIOD: 25 # 40 MHz
 
 # Fix hold violations
 PL_RESIZER_HOLD_SLACK_MARGIN: 0.35
@@ -161,28 +199,22 @@ MACROS:
       "nom_*":
         - dir::../macros/a09_chipathon26_top/final/spef/nom/a09_chipathon26_top.nom.spef
     lib:
-      "max_tt_025C_5v00":
-        - dir::../macros/a09_chipathon26_top/final/lib/max_tt_025C_5v00/a09_chipathon26_top__max_tt_025C_5v00.lib
-      "min_tt_025C_5v00":
-        - dir::../macros/a09_chipathon26_top/final/lib/min_tt_025C_5v00/a09_chipathon26_top__min_tt_025C_5v00.lib
       "nom_tt_025C_5v00":
         - dir::../macros/a09_chipathon26_top/final/lib/nom_tt_025C_5v00/a09_chipathon26_top__nom_tt_025C_5v00.lib
-      "max_ff_n40C_5v50":
-        - dir::../macros/a09_chipathon26_top/final/lib/max_ff_n40C_5v50/a09_chipathon26_top__max_ff_n40C_5v50.lib
       "min_ff_n40C_5v50":
         - dir::../macros/a09_chipathon26_top/final/lib/min_ff_n40C_5v50/a09_chipathon26_top__min_ff_n40C_5v50.lib
-      "nom_ff_n40C_5v50":
-        - dir::../macros/a09_chipathon26_top/final/lib/nom_ff_n40C_5v50/a09_chipathon26_top__nom_ff_n40C_5v50.lib
       "max_ss_125C_4v50":
         - dir::../macros/a09_chipathon26_top/final/lib/max_ss_125C_4v50/a09_chipathon26_top__max_ss_125C_4v50.lib
-      "min_ss_125C_4v50":
-        - dir::../macros/a09_chipathon26_top/final/lib/min_ss_125C_4v50/a09_chipathon26_top__min_ss_125C_4v50.lib
-      "nom_ss_125C_4v50":
-        - dir::../macros/a09_chipathon26_top/final/lib/nom_ss_125C_4v50/a09_chipathon26_top__nom_ss_125C_4v50.lib
+      "nom_tt_025C_3v30":
+        - dir::../macros/a09_chipathon26_top/final/lib/nom_tt_025C_3v30/a09_chipathon26_top__nom_tt_025C_3v30.lib
+      "min_ff_n40C_3v60":
+        - dir::../macros/a09_chipathon26_top/final/lib/min_ff_n40C_3v60/a09_chipathon26_top__min_ff_n40C_3v60.lib
+      "max_ss_125C_3v00":
+        - dir::../macros/a09_chipathon26_top/final/lib/max_ss_125C_3v00/a09_chipathon26_top__max_ss_125C_3v00.lib
     instances:
       i_chip_core.a09_inst:
-        location: [1600, 1600]
-        orientation: N
+        location: [600, 600]
+        orientation: S
 
   gf180mcu_ws_ip__id:
     gds:
@@ -216,7 +248,7 @@ MACROS:
 
 
 # PDN macro connections
-PDN_MACRO_CONNECTIONS: []
+PDN_MACRO_CONNECTIONS: 
   # - "i_chip_core.a09_inst VDD VDD VSS VSS"
 
 # Halo size around macros while cutting rows.
