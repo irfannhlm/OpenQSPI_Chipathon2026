@@ -58,7 +58,7 @@ module qspi_master #(
 
   // Abort lock register
   logic qspi_done, qspi_abort;
-  always_ff @(posedge clk_i, negedge rst_ni) begin : abort_lock
+  always_ff @(posedge clk_i) begin : abort_lock
     if (!rst_ni) begin
       qspi_abort <= 1'b0;
     end else if (qspi_abort_i) begin
@@ -71,7 +71,7 @@ module qspi_master #(
   // Byte/bit target pre-calculation
   logic [31:0] byte_target_data;
   logic [ 5:0] bit_target_dummy;
-  always_ff @(posedge clk_i, negedge rst_ni) begin : target_precalc
+  always_ff @(posedge clk_i) begin : target_precalc
     if (!rst_ni) begin
       byte_target_data <= 32'd0;
       bit_target_dummy <= 6'd0;
@@ -85,7 +85,7 @@ module qspi_master #(
   // clock counter
   logic [7:0] clk_cnt;
   logic clk_cnt_rst;
-  always_ff @(posedge clk_i, negedge rst_ni) begin : clock_counter
+  always_ff @(posedge clk_i) begin : clock_counter
     if (!rst_ni) begin
       clk_cnt <= 'd0;
     end else if (clk_cnt_rst) begin
@@ -102,7 +102,7 @@ module qspi_master #(
   // qspi_sck generation
   logic qspi_sck;
   logic qspi_sck_rst, qspi_sck_pause;
-  always_ff @(posedge clk_i, negedge rst_ni) begin : qspi_sck_gen
+  always_ff @(posedge clk_i) begin : qspi_sck_gen
     if (!rst_ni) begin
       qspi_sck <= 1'b0;
     end else if (qspi_sck_rst) begin
@@ -117,7 +117,7 @@ module qspi_master #(
   // qspi_csn generation
   logic [CS_NUM-1:0] qspi_csn;
   logic qspi_csn_en;
-  always_ff @(posedge clk_i, negedge rst_ni) begin : qspi_csn_gen
+  always_ff @(posedge clk_i) begin : qspi_csn_gen
     if (!rst_ni) begin
       qspi_csn <= {CS_NUM{1'b1}};  // reset to idle state
     end else if (~qspi_csn_en) begin
@@ -144,7 +144,7 @@ module qspi_master #(
   logic bit_cnt_rst;
   logic bit_cnt_ddr;
   wire bit_cnt_edge = qspi_sck_negedge || (qspi_sck_posedge && bit_cnt_ddr);
-  always_ff @(posedge clk_i, negedge rst_ni) begin : bit_counter
+  always_ff @(posedge clk_i) begin : bit_counter
     if (!rst_ni) begin
       bit_cnt <= 'd0;
     end else if (bit_cnt_rst) begin
@@ -162,7 +162,7 @@ module qspi_master #(
   logic [31:0] byte_cnt;
   logic byte_cnt_rst;
   wire byte_cnt_edge = (bit_cnt[2:0] == bit_cnt_limit && qspi_sck_negedge);
-  always_ff @(posedge clk_i, negedge rst_ni) begin : byte_counter
+  always_ff @(posedge clk_i) begin : byte_counter
     if (!rst_ni) begin
       byte_cnt <= 'd0;
     end else if (byte_cnt_rst) begin
@@ -182,7 +182,7 @@ module qspi_master #(
   logic tx_shifter_en, tx_shifter_load, tx_shifter_ddr;
   logic tx_shifter_preset;  // preset shifter with first byte of address/data
   wire  tx_shift = tx_shifter_en && (qspi_sck_negedge || (qspi_sck_posedge && tx_shifter_ddr));
-  always_ff @(posedge clk_i, negedge rst_ni) begin : output_shifter
+  always_ff @(posedge clk_i) begin : output_shifter
     if (!rst_ni) begin
       tx_shifter <= 8'd0;
     end else if ((tx_shifter_load || tx_shifter_preset) && ~qspi_sck_pause) begin
@@ -285,7 +285,7 @@ module qspi_master #(
   logic [1:0] rx_shifter_mode;  // 0x: single, 10: dual, 11: quad
   logic rx_shifter_en, rx_shifter_ddr;
   wire rx_shift = rx_shifter_en && (qspi_sck_posedge || (qspi_sck_negedge && rx_shifter_ddr));
-  always_ff @(posedge clk_i, negedge rst_ni) begin : input_shifter
+  always_ff @(posedge clk_i) begin : input_shifter
     if (!rst_ni) begin
       rx_shifter <= 8'd0;
     end else if (rx_shift && ~qspi_sck_pause) begin
@@ -301,24 +301,24 @@ module qspi_master #(
 
   // rx data register
   logic [31:0] rx_data;
-  logic [ 2:0] qspi_rdata_valid;
-  logic qspi_rdata_rst, qspi_rdata_load;
-  always_ff @(posedge clk_i, negedge rst_ni) begin : rx_data_delay
+  logic [ 1:0] qspi_rdata_valid_q;
+  logic qspi_rdata_rst, qspi_rdata_load, qspi_rdata_valid;
+  always_ff @(posedge clk_i) begin : rx_data_delay
     if (!rst_ni) begin
       qspi_rdata_load <= 1'b0;
-      qspi_rdata_valid[0] <= 1'b0;
-      qspi_rdata_valid[1] <= 1'b0;
+      qspi_rdata_valid_q[0] <= 1'b0;
+      qspi_rdata_valid_q[1] <= 1'b0;
     end else begin
       // load every byte
       qspi_rdata_load <= rx_shifter_en && byte_cnt_edge && !qspi_sck_pause;
       // rdata valid when last byte or every 4 bytes
-      qspi_rdata_valid[0] <= rx_shifter_en && byte_cnt_edge && !qspi_sck_pause && !qspi_abort;
-      qspi_rdata_valid[1] <= (byte_cnt == byte_target_data || (byte_cnt[1:0] == 2'd3));
+      qspi_rdata_valid_q[0] <= rx_shifter_en && byte_cnt_edge && !qspi_sck_pause && !qspi_abort;
+      qspi_rdata_valid_q[1] <= (byte_cnt == byte_target_data || (byte_cnt[1:0] == 2'd3));
     end
   end
-  assign qspi_rdata_valid[2] = qspi_rdata_valid[0] && qspi_rdata_valid[1];
+  assign qspi_rdata_valid = qspi_rdata_valid_q[0] && qspi_rdata_valid_q[1];
 
-  always_ff @(posedge clk_i, negedge rst_ni) begin : rx_data_reg
+  always_ff @(posedge clk_i) begin : rx_data_reg
     if (!rst_ni) begin
       rx_data <= 'd0;
     end else if (qspi_rdata_rst) begin
@@ -363,7 +363,7 @@ module qspi_master #(
 
   // FSM state registers
   qspi_state_t qspi_nstate, qspi_cstate;
-  always_ff @(posedge clk_i, negedge rst_ni) begin : fsm_reg
+  always_ff @(posedge clk_i) begin : fsm_reg
     if (!rst_ni) begin
       qspi_cstate <= IDLE;
     end else begin
@@ -373,7 +373,7 @@ module qspi_master #(
 
   // CRM state register
   logic crm_active;
-  always_ff @(posedge clk_i, negedge rst_ni) begin : crm_state
+  always_ff @(posedge clk_i) begin : crm_state
     if (!rst_ni) begin
       crm_active <= 1'b0;
     end else if (qspi_done) begin
@@ -385,7 +385,7 @@ module qspi_master #(
   logic [31:0] clk_timer;
   logic clk_timer_rst;
   wire clk_timer_expired = (clk_timer == qspi_timeout_i) && (qspi_timeout_i != 32'd0);
-  always_ff @(posedge clk_i, negedge rst_ni) begin : clk_timer_reg
+  always_ff @(posedge clk_i) begin : clk_timer_reg
     if (!rst_ni) begin
       clk_timer <= 'd0;
     end else if (clk_timer_rst) begin
@@ -720,7 +720,7 @@ module qspi_master #(
     endcase
   end
 
-  always_ff @(posedge clk_i, negedge rst_ni) begin : shifter_mode_reg
+  always_ff @(posedge clk_i) begin : shifter_mode_reg
     if (!rst_ni) begin
       tx_shifter_mode <= 2'b00;
       bit_cnt_mode <= 2'b00;
@@ -738,7 +738,7 @@ module qspi_master #(
   assign qspi_o = tx_shifter_out;
   assign rx_shifter_in = qspi_i;
 
-  always_ff @(posedge clk_i, negedge rst_ni) begin : qspi_oe_reg
+  always_ff @(posedge clk_i) begin : qspi_oe_reg
     if (!rst_ni) begin
       qspi_oe <= 4'b0000;  // default to output disabled
     end else begin
@@ -758,11 +758,11 @@ module qspi_master #(
   assign fifo_pop_o = qspi_wdata_ready && !fifo_empty_i;  // pop FIFO when requesting write data
 
   logic fifo_push;
-  always_ff @(posedge clk_i, negedge rst_ni) begin : fifo_push_lock
+  always_ff @(posedge clk_i) begin : fifo_push_lock
     if (!rst_ni) begin
       fifo_push <= 1'b0;
     end else begin
-      if (qspi_rdata_valid[2]) begin
+      if (qspi_rdata_valid) begin
         fifo_push <= 1'b1;  // lock push signal
       end else if (~fifo_full_i) begin
         fifo_push <= 1'b0;  // unlock push signal when FIFO is not full
@@ -771,7 +771,7 @@ module qspi_master #(
   end
   assign fifo_push_o = fifo_push && ~fifo_full_i;  // output push signal when FIFO is not full
 
-  always_ff @(posedge clk_i, negedge rst_ni) begin : delayed_output
+  always_ff @(posedge clk_i) begin : delayed_output
     if (!rst_ni) begin
       qspi_done_o <= 1'b0;
       qspi_timeout_o <= 1'b0;

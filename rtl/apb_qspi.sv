@@ -150,7 +150,7 @@ module apb_qspi #(
     else fifo_err_next = 4'b0000;
   end
 
-  always_ff @(posedge clk_i, negedge rst_ni) begin : csr_regs
+  always_ff @(posedge clk_i) begin : csr_regs
     if (!rst_ni) begin
       cfg0_q           <= 32'd0;
       dlen_q           <= 32'd0;
@@ -214,6 +214,7 @@ module apb_qspi #(
       .qspi_start_i  (qspi_start_pulse),
       .qspi_done_o   (qm_done),
       .qspi_timeout_o(qm_timeout),
+      .qspi_busy_o   (/*not used*/),
 
       .qspi_timeout_i  (timeout_q),
       .qspi_prescaler_i(cfg0_q[7:0]),

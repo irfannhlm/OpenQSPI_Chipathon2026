@@ -72,7 +72,7 @@ module uart_to_apb #(
   logic psel, pready;
   logic apb_handshake, apb_req, apb_error;
   assign apb_handshake = (psel && penable_o && pready);
-  always_ff @(posedge clk_i, negedge rst_ni) begin : apb_control_reg
+  always_ff @(posedge clk_i) begin : apb_control_reg
     if (!rst_ni) begin
       penable_o <= 1'b0;
       apb_error <= 1'b0;
@@ -124,7 +124,7 @@ module uart_to_apb #(
   logic [4:0] byte_cnt;
   logic byte_cnt_rst;
   wire uart_done = (rx_valid || tx_done);
-  always_ff @(posedge clk_i, negedge rst_ni) begin : byte_counter
+  always_ff @(posedge clk_i) begin : byte_counter
     if (!rst_ni) begin
       byte_cnt <= 'd0;
     end else if (byte_cnt_rst) begin
@@ -137,7 +137,7 @@ module uart_to_apb #(
   // mode register
   logic apb_mode;  // 0: APB read, 1: APB write
   logic apb_done, apb_rst;
-  always_ff @(posedge clk_i, negedge rst_ni) begin : mode_state_reg
+  always_ff @(posedge clk_i) begin : mode_state_reg
     if (!rst_ni) begin
       apb_mode <= 1'b0;
       apb_done <= 1'b0;
@@ -155,7 +155,7 @@ module uart_to_apb #(
   // address register
   logic [31:0] addr_reg;
   logic addr_rst, addr_en;
-  always_ff @(posedge clk_i, negedge rst_ni) begin : addr_reg_block
+  always_ff @(posedge clk_i) begin : addr_reg_block
     if (!rst_ni) begin
       addr_reg <= 'd0;
     end else if (addr_rst) begin
@@ -174,7 +174,7 @@ module uart_to_apb #(
   // wdata register
   logic [31:0] wdata_reg;
   logic wdata_rst, wdata_en;
-  always_ff @(posedge clk_i, negedge rst_ni) begin : wdata_reg_block
+  always_ff @(posedge clk_i) begin : wdata_reg_block
     if (!rst_ni) begin
       wdata_reg <= 'd0;
     end else if (wdata_rst) begin
@@ -189,7 +189,7 @@ module uart_to_apb #(
   logic [31:0] rdata_reg;
   logic [7:0] rdata_byte;
   logic rdata_en;
-  always_ff @(posedge clk_i, negedge rst_ni) begin : rdata_reg_block
+  always_ff @(posedge clk_i) begin : rdata_reg_block
     if (!rst_ni) begin
       rdata_reg <= 'd0;
     end else if (apb_handshake && !pslverr_i) begin
@@ -222,7 +222,7 @@ module uart_to_apb #(
   } fsm_state_t;
   fsm_state_t fsm_cstate, fsm_nstate;
 
-  always_ff @(posedge clk_i, negedge rst_ni) begin : fsm_reg
+  always_ff @(posedge clk_i) begin : fsm_reg
     if (!rst_ni) begin
       fsm_cstate <= ADDR;
     end else begin

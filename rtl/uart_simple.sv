@@ -26,12 +26,14 @@ module uart_simple #(
     output logic uart_tx_o
 );
   localparam int BaudDiv = CLOCK_FREQ / BAUD_RATE;
-  localparam logic [$clog2(BaudDiv)-1:0] MaxCount = BaudDiv - 1;
-  localparam logic [$clog2(BaudDiv)-1:0] MidCount = (BaudDiv >> 1) - 1;
+  localparam int CntWidth = $clog2(BaudDiv);
+
+  localparam logic [CntWidth-1:0] MaxCount = CntWidth'(BaudDiv - 1);
+  localparam logic [CntWidth-1:0] MidCount = CntWidth'((BaudDiv >> 1) - 1);
 
   // Two stage synchronizer for UART RX input
   logic [1:0] uart_rx_sync;
-  always_ff @(posedge clk_i, negedge rst_ni) begin
+  always_ff @(posedge clk_i) begin
     if (!rst_ni) begin
       uart_rx_sync <= 2'b11;
     end else begin
@@ -42,9 +44,9 @@ module uart_simple #(
   wire uart_rx_negedge = uart_rx_sync[1] && !uart_rx_sync[0];
 
   // Clock counter
-  logic [$clog2(BaudDiv)-1:0] clk_cnt;
+  logic [CntWidth-1:0] clk_cnt;
   logic clk_cnt_rst;
-  always_ff @(posedge clk_i, negedge rst_ni) begin : clock_counter
+  always_ff @(posedge clk_i) begin : clock_counter
     if (!rst_ni) begin
       clk_cnt <= '0;
     end else if (clk_cnt_rst) begin
@@ -61,7 +63,7 @@ module uart_simple #(
   // Bit counter
   logic [2:0] bit_cnt;
   logic bit_cnt_rst;
-  always_ff @(posedge clk_i, negedge rst_ni) begin : bit_counter
+  always_ff @(posedge clk_i) begin : bit_counter
     if (!rst_ni) begin
       bit_cnt <= '0;
     end else if (bit_cnt_rst) begin
@@ -74,7 +76,7 @@ module uart_simple #(
   // RX shifter
   logic [7:0] rx_shift_reg;
   logic rx_shifter_en;
-  always_ff @(posedge clk_i, negedge rst_ni) begin : rx_shifter
+  always_ff @(posedge clk_i) begin : rx_shifter
     if (!rst_ni) begin
       rx_shift_reg <= '0;
     end else if (clk_cnt == MaxCount && rx_shifter_en) begin
@@ -86,7 +88,7 @@ module uart_simple #(
   // TX shifter
   logic [8:0] tx_shift_reg;
   logic tx_shifter_en, tx_shifter_load;
-  always_ff @(posedge clk_i, negedge rst_ni) begin : tx_shifter
+  always_ff @(posedge clk_i) begin : tx_shifter
     if (!rst_ni) begin
       tx_shift_reg <= 9'b111111111;  // idle state is high
     end else if (tx_shifter_load) begin
@@ -99,7 +101,7 @@ module uart_simple #(
 
   // UART mode flag
   logic uart_mode;  // 0: RX, 1: TX
-  always_ff @(posedge clk_i, negedge rst_ni) begin
+  always_ff @(posedge clk_i) begin
     if (!rst_ni) begin
       uart_mode <= 1'b0;
     end else if (tx_start_i && !uart_busy_o) begin
@@ -118,7 +120,7 @@ module uart_simple #(
   } uart_state_t;
   uart_state_t uart_cstate, uart_nstate;
 
-  always_ff @(posedge clk_i, negedge rst_ni) begin : fsm_reg
+  always_ff @(posedge clk_i) begin : fsm_reg
     if (!rst_ni) begin
       uart_cstate <= IDLE;
     end else begin
