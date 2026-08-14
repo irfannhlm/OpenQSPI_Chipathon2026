@@ -15,6 +15,15 @@ macros/**/final/*
 !macros/**/final/metrics.json
 !macros/**/final/sta.rpt
 
+final/*
+# !final/gds/
+# !final/gds/*
+# !final/pnl/
+# !final/pnl/**
+!final/metrics.json
+!final/sta.rpt
+
+
 img/
 *.lyrdb
 .ipynb_checkpoints/
