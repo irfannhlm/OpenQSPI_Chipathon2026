@@ -51,17 +51,17 @@ The layout flow consists of three stages: (must be run chronologically)
 cd layout/chipathon26-template
 nix-shell
 
-# ---- Macro Hardening Flow ----
+# ---- Macro Hardening Flow ---- (10-15 mins full run)
 make librelane-macro
 make librelane-macro-openroad   # Inspect macro floorplan/routing in OpenROAD GUI
 make librelane-macro-klayout    # Inspect final macro GDS in KLayout
 
-# ---- Padring Integration Flow ----
+# ---- Padring Integration Flow ---- (~1.5 hours full run)
 make librelane
 make librelane-openroad # Inspect chip-level integration in OpenROAD GUI
 make librelane-klayout  # Inspect full-chip signoff GDS in KLayout
 
-# ---- Cocotb Gate-Level Simulation ----
+# ---- Cocotb Gate-Level Simulation ---- (1-2 mins full run)
 make sim-gl             # Zero-delay gate-level simulation with iverilog (default)
 make sim-gl SIM=questa  # SDF timing-annotated gate-level simulation with QuestaSim
 ```

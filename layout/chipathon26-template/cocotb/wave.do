@@ -9,8 +9,8 @@ add wave -noupdate {/chip_top_tb/i_chip_top/\i_chip_core.a09_inst /paddr}
 add wave -noupdate -expand {/chip_top_tb/i_chip_top/\i_chip_core.a09_inst /pwdata001}
 add wave -noupdate {/chip_top_tb/i_chip_top/\i_chip_core.a09_inst /\inst_apb_qspi.pwrite_i }
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 2} {2171041908 ps} 0} {{Cursor 3} {3534547218 ps} 0}
-quietly wave cursor active 2
+WaveRestoreCursors
+quietly wave cursor active 0
 configure wave -namecolwidth 415
 configure wave -valuecolwidth 100
 configure wave -justifyvalue left
@@ -25,4 +25,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {3534524374 ps} {3534570198 ps}
+WaveRestoreZoom {3550347199 ps} {3550409535 ps}
