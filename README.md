@@ -29,8 +29,8 @@ curl -L https://nixos.org/nix/install | sh
 # Enable flakes
 mkdir -p ~/.config/nix && echo 'experimental-features = nix-command flakes' >> ~/.config/nix/nix.conf
 
-# (Optional, but recommended) add user to trusted
-echo 'trusted-users = root <username>' | sudo tee -a ~/.config/nix/nix.conf
+# (Optional, but recommended) Add user to trusted users
+echo 'trusted-users = root $USER' | sudo tee -a ~/.config/nix/nix.conf
 
 # Develop environment
 cd layout/chipathon26-template
@@ -53,13 +53,13 @@ nix-shell
 
 # ---- Macro Hardening Flow ---- (10-15 mins full run)
 make librelane-macro
-make librelane-macro-openroad   # Inspect macro floorplan/routing in OpenROAD GUI
-make librelane-macro-klayout    # Inspect final macro GDS in KLayout
+make librelane-macro-openroad   # (Optional) Inspect macro floorplan/routing in OpenROAD GUI
+make librelane-macro-klayout    # (Optional) Inspect final macro GDS in KLayout
 
 # ---- Padring Integration Flow ---- (~1.5 hours full run)
 make librelane
-make librelane-openroad # Inspect chip-level integration in OpenROAD GUI
-make librelane-klayout  # Inspect full-chip signoff GDS in KLayout
+make librelane-openroad # (Optional) Inspect chip-level integration in OpenROAD GUI
+make librelane-klayout  # (Optional) Inspect full-chip signoff GDS in KLayout
 
 # ---- Cocotb Gate-Level Simulation ---- (1-2 mins full run)
 make sim-gl             # Zero-delay gate-level simulation with iverilog (default)
