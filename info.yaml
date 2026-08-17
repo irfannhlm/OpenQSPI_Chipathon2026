@@ -13,7 +13,36 @@
 # ======================================================
 project:
   title: "Fully Configurable 32-bit QSPI Master Controller"             # Project title (e.g. "Simple CPU", "PLL", "ADC")
-  team: "Crispi"                      # Your Team name
+  team: "A09 Crispi"                      # Your Team name
   discord: "Irfan"                   # Optional: Discord username (for support / communication)
   description: "A fully configurable QSPI controller wrapped with High-Speed UART interface"  # Short one-line description
   lvs_config: "lvs_config.json"
+
+pins:
+  - name: vdd
+    io_type: power
+  - name: vss
+    io_type: ground
+  - name: clk
+    io_type: input_schmitt
+  - name: rst_n
+    io_type: input_cmos
+  - name: uart_rx
+    io_type: input_cmos
+  - name: uart_tx
+    io_type: bidirectional # configured at 8mA (lower drive)
+  - name: qspi_csn0
+    io_type: bidirectional # configured at 12mA
+  - name: qspi_csn1
+    io_type: bidirectional # configured at 12mA
+  - name: qspi_sck
+    io_type: bidirectional # configured at 16mA (higher drive)
+  - name: qspi_io0
+    io_type: bidirectional # configured at 16mA (higher drive)
+  - name: qspi_io1
+    io_type: bidirectional # configured at 16mA (higher drive)
+  - name: qspi_io2
+    io_type: bidirectional # configured at 16mA (higher drive)
+  - name: qspi_io3
+    io_type: bidirectional # configured at 16mA (higher drive)
+
