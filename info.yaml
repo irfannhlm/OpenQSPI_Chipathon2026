@@ -19,10 +19,10 @@ project:
   lvs_config: "lvs_config.json"
 
 pins:
-  - name: vdd
-    io_type: power
-  - name: vss
+  - name: VSS
     io_type: ground
+  - name: VDD
+    io_type: power
   - name: clk
     io_type: input_schmitt
   - name: rst_n
@@ -31,18 +31,18 @@ pins:
     io_type: input_cmos
   - name: uart_tx
     io_type: bidirectional # configured at 8mA (lower drive)
-  - name: qspi_csn0
+  - name: qspi_csn[0]
     io_type: bidirectional # configured at 12mA
-  - name: qspi_csn1
+  - name: qspi_csn[1]
     io_type: bidirectional # configured at 12mA
   - name: qspi_sck
     io_type: bidirectional # configured at 16mA (higher drive)
-  - name: qspi_io0
+  - name: qspi_io[0]
     io_type: bidirectional # configured at 16mA (higher drive)
-  - name: qspi_io1
+  - name: qspi_io[1]
     io_type: bidirectional # configured at 16mA (higher drive)
-  - name: qspi_io2
+  - name: qspi_io[2]
     io_type: bidirectional # configured at 16mA (higher drive)
-  - name: qspi_io3
+  - name: qspi_io[3]
     io_type: bidirectional # configured at 16mA (higher drive)
 
