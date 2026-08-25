@@ -5,6 +5,7 @@
 
 module top #(
     parameter int CS_NUM     = 2,
+    parameter int FIFO_DEPTH = 8,
     parameter int CLOCK_FREQ = 50_000_000,
     parameter int BAUD_RATE  = 921_600
 ) (
@@ -69,7 +70,7 @@ module top #(
   logic [3:0] qspi_oe;  // output enable for qspi_o
 
   apb_qspi #(
-      .FIFO_DEPTH(16),
+      .FIFO_DEPTH(FIFO_DEPTH),
       .CS_NUM(CS_NUM)
   ) inst_apb_qspi (
       // clock and reset
