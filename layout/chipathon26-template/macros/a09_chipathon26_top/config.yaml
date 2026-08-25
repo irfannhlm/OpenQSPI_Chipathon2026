@@ -24,6 +24,9 @@ meta:
     #Netgen.LVS: null
     #Checker.LVS: null
 
+# Use 7-track for higher density
+STD_CELL_LIBRARY: gf180mcu_fd_sc_mcu7t5v0 
+
 DESIGN_NAME: a09_chipathon26_top
 VERILOG_FILES:
 - dir::a09_chipathon26_top.sv
@@ -48,6 +51,7 @@ FALLBACK_SDC: dir::a09_chipathon26_top.sdc
 # Core sizing
 FP_SIZING: absolute
 DIE_AREA:  [0, 0, 550, 550]
+CORE_AREA: [20, 20, 530, 530]
 
 # Power / ground nets
 VDD_NETS:
@@ -56,8 +60,8 @@ GND_NETS:
 - VSS
 
 # Clock
-CLOCK_PORT: clk_i
-CLOCK_NET: clk_i
+CLOCK_PORT: clk
+CLOCK_NET: clk
 CLOCK_PERIOD: 25 # 40 MHz
 
 # add 3v3 timing corners
@@ -117,9 +121,19 @@ GRT_ALLOW_CONGESTION: true
 RT_MAX_LAYER: Metal3
 
 # PDN - Straps
+PDN_VWIDTH: 1.6
+PDN_HWIDTH: 1.6
 PDN_VSPACING: 1
 PDN_HSPACING: 1
-PDN_VPITCH: 75
-PDN_HPITCH: 75
+PDN_VPITCH: 78.4 # integer multiple of std cell height
+PDN_HPITCH: 78.4 # integer multiple of std cell height
+PDN_VOFFSET: 53.56
+PDN_HOFFSET: 53.56
+
+# PDN - Ring
+PDN_CORE_RING: True
+PDN_CORE_VERTICAL_LAYER: Metal2
+PDN_CORE_HORIZONTAL_LAYER: Metal3
+PDN_CORE_RING_ALLOW_OUT_OF_DIE: False # force PDN ring inside die area 
 
 IO_PIN_ORDER_CFG: dir::pin_order.cfg
