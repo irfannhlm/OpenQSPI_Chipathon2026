@@ -1,0 +1,2847 @@
+spec_blob_sha: 7398a4da36e4d6ad9f9b76c06813b073c9c0ed2f
+source_mapping: build/padframes/A09/project_defs/BH/A09_BH_pad_map.yaml
+source_padring_def: build/padframes/A09/project_defs/BH/A09_BH_padring.def
+variant: BH
+origin_microns:
+- '350'
+- '2035'
+origin_dbu:
+- 70000
+- 407000
+size_microns:
+- '1110'
+- '550'
+diearea_dbu:
+- 0
+- 0
+- 222000
+- 110000
+usable_area: 610500
+blockages: []
+routing_blockage_layers:
+- Metal1
+- Metal2
+- Metal3
+- Metal4
+- Metal5
+pins:
+- user_pin_name: VSS
+  default_project_pin: VSS
+  project_pin: VSS
+  cell_terminal: DVSS
+  padring_instance: W18
+  physical_pad_slot: W18
+  cell: gf180mcu_fd_io__dvss
+  direction: INOUT
+  use: GROUND
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 69800
+    - 428828
+    - 70000
+    - 430728
+    extended_top_level:
+    - 70000
+    - 428828
+    - 70200
+    - 430728
+    translated_user:
+    - 0
+    - 21828
+    - 200
+    - 23728
+  - routing_layer: Metal2
+    top_level:
+    - 69800
+    - 426198
+    - 70000
+    - 428248
+    extended_top_level:
+    - 70000
+    - 426198
+    - 70200
+    - 428248
+    translated_user:
+    - 0
+    - 19198
+    - 200
+    - 21248
+  - routing_layer: Metal2
+    top_level:
+    - 69800
+    - 423828
+    - 70000
+    - 425878
+    extended_top_level:
+    - 70000
+    - 423828
+    - 70200
+    - 425878
+    translated_user:
+    - 0
+    - 16828
+    - 200
+    - 18878
+  - routing_layer: Metal2
+    top_level:
+    - 69800
+    - 421122
+    - 70000
+    - 423172
+    extended_top_level:
+    - 70000
+    - 421122
+    - 70200
+    - 423172
+    translated_user:
+    - 0
+    - 14122
+    - 200
+    - 16172
+  - routing_layer: Metal2
+    top_level:
+    - 69800
+    - 418752
+    - 70000
+    - 420802
+    extended_top_level:
+    - 70000
+    - 418752
+    - 70200
+    - 420802
+    translated_user:
+    - 0
+    - 11752
+    - 200
+    - 13802
+  - routing_layer: Metal2
+    top_level:
+    - 69800
+    - 416272
+    - 70000
+    - 418172
+    extended_top_level:
+    - 70000
+    - 416272
+    - 70200
+    - 418172
+    translated_user:
+    - 0
+    - 9272
+    - 200
+    - 11172
+- user_pin_name: VDD
+  default_project_pin: VDD
+  project_pin: VDD
+  cell_terminal: DVDD
+  padring_instance: W19
+  physical_pad_slot: W19
+  cell: gf180mcu_fd_io__dvdd
+  direction: INOUT
+  use: POWER
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 69069
+    - 448828
+    - 70000
+    - 450728
+    extended_top_level:
+    - 70000
+    - 448828
+    - 70200
+    - 450728
+    translated_user:
+    - 0
+    - 41828
+    - 200
+    - 43728
+  - routing_layer: Metal2
+    top_level:
+    - 69069
+    - 446198
+    - 70000
+    - 448248
+    extended_top_level:
+    - 70000
+    - 446198
+    - 70200
+    - 448248
+    translated_user:
+    - 0
+    - 39198
+    - 200
+    - 41248
+  - routing_layer: Metal2
+    top_level:
+    - 69069
+    - 443828
+    - 70000
+    - 445878
+    extended_top_level:
+    - 70000
+    - 443828
+    - 70200
+    - 445878
+    translated_user:
+    - 0
+    - 36828
+    - 200
+    - 38878
+  - routing_layer: Metal2
+    top_level:
+    - 69069
+    - 441122
+    - 70000
+    - 443172
+    extended_top_level:
+    - 70000
+    - 441122
+    - 70200
+    - 443172
+    translated_user:
+    - 0
+    - 34122
+    - 200
+    - 36172
+  - routing_layer: Metal2
+    top_level:
+    - 69069
+    - 438752
+    - 70000
+    - 440802
+    extended_top_level:
+    - 70000
+    - 438752
+    - 70200
+    - 440802
+    translated_user:
+    - 0
+    - 31752
+    - 200
+    - 33802
+  - routing_layer: Metal2
+    top_level:
+    - 69069
+    - 436272
+    - 70000
+    - 438172
+    extended_top_level:
+    - 70000
+    - 436272
+    - 70200
+    - 438172
+    translated_user:
+    - 0
+    - 29272
+    - 200
+    - 31172
+- user_pin_name: clk
+  default_project_pin: clk_PU
+  project_pin: clk_PU
+  cell_terminal: PU
+  padring_instance: W20
+  physical_pad_slot: W20
+  cell: gf180mcu_fd_io__in_s
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 66054
+    - 469731
+    - 70000
+    - 469807
+    extended_top_level:
+    - 70000
+    - 469731
+    - 70200
+    - 469807
+    translated_user:
+    - 0
+    - 62731
+    - 200
+    - 62807
+- user_pin_name: clk
+  default_project_pin: clk_PD
+  project_pin: clk_PD
+  cell_terminal: PD
+  padring_instance: W20
+  physical_pad_slot: W20
+  cell: gf180mcu_fd_io__in_s
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 65990
+    - 468858
+    - 70000
+    - 468934
+    extended_top_level:
+    - 70000
+    - 468858
+    - 70200
+    - 468934
+    translated_user:
+    - 0
+    - 61858
+    - 200
+    - 61934
+- user_pin_name: clk
+  default_project_pin: clk
+  project_pin: clk
+  cell_terminal: Y
+  padring_instance: W20
+  physical_pad_slot: W20
+  cell: gf180mcu_fd_io__in_s
+  direction: INPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 63950
+    - 456752
+    - 70000
+    - 456828
+    extended_top_level:
+    - 70000
+    - 456752
+    - 70200
+    - 456828
+    translated_user:
+    - 0
+    - 49752
+    - 200
+    - 49828
+- user_pin_name: rst_n
+  default_project_pin: rst_n_PU
+  project_pin: rst_n_PU
+  cell_terminal: PU
+  padring_instance: W21
+  physical_pad_slot: W21
+  cell: gf180mcu_fd_io__in_c
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 66054
+    - 489731
+    - 70000
+    - 489807
+    extended_top_level:
+    - 70000
+    - 489731
+    - 70200
+    - 489807
+    translated_user:
+    - 0
+    - 82731
+    - 200
+    - 82807
+- user_pin_name: rst_n
+  default_project_pin: rst_n_PD
+  project_pin: rst_n_PD
+  cell_terminal: PD
+  padring_instance: W21
+  physical_pad_slot: W21
+  cell: gf180mcu_fd_io__in_c
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 65990
+    - 488858
+    - 70000
+    - 488934
+    extended_top_level:
+    - 70000
+    - 488858
+    - 70200
+    - 488934
+    translated_user:
+    - 0
+    - 81858
+    - 200
+    - 81934
+- user_pin_name: rst_n
+  default_project_pin: rst_n
+  project_pin: rst_n
+  cell_terminal: Y
+  padring_instance: W21
+  physical_pad_slot: W21
+  cell: gf180mcu_fd_io__in_c
+  direction: INPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 63950
+    - 476752
+    - 70000
+    - 476828
+    extended_top_level:
+    - 70000
+    - 476752
+    - 70200
+    - 476828
+    translated_user:
+    - 0
+    - 69752
+    - 200
+    - 69828
+- user_pin_name: uart_rx
+  default_project_pin: uart_rx_PU
+  project_pin: uart_rx_PU
+  cell_terminal: PU
+  padring_instance: W22
+  physical_pad_slot: W22
+  cell: gf180mcu_fd_io__in_c
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 66054
+    - 509731
+    - 70000
+    - 509807
+    extended_top_level:
+    - 70000
+    - 509731
+    - 70200
+    - 509807
+    translated_user:
+    - 0
+    - 102731
+    - 200
+    - 102807
+- user_pin_name: uart_rx
+  default_project_pin: uart_rx_PD
+  project_pin: uart_rx_PD
+  cell_terminal: PD
+  padring_instance: W22
+  physical_pad_slot: W22
+  cell: gf180mcu_fd_io__in_c
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 65990
+    - 508858
+    - 70000
+    - 508934
+    extended_top_level:
+    - 70000
+    - 508858
+    - 70200
+    - 508934
+    translated_user:
+    - 0
+    - 101858
+    - 200
+    - 101934
+- user_pin_name: uart_rx
+  default_project_pin: uart_rx
+  project_pin: uart_rx
+  cell_terminal: Y
+  padring_instance: W22
+  physical_pad_slot: W22
+  cell: gf180mcu_fd_io__in_c
+  direction: INPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 63950
+    - 496752
+    - 70000
+    - 496828
+    extended_top_level:
+    - 70000
+    - 496752
+    - 70200
+    - 496828
+    translated_user:
+    - 0
+    - 89752
+    - 200
+    - 89828
+- user_pin_name: uart_tx
+  default_project_pin: uart_tx_CS
+  project_pin: uart_tx_CS
+  cell_terminal: CS
+  padring_instance: N01
+  physical_pad_slot: N01
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 90252
+    - 517000
+    - 90328
+    - 521291
+    extended_top_level:
+    - 90252
+    - 516800
+    - 90328
+    - 517000
+    translated_user:
+    - 20252
+    - 109800
+    - 20328
+    - 110000
+- user_pin_name: uart_tx
+  default_project_pin: uart_tx_SL
+  project_pin: uart_tx_SL
+  cell_terminal: SL
+  padring_instance: N01
+  physical_pad_slot: N01
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 77190
+    - 517000
+    - 77266
+    - 533972
+    extended_top_level:
+    - 77190
+    - 516800
+    - 77266
+    - 517000
+    translated_user:
+    - 7190
+    - 109800
+    - 7266
+    - 110000
+- user_pin_name: uart_tx
+  default_project_pin: uart_tx_IE
+  project_pin: uart_tx_IE
+  cell_terminal: IE
+  padring_instance: N01
+  physical_pad_slot: N01
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 88647
+    - 517000
+    - 88723
+    - 520016
+    extended_top_level:
+    - 88647
+    - 516800
+    - 88723
+    - 517000
+    translated_user:
+    - 18647
+    - 109800
+    - 18723
+    - 110000
+- user_pin_name: uart_tx
+  default_project_pin: uart_tx_OE
+  project_pin: uart_tx_OE
+  cell_terminal: OE
+  padring_instance: N01
+  physical_pad_slot: N01
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 76898
+    - 517000
+    - 76974
+    - 533732
+    extended_top_level:
+    - 76898
+    - 516800
+    - 76974
+    - 517000
+    translated_user:
+    - 6898
+    - 109800
+    - 6974
+    - 110000
+- user_pin_name: uart_tx
+  default_project_pin: uart_tx_PU
+  project_pin: uart_tx_PU
+  cell_terminal: PU
+  padring_instance: N01
+  physical_pad_slot: N01
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 89731
+    - 517000
+    - 89807
+    - 520916
+    extended_top_level:
+    - 89731
+    - 516800
+    - 89807
+    - 517000
+    translated_user:
+    - 19731
+    - 109800
+    - 19807
+    - 110000
+- user_pin_name: uart_tx
+  default_project_pin: uart_tx_PD
+  project_pin: uart_tx_PD
+  cell_terminal: PD
+  padring_instance: N01
+  physical_pad_slot: N01
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 88858
+    - 517000
+    - 88934
+    - 520980
+    extended_top_level:
+    - 88858
+    - 516800
+    - 88934
+    - 517000
+    translated_user:
+    - 18858
+    - 109800
+    - 18934
+    - 110000
+- user_pin_name: uart_tx
+  default_project_pin: uart_tx_OUT
+  project_pin: uart_tx_OUT
+  cell_terminal: A
+  padring_instance: N01
+  physical_pad_slot: N01
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 77044
+    - 517000
+    - 77120
+    - 534108
+    extended_top_level:
+    - 77044
+    - 516800
+    - 77120
+    - 517000
+    translated_user:
+    - 7044
+    - 109800
+    - 7120
+    - 110000
+- user_pin_name: uart_tx
+  default_project_pin: uart_tx_PDRV0
+  project_pin: uart_tx_PDRV0
+  cell_terminal: PDRV0
+  padring_instance: N01
+  physical_pad_slot: N01
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 89502
+    - 517000
+    - 89578
+    - 534067
+    extended_top_level:
+    - 89502
+    - 516800
+    - 89578
+    - 517000
+    translated_user:
+    - 19502
+    - 109800
+    - 19578
+    - 110000
+- user_pin_name: uart_tx
+  default_project_pin: uart_tx_PDRV1
+  project_pin: uart_tx_PDRV1
+  cell_terminal: PDRV1
+  padring_instance: N01
+  physical_pad_slot: N01
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 89360
+    - 517000
+    - 89436
+    - 534002
+    extended_top_level:
+    - 89360
+    - 516800
+    - 89436
+    - 517000
+    translated_user:
+    - 19360
+    - 109800
+    - 19436
+    - 110000
+- user_pin_name: uart_tx
+  default_project_pin: uart_tx_IN
+  project_pin: uart_tx_IN
+  cell_terminal: Y
+  padring_instance: N01
+  physical_pad_slot: N01
+  cell: gf180mcu_fd_io__bi_t
+  direction: INPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 76752
+    - 517000
+    - 76828
+    - 523020
+    extended_top_level:
+    - 76752
+    - 516800
+    - 76828
+    - 517000
+    translated_user:
+    - 6752
+    - 109800
+    - 6828
+    - 110000
+- user_pin_name: qspi_csn[0]
+  default_project_pin: qspi_csn_CS[0]
+  project_pin: qspi_csn_CS[0]
+  cell_terminal: CS
+  padring_instance: N02
+  physical_pad_slot: N02
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 110252
+    - 517000
+    - 110328
+    - 521291
+    extended_top_level:
+    - 110252
+    - 516800
+    - 110328
+    - 517000
+    translated_user:
+    - 40252
+    - 109800
+    - 40328
+    - 110000
+- user_pin_name: qspi_csn[0]
+  default_project_pin: qspi_csn_SL[0]
+  project_pin: qspi_csn_SL[0]
+  cell_terminal: SL
+  padring_instance: N02
+  physical_pad_slot: N02
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 97190
+    - 517000
+    - 97266
+    - 533972
+    extended_top_level:
+    - 97190
+    - 516800
+    - 97266
+    - 517000
+    translated_user:
+    - 27190
+    - 109800
+    - 27266
+    - 110000
+- user_pin_name: qspi_csn[0]
+  default_project_pin: qspi_csn_IE[0]
+  project_pin: qspi_csn_IE[0]
+  cell_terminal: IE
+  padring_instance: N02
+  physical_pad_slot: N02
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 108647
+    - 517000
+    - 108723
+    - 520016
+    extended_top_level:
+    - 108647
+    - 516800
+    - 108723
+    - 517000
+    translated_user:
+    - 38647
+    - 109800
+    - 38723
+    - 110000
+- user_pin_name: qspi_csn[0]
+  default_project_pin: qspi_csn_OE[0]
+  project_pin: qspi_csn_OE[0]
+  cell_terminal: OE
+  padring_instance: N02
+  physical_pad_slot: N02
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 96898
+    - 517000
+    - 96974
+    - 533732
+    extended_top_level:
+    - 96898
+    - 516800
+    - 96974
+    - 517000
+    translated_user:
+    - 26898
+    - 109800
+    - 26974
+    - 110000
+- user_pin_name: qspi_csn[0]
+  default_project_pin: qspi_csn_PU[0]
+  project_pin: qspi_csn_PU[0]
+  cell_terminal: PU
+  padring_instance: N02
+  physical_pad_slot: N02
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 109731
+    - 517000
+    - 109807
+    - 520916
+    extended_top_level:
+    - 109731
+    - 516800
+    - 109807
+    - 517000
+    translated_user:
+    - 39731
+    - 109800
+    - 39807
+    - 110000
+- user_pin_name: qspi_csn[0]
+  default_project_pin: qspi_csn_PD[0]
+  project_pin: qspi_csn_PD[0]
+  cell_terminal: PD
+  padring_instance: N02
+  physical_pad_slot: N02
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 108858
+    - 517000
+    - 108934
+    - 520980
+    extended_top_level:
+    - 108858
+    - 516800
+    - 108934
+    - 517000
+    translated_user:
+    - 38858
+    - 109800
+    - 38934
+    - 110000
+- user_pin_name: qspi_csn[0]
+  default_project_pin: qspi_csn_OUT[0]
+  project_pin: qspi_csn_OUT[0]
+  cell_terminal: A
+  padring_instance: N02
+  physical_pad_slot: N02
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 97044
+    - 517000
+    - 97120
+    - 534108
+    extended_top_level:
+    - 97044
+    - 516800
+    - 97120
+    - 517000
+    translated_user:
+    - 27044
+    - 109800
+    - 27120
+    - 110000
+- user_pin_name: qspi_csn[0]
+  default_project_pin: qspi_csn_PDRV0[0]
+  project_pin: qspi_csn_PDRV0[0]
+  cell_terminal: PDRV0
+  padring_instance: N02
+  physical_pad_slot: N02
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 109502
+    - 517000
+    - 109578
+    - 534067
+    extended_top_level:
+    - 109502
+    - 516800
+    - 109578
+    - 517000
+    translated_user:
+    - 39502
+    - 109800
+    - 39578
+    - 110000
+- user_pin_name: qspi_csn[0]
+  default_project_pin: qspi_csn_PDRV1[0]
+  project_pin: qspi_csn_PDRV1[0]
+  cell_terminal: PDRV1
+  padring_instance: N02
+  physical_pad_slot: N02
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 109360
+    - 517000
+    - 109436
+    - 534002
+    extended_top_level:
+    - 109360
+    - 516800
+    - 109436
+    - 517000
+    translated_user:
+    - 39360
+    - 109800
+    - 39436
+    - 110000
+- user_pin_name: qspi_csn[0]
+  default_project_pin: qspi_csn_IN[0]
+  project_pin: qspi_csn_IN[0]
+  cell_terminal: Y
+  padring_instance: N02
+  physical_pad_slot: N02
+  cell: gf180mcu_fd_io__bi_t
+  direction: INPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 96752
+    - 517000
+    - 96828
+    - 523020
+    extended_top_level:
+    - 96752
+    - 516800
+    - 96828
+    - 517000
+    translated_user:
+    - 26752
+    - 109800
+    - 26828
+    - 110000
+- user_pin_name: qspi_csn[1]
+  default_project_pin: qspi_csn_CS[1]
+  project_pin: qspi_csn_CS[1]
+  cell_terminal: CS
+  padring_instance: N03
+  physical_pad_slot: N03
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 130252
+    - 517000
+    - 130328
+    - 521291
+    extended_top_level:
+    - 130252
+    - 516800
+    - 130328
+    - 517000
+    translated_user:
+    - 60252
+    - 109800
+    - 60328
+    - 110000
+- user_pin_name: qspi_csn[1]
+  default_project_pin: qspi_csn_SL[1]
+  project_pin: qspi_csn_SL[1]
+  cell_terminal: SL
+  padring_instance: N03
+  physical_pad_slot: N03
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 117190
+    - 517000
+    - 117266
+    - 533972
+    extended_top_level:
+    - 117190
+    - 516800
+    - 117266
+    - 517000
+    translated_user:
+    - 47190
+    - 109800
+    - 47266
+    - 110000
+- user_pin_name: qspi_csn[1]
+  default_project_pin: qspi_csn_IE[1]
+  project_pin: qspi_csn_IE[1]
+  cell_terminal: IE
+  padring_instance: N03
+  physical_pad_slot: N03
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 128647
+    - 517000
+    - 128723
+    - 520016
+    extended_top_level:
+    - 128647
+    - 516800
+    - 128723
+    - 517000
+    translated_user:
+    - 58647
+    - 109800
+    - 58723
+    - 110000
+- user_pin_name: qspi_csn[1]
+  default_project_pin: qspi_csn_OE[1]
+  project_pin: qspi_csn_OE[1]
+  cell_terminal: OE
+  padring_instance: N03
+  physical_pad_slot: N03
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 116898
+    - 517000
+    - 116974
+    - 533732
+    extended_top_level:
+    - 116898
+    - 516800
+    - 116974
+    - 517000
+    translated_user:
+    - 46898
+    - 109800
+    - 46974
+    - 110000
+- user_pin_name: qspi_csn[1]
+  default_project_pin: qspi_csn_PU[1]
+  project_pin: qspi_csn_PU[1]
+  cell_terminal: PU
+  padring_instance: N03
+  physical_pad_slot: N03
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 129731
+    - 517000
+    - 129807
+    - 520916
+    extended_top_level:
+    - 129731
+    - 516800
+    - 129807
+    - 517000
+    translated_user:
+    - 59731
+    - 109800
+    - 59807
+    - 110000
+- user_pin_name: qspi_csn[1]
+  default_project_pin: qspi_csn_PD[1]
+  project_pin: qspi_csn_PD[1]
+  cell_terminal: PD
+  padring_instance: N03
+  physical_pad_slot: N03
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 128858
+    - 517000
+    - 128934
+    - 520980
+    extended_top_level:
+    - 128858
+    - 516800
+    - 128934
+    - 517000
+    translated_user:
+    - 58858
+    - 109800
+    - 58934
+    - 110000
+- user_pin_name: qspi_csn[1]
+  default_project_pin: qspi_csn_OUT[1]
+  project_pin: qspi_csn_OUT[1]
+  cell_terminal: A
+  padring_instance: N03
+  physical_pad_slot: N03
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 117044
+    - 517000
+    - 117120
+    - 534108
+    extended_top_level:
+    - 117044
+    - 516800
+    - 117120
+    - 517000
+    translated_user:
+    - 47044
+    - 109800
+    - 47120
+    - 110000
+- user_pin_name: qspi_csn[1]
+  default_project_pin: qspi_csn_PDRV0[1]
+  project_pin: qspi_csn_PDRV0[1]
+  cell_terminal: PDRV0
+  padring_instance: N03
+  physical_pad_slot: N03
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 129502
+    - 517000
+    - 129578
+    - 534067
+    extended_top_level:
+    - 129502
+    - 516800
+    - 129578
+    - 517000
+    translated_user:
+    - 59502
+    - 109800
+    - 59578
+    - 110000
+- user_pin_name: qspi_csn[1]
+  default_project_pin: qspi_csn_PDRV1[1]
+  project_pin: qspi_csn_PDRV1[1]
+  cell_terminal: PDRV1
+  padring_instance: N03
+  physical_pad_slot: N03
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 129360
+    - 517000
+    - 129436
+    - 534002
+    extended_top_level:
+    - 129360
+    - 516800
+    - 129436
+    - 517000
+    translated_user:
+    - 59360
+    - 109800
+    - 59436
+    - 110000
+- user_pin_name: qspi_csn[1]
+  default_project_pin: qspi_csn_IN[1]
+  project_pin: qspi_csn_IN[1]
+  cell_terminal: Y
+  padring_instance: N03
+  physical_pad_slot: N03
+  cell: gf180mcu_fd_io__bi_t
+  direction: INPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 116752
+    - 517000
+    - 116828
+    - 523020
+    extended_top_level:
+    - 116752
+    - 516800
+    - 116828
+    - 517000
+    translated_user:
+    - 46752
+    - 109800
+    - 46828
+    - 110000
+- user_pin_name: qspi_sck
+  default_project_pin: qspi_sck_CS
+  project_pin: qspi_sck_CS
+  cell_terminal: CS
+  padring_instance: N04
+  physical_pad_slot: N04
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 150252
+    - 517000
+    - 150328
+    - 521291
+    extended_top_level:
+    - 150252
+    - 516800
+    - 150328
+    - 517000
+    translated_user:
+    - 80252
+    - 109800
+    - 80328
+    - 110000
+- user_pin_name: qspi_sck
+  default_project_pin: qspi_sck_SL
+  project_pin: qspi_sck_SL
+  cell_terminal: SL
+  padring_instance: N04
+  physical_pad_slot: N04
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 137190
+    - 517000
+    - 137266
+    - 533972
+    extended_top_level:
+    - 137190
+    - 516800
+    - 137266
+    - 517000
+    translated_user:
+    - 67190
+    - 109800
+    - 67266
+    - 110000
+- user_pin_name: qspi_sck
+  default_project_pin: qspi_sck_IE
+  project_pin: qspi_sck_IE
+  cell_terminal: IE
+  padring_instance: N04
+  physical_pad_slot: N04
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 148647
+    - 517000
+    - 148723
+    - 520016
+    extended_top_level:
+    - 148647
+    - 516800
+    - 148723
+    - 517000
+    translated_user:
+    - 78647
+    - 109800
+    - 78723
+    - 110000
+- user_pin_name: qspi_sck
+  default_project_pin: qspi_sck_OE
+  project_pin: qspi_sck_OE
+  cell_terminal: OE
+  padring_instance: N04
+  physical_pad_slot: N04
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 136898
+    - 517000
+    - 136974
+    - 533732
+    extended_top_level:
+    - 136898
+    - 516800
+    - 136974
+    - 517000
+    translated_user:
+    - 66898
+    - 109800
+    - 66974
+    - 110000
+- user_pin_name: qspi_sck
+  default_project_pin: qspi_sck_PU
+  project_pin: qspi_sck_PU
+  cell_terminal: PU
+  padring_instance: N04
+  physical_pad_slot: N04
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 149731
+    - 517000
+    - 149807
+    - 520916
+    extended_top_level:
+    - 149731
+    - 516800
+    - 149807
+    - 517000
+    translated_user:
+    - 79731
+    - 109800
+    - 79807
+    - 110000
+- user_pin_name: qspi_sck
+  default_project_pin: qspi_sck_PD
+  project_pin: qspi_sck_PD
+  cell_terminal: PD
+  padring_instance: N04
+  physical_pad_slot: N04
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 148858
+    - 517000
+    - 148934
+    - 520980
+    extended_top_level:
+    - 148858
+    - 516800
+    - 148934
+    - 517000
+    translated_user:
+    - 78858
+    - 109800
+    - 78934
+    - 110000
+- user_pin_name: qspi_sck
+  default_project_pin: qspi_sck_OUT
+  project_pin: qspi_sck_OUT
+  cell_terminal: A
+  padring_instance: N04
+  physical_pad_slot: N04
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 137044
+    - 517000
+    - 137120
+    - 534108
+    extended_top_level:
+    - 137044
+    - 516800
+    - 137120
+    - 517000
+    translated_user:
+    - 67044
+    - 109800
+    - 67120
+    - 110000
+- user_pin_name: qspi_sck
+  default_project_pin: qspi_sck_PDRV0
+  project_pin: qspi_sck_PDRV0
+  cell_terminal: PDRV0
+  padring_instance: N04
+  physical_pad_slot: N04
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 149502
+    - 517000
+    - 149578
+    - 534067
+    extended_top_level:
+    - 149502
+    - 516800
+    - 149578
+    - 517000
+    translated_user:
+    - 79502
+    - 109800
+    - 79578
+    - 110000
+- user_pin_name: qspi_sck
+  default_project_pin: qspi_sck_PDRV1
+  project_pin: qspi_sck_PDRV1
+  cell_terminal: PDRV1
+  padring_instance: N04
+  physical_pad_slot: N04
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 149360
+    - 517000
+    - 149436
+    - 534002
+    extended_top_level:
+    - 149360
+    - 516800
+    - 149436
+    - 517000
+    translated_user:
+    - 79360
+    - 109800
+    - 79436
+    - 110000
+- user_pin_name: qspi_sck
+  default_project_pin: qspi_sck_IN
+  project_pin: qspi_sck_IN
+  cell_terminal: Y
+  padring_instance: N04
+  physical_pad_slot: N04
+  cell: gf180mcu_fd_io__bi_t
+  direction: INPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 136752
+    - 517000
+    - 136828
+    - 523020
+    extended_top_level:
+    - 136752
+    - 516800
+    - 136828
+    - 517000
+    translated_user:
+    - 66752
+    - 109800
+    - 66828
+    - 110000
+- user_pin_name: qspi_io[0]
+  default_project_pin: qspi_io_CS[0]
+  project_pin: qspi_io_CS[0]
+  cell_terminal: CS
+  padring_instance: N05
+  physical_pad_slot: N05
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 170252
+    - 517000
+    - 170328
+    - 521291
+    extended_top_level:
+    - 170252
+    - 516800
+    - 170328
+    - 517000
+    translated_user:
+    - 100252
+    - 109800
+    - 100328
+    - 110000
+- user_pin_name: qspi_io[0]
+  default_project_pin: qspi_io_SL[0]
+  project_pin: qspi_io_SL[0]
+  cell_terminal: SL
+  padring_instance: N05
+  physical_pad_slot: N05
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 157190
+    - 517000
+    - 157266
+    - 533972
+    extended_top_level:
+    - 157190
+    - 516800
+    - 157266
+    - 517000
+    translated_user:
+    - 87190
+    - 109800
+    - 87266
+    - 110000
+- user_pin_name: qspi_io[0]
+  default_project_pin: qspi_io_IE[0]
+  project_pin: qspi_io_IE[0]
+  cell_terminal: IE
+  padring_instance: N05
+  physical_pad_slot: N05
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 168647
+    - 517000
+    - 168723
+    - 520016
+    extended_top_level:
+    - 168647
+    - 516800
+    - 168723
+    - 517000
+    translated_user:
+    - 98647
+    - 109800
+    - 98723
+    - 110000
+- user_pin_name: qspi_io[0]
+  default_project_pin: qspi_io_OE[0]
+  project_pin: qspi_io_OE[0]
+  cell_terminal: OE
+  padring_instance: N05
+  physical_pad_slot: N05
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 156898
+    - 517000
+    - 156974
+    - 533732
+    extended_top_level:
+    - 156898
+    - 516800
+    - 156974
+    - 517000
+    translated_user:
+    - 86898
+    - 109800
+    - 86974
+    - 110000
+- user_pin_name: qspi_io[0]
+  default_project_pin: qspi_io_PU[0]
+  project_pin: qspi_io_PU[0]
+  cell_terminal: PU
+  padring_instance: N05
+  physical_pad_slot: N05
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 169731
+    - 517000
+    - 169807
+    - 520916
+    extended_top_level:
+    - 169731
+    - 516800
+    - 169807
+    - 517000
+    translated_user:
+    - 99731
+    - 109800
+    - 99807
+    - 110000
+- user_pin_name: qspi_io[0]
+  default_project_pin: qspi_io_PD[0]
+  project_pin: qspi_io_PD[0]
+  cell_terminal: PD
+  padring_instance: N05
+  physical_pad_slot: N05
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 168858
+    - 517000
+    - 168934
+    - 520980
+    extended_top_level:
+    - 168858
+    - 516800
+    - 168934
+    - 517000
+    translated_user:
+    - 98858
+    - 109800
+    - 98934
+    - 110000
+- user_pin_name: qspi_io[0]
+  default_project_pin: qspi_io_OUT[0]
+  project_pin: qspi_io_OUT[0]
+  cell_terminal: A
+  padring_instance: N05
+  physical_pad_slot: N05
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 157044
+    - 517000
+    - 157120
+    - 534108
+    extended_top_level:
+    - 157044
+    - 516800
+    - 157120
+    - 517000
+    translated_user:
+    - 87044
+    - 109800
+    - 87120
+    - 110000
+- user_pin_name: qspi_io[0]
+  default_project_pin: qspi_io_PDRV0[0]
+  project_pin: qspi_io_PDRV0[0]
+  cell_terminal: PDRV0
+  padring_instance: N05
+  physical_pad_slot: N05
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 169502
+    - 517000
+    - 169578
+    - 534067
+    extended_top_level:
+    - 169502
+    - 516800
+    - 169578
+    - 517000
+    translated_user:
+    - 99502
+    - 109800
+    - 99578
+    - 110000
+- user_pin_name: qspi_io[0]
+  default_project_pin: qspi_io_PDRV1[0]
+  project_pin: qspi_io_PDRV1[0]
+  cell_terminal: PDRV1
+  padring_instance: N05
+  physical_pad_slot: N05
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 169360
+    - 517000
+    - 169436
+    - 534002
+    extended_top_level:
+    - 169360
+    - 516800
+    - 169436
+    - 517000
+    translated_user:
+    - 99360
+    - 109800
+    - 99436
+    - 110000
+- user_pin_name: qspi_io[0]
+  default_project_pin: qspi_io_IN[0]
+  project_pin: qspi_io_IN[0]
+  cell_terminal: Y
+  padring_instance: N05
+  physical_pad_slot: N05
+  cell: gf180mcu_fd_io__bi_t
+  direction: INPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 156752
+    - 517000
+    - 156828
+    - 523020
+    extended_top_level:
+    - 156752
+    - 516800
+    - 156828
+    - 517000
+    translated_user:
+    - 86752
+    - 109800
+    - 86828
+    - 110000
+- user_pin_name: qspi_io[1]
+  default_project_pin: qspi_io_CS[1]
+  project_pin: qspi_io_CS[1]
+  cell_terminal: CS
+  padring_instance: N06
+  physical_pad_slot: N06
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 190252
+    - 517000
+    - 190328
+    - 521291
+    extended_top_level:
+    - 190252
+    - 516800
+    - 190328
+    - 517000
+    translated_user:
+    - 120252
+    - 109800
+    - 120328
+    - 110000
+- user_pin_name: qspi_io[1]
+  default_project_pin: qspi_io_SL[1]
+  project_pin: qspi_io_SL[1]
+  cell_terminal: SL
+  padring_instance: N06
+  physical_pad_slot: N06
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 177190
+    - 517000
+    - 177266
+    - 533972
+    extended_top_level:
+    - 177190
+    - 516800
+    - 177266
+    - 517000
+    translated_user:
+    - 107190
+    - 109800
+    - 107266
+    - 110000
+- user_pin_name: qspi_io[1]
+  default_project_pin: qspi_io_IE[1]
+  project_pin: qspi_io_IE[1]
+  cell_terminal: IE
+  padring_instance: N06
+  physical_pad_slot: N06
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 188647
+    - 517000
+    - 188723
+    - 520016
+    extended_top_level:
+    - 188647
+    - 516800
+    - 188723
+    - 517000
+    translated_user:
+    - 118647
+    - 109800
+    - 118723
+    - 110000
+- user_pin_name: qspi_io[1]
+  default_project_pin: qspi_io_OE[1]
+  project_pin: qspi_io_OE[1]
+  cell_terminal: OE
+  padring_instance: N06
+  physical_pad_slot: N06
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 176898
+    - 517000
+    - 176974
+    - 533732
+    extended_top_level:
+    - 176898
+    - 516800
+    - 176974
+    - 517000
+    translated_user:
+    - 106898
+    - 109800
+    - 106974
+    - 110000
+- user_pin_name: qspi_io[1]
+  default_project_pin: qspi_io_PU[1]
+  project_pin: qspi_io_PU[1]
+  cell_terminal: PU
+  padring_instance: N06
+  physical_pad_slot: N06
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 189731
+    - 517000
+    - 189807
+    - 520916
+    extended_top_level:
+    - 189731
+    - 516800
+    - 189807
+    - 517000
+    translated_user:
+    - 119731
+    - 109800
+    - 119807
+    - 110000
+- user_pin_name: qspi_io[1]
+  default_project_pin: qspi_io_PD[1]
+  project_pin: qspi_io_PD[1]
+  cell_terminal: PD
+  padring_instance: N06
+  physical_pad_slot: N06
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 188858
+    - 517000
+    - 188934
+    - 520980
+    extended_top_level:
+    - 188858
+    - 516800
+    - 188934
+    - 517000
+    translated_user:
+    - 118858
+    - 109800
+    - 118934
+    - 110000
+- user_pin_name: qspi_io[1]
+  default_project_pin: qspi_io_OUT[1]
+  project_pin: qspi_io_OUT[1]
+  cell_terminal: A
+  padring_instance: N06
+  physical_pad_slot: N06
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 177044
+    - 517000
+    - 177120
+    - 534108
+    extended_top_level:
+    - 177044
+    - 516800
+    - 177120
+    - 517000
+    translated_user:
+    - 107044
+    - 109800
+    - 107120
+    - 110000
+- user_pin_name: qspi_io[1]
+  default_project_pin: qspi_io_PDRV0[1]
+  project_pin: qspi_io_PDRV0[1]
+  cell_terminal: PDRV0
+  padring_instance: N06
+  physical_pad_slot: N06
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 189502
+    - 517000
+    - 189578
+    - 534067
+    extended_top_level:
+    - 189502
+    - 516800
+    - 189578
+    - 517000
+    translated_user:
+    - 119502
+    - 109800
+    - 119578
+    - 110000
+- user_pin_name: qspi_io[1]
+  default_project_pin: qspi_io_PDRV1[1]
+  project_pin: qspi_io_PDRV1[1]
+  cell_terminal: PDRV1
+  padring_instance: N06
+  physical_pad_slot: N06
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 189360
+    - 517000
+    - 189436
+    - 534002
+    extended_top_level:
+    - 189360
+    - 516800
+    - 189436
+    - 517000
+    translated_user:
+    - 119360
+    - 109800
+    - 119436
+    - 110000
+- user_pin_name: qspi_io[1]
+  default_project_pin: qspi_io_IN[1]
+  project_pin: qspi_io_IN[1]
+  cell_terminal: Y
+  padring_instance: N06
+  physical_pad_slot: N06
+  cell: gf180mcu_fd_io__bi_t
+  direction: INPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 176752
+    - 517000
+    - 176828
+    - 523020
+    extended_top_level:
+    - 176752
+    - 516800
+    - 176828
+    - 517000
+    translated_user:
+    - 106752
+    - 109800
+    - 106828
+    - 110000
+- user_pin_name: qspi_io[2]
+  default_project_pin: qspi_io_CS[2]
+  project_pin: qspi_io_CS[2]
+  cell_terminal: CS
+  padring_instance: N07
+  physical_pad_slot: N07
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 210252
+    - 517000
+    - 210328
+    - 521291
+    extended_top_level:
+    - 210252
+    - 516800
+    - 210328
+    - 517000
+    translated_user:
+    - 140252
+    - 109800
+    - 140328
+    - 110000
+- user_pin_name: qspi_io[2]
+  default_project_pin: qspi_io_SL[2]
+  project_pin: qspi_io_SL[2]
+  cell_terminal: SL
+  padring_instance: N07
+  physical_pad_slot: N07
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 197190
+    - 517000
+    - 197266
+    - 533972
+    extended_top_level:
+    - 197190
+    - 516800
+    - 197266
+    - 517000
+    translated_user:
+    - 127190
+    - 109800
+    - 127266
+    - 110000
+- user_pin_name: qspi_io[2]
+  default_project_pin: qspi_io_IE[2]
+  project_pin: qspi_io_IE[2]
+  cell_terminal: IE
+  padring_instance: N07
+  physical_pad_slot: N07
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 208647
+    - 517000
+    - 208723
+    - 520016
+    extended_top_level:
+    - 208647
+    - 516800
+    - 208723
+    - 517000
+    translated_user:
+    - 138647
+    - 109800
+    - 138723
+    - 110000
+- user_pin_name: qspi_io[2]
+  default_project_pin: qspi_io_OE[2]
+  project_pin: qspi_io_OE[2]
+  cell_terminal: OE
+  padring_instance: N07
+  physical_pad_slot: N07
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 196898
+    - 517000
+    - 196974
+    - 533732
+    extended_top_level:
+    - 196898
+    - 516800
+    - 196974
+    - 517000
+    translated_user:
+    - 126898
+    - 109800
+    - 126974
+    - 110000
+- user_pin_name: qspi_io[2]
+  default_project_pin: qspi_io_PU[2]
+  project_pin: qspi_io_PU[2]
+  cell_terminal: PU
+  padring_instance: N07
+  physical_pad_slot: N07
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 209731
+    - 517000
+    - 209807
+    - 520916
+    extended_top_level:
+    - 209731
+    - 516800
+    - 209807
+    - 517000
+    translated_user:
+    - 139731
+    - 109800
+    - 139807
+    - 110000
+- user_pin_name: qspi_io[2]
+  default_project_pin: qspi_io_PD[2]
+  project_pin: qspi_io_PD[2]
+  cell_terminal: PD
+  padring_instance: N07
+  physical_pad_slot: N07
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 208858
+    - 517000
+    - 208934
+    - 520980
+    extended_top_level:
+    - 208858
+    - 516800
+    - 208934
+    - 517000
+    translated_user:
+    - 138858
+    - 109800
+    - 138934
+    - 110000
+- user_pin_name: qspi_io[2]
+  default_project_pin: qspi_io_OUT[2]
+  project_pin: qspi_io_OUT[2]
+  cell_terminal: A
+  padring_instance: N07
+  physical_pad_slot: N07
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 197044
+    - 517000
+    - 197120
+    - 534108
+    extended_top_level:
+    - 197044
+    - 516800
+    - 197120
+    - 517000
+    translated_user:
+    - 127044
+    - 109800
+    - 127120
+    - 110000
+- user_pin_name: qspi_io[2]
+  default_project_pin: qspi_io_PDRV0[2]
+  project_pin: qspi_io_PDRV0[2]
+  cell_terminal: PDRV0
+  padring_instance: N07
+  physical_pad_slot: N07
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 209502
+    - 517000
+    - 209578
+    - 534067
+    extended_top_level:
+    - 209502
+    - 516800
+    - 209578
+    - 517000
+    translated_user:
+    - 139502
+    - 109800
+    - 139578
+    - 110000
+- user_pin_name: qspi_io[2]
+  default_project_pin: qspi_io_PDRV1[2]
+  project_pin: qspi_io_PDRV1[2]
+  cell_terminal: PDRV1
+  padring_instance: N07
+  physical_pad_slot: N07
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 209360
+    - 517000
+    - 209436
+    - 534002
+    extended_top_level:
+    - 209360
+    - 516800
+    - 209436
+    - 517000
+    translated_user:
+    - 139360
+    - 109800
+    - 139436
+    - 110000
+- user_pin_name: qspi_io[2]
+  default_project_pin: qspi_io_IN[2]
+  project_pin: qspi_io_IN[2]
+  cell_terminal: Y
+  padring_instance: N07
+  physical_pad_slot: N07
+  cell: gf180mcu_fd_io__bi_t
+  direction: INPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 196752
+    - 517000
+    - 196828
+    - 523020
+    extended_top_level:
+    - 196752
+    - 516800
+    - 196828
+    - 517000
+    translated_user:
+    - 126752
+    - 109800
+    - 126828
+    - 110000
+- user_pin_name: qspi_io[3]
+  default_project_pin: qspi_io_CS[3]
+  project_pin: qspi_io_CS[3]
+  cell_terminal: CS
+  padring_instance: N08
+  physical_pad_slot: N08
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 230252
+    - 517000
+    - 230328
+    - 521291
+    extended_top_level:
+    - 230252
+    - 516800
+    - 230328
+    - 517000
+    translated_user:
+    - 160252
+    - 109800
+    - 160328
+    - 110000
+- user_pin_name: qspi_io[3]
+  default_project_pin: qspi_io_SL[3]
+  project_pin: qspi_io_SL[3]
+  cell_terminal: SL
+  padring_instance: N08
+  physical_pad_slot: N08
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 217190
+    - 517000
+    - 217266
+    - 533972
+    extended_top_level:
+    - 217190
+    - 516800
+    - 217266
+    - 517000
+    translated_user:
+    - 147190
+    - 109800
+    - 147266
+    - 110000
+- user_pin_name: qspi_io[3]
+  default_project_pin: qspi_io_IE[3]
+  project_pin: qspi_io_IE[3]
+  cell_terminal: IE
+  padring_instance: N08
+  physical_pad_slot: N08
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 228647
+    - 517000
+    - 228723
+    - 520016
+    extended_top_level:
+    - 228647
+    - 516800
+    - 228723
+    - 517000
+    translated_user:
+    - 158647
+    - 109800
+    - 158723
+    - 110000
+- user_pin_name: qspi_io[3]
+  default_project_pin: qspi_io_OE[3]
+  project_pin: qspi_io_OE[3]
+  cell_terminal: OE
+  padring_instance: N08
+  physical_pad_slot: N08
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 216898
+    - 517000
+    - 216974
+    - 533732
+    extended_top_level:
+    - 216898
+    - 516800
+    - 216974
+    - 517000
+    translated_user:
+    - 146898
+    - 109800
+    - 146974
+    - 110000
+- user_pin_name: qspi_io[3]
+  default_project_pin: qspi_io_PU[3]
+  project_pin: qspi_io_PU[3]
+  cell_terminal: PU
+  padring_instance: N08
+  physical_pad_slot: N08
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 229731
+    - 517000
+    - 229807
+    - 520916
+    extended_top_level:
+    - 229731
+    - 516800
+    - 229807
+    - 517000
+    translated_user:
+    - 159731
+    - 109800
+    - 159807
+    - 110000
+- user_pin_name: qspi_io[3]
+  default_project_pin: qspi_io_PD[3]
+  project_pin: qspi_io_PD[3]
+  cell_terminal: PD
+  padring_instance: N08
+  physical_pad_slot: N08
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 228858
+    - 517000
+    - 228934
+    - 520980
+    extended_top_level:
+    - 228858
+    - 516800
+    - 228934
+    - 517000
+    translated_user:
+    - 158858
+    - 109800
+    - 158934
+    - 110000
+- user_pin_name: qspi_io[3]
+  default_project_pin: qspi_io_OUT[3]
+  project_pin: qspi_io_OUT[3]
+  cell_terminal: A
+  padring_instance: N08
+  physical_pad_slot: N08
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 217044
+    - 517000
+    - 217120
+    - 534108
+    extended_top_level:
+    - 217044
+    - 516800
+    - 217120
+    - 517000
+    translated_user:
+    - 147044
+    - 109800
+    - 147120
+    - 110000
+- user_pin_name: qspi_io[3]
+  default_project_pin: qspi_io_PDRV0[3]
+  project_pin: qspi_io_PDRV0[3]
+  cell_terminal: PDRV0
+  padring_instance: N08
+  physical_pad_slot: N08
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 229502
+    - 517000
+    - 229578
+    - 534067
+    extended_top_level:
+    - 229502
+    - 516800
+    - 229578
+    - 517000
+    translated_user:
+    - 159502
+    - 109800
+    - 159578
+    - 110000
+- user_pin_name: qspi_io[3]
+  default_project_pin: qspi_io_PDRV1[3]
+  project_pin: qspi_io_PDRV1[3]
+  cell_terminal: PDRV1
+  padring_instance: N08
+  physical_pad_slot: N08
+  cell: gf180mcu_fd_io__bi_t
+  direction: OUTPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 229360
+    - 517000
+    - 229436
+    - 534002
+    extended_top_level:
+    - 229360
+    - 516800
+    - 229436
+    - 517000
+    translated_user:
+    - 159360
+    - 109800
+    - 159436
+    - 110000
+- user_pin_name: qspi_io[3]
+  default_project_pin: qspi_io_IN[3]
+  project_pin: qspi_io_IN[3]
+  cell_terminal: Y
+  padring_instance: N08
+  physical_pad_slot: N08
+  cell: gf180mcu_fd_io__bi_t
+  direction: INPUT
+  use: SIGNAL
+  rectangles:
+  - routing_layer: Metal2
+    top_level:
+    - 216752
+    - 517000
+    - 216828
+    - 523020
+    extended_top_level:
+    - 216752
+    - 516800
+    - 216828
+    - 517000
+    translated_user:
+    - 146752
+    - 109800
+    - 146828
+    - 110000
+project_gds_size:
+  source_gds: /Users/kanobailey/chipathon/2026/gds/A09/a09_chipathon26_top.gds
+  top_cell: a09_chipathon26_top
+  layer: 0
+  datatype: 0
+  layout_dbu_microns: 0.001
+  rectangle_dbu:
+  - 0
+  - 0
+  - 550000
+  - 550000
+  width_microns: '550'
+  height_microns: '550'
+  top_cell_text:
+  - text: qspi_csn_CS[0]
+    layer: 36
+    datatype: 10
+  - text: qspi_csn_CS[1]
+    layer: 36
+    datatype: 10
+  - text: qspi_csn_IE[0]
+    layer: 36
+    datatype: 10
+  - text: qspi_csn_IE[1]
+    layer: 36
+    datatype: 10
+  - text: qspi_csn_IN[0]
+    layer: 36
+    datatype: 10
+  - text: qspi_csn_IN[1]
+    layer: 36
+    datatype: 10
+  - text: qspi_csn_OE[0]
+    layer: 36
+    datatype: 10
+  - text: qspi_csn_OE[1]
+    layer: 36
+    datatype: 10
+  - text: qspi_csn_OUT[0]
+    layer: 36
+    datatype: 10
+  - text: qspi_csn_OUT[1]
+    layer: 36
+    datatype: 10
+  - text: qspi_csn_PDRV0[0]
+    layer: 36
+    datatype: 10
+  - text: qspi_csn_PDRV0[1]
+    layer: 36
+    datatype: 10
+  - text: qspi_csn_PDRV1[0]
+    layer: 36
+    datatype: 10
+  - text: qspi_csn_PDRV1[1]
+    layer: 36
+    datatype: 10
+  - text: qspi_csn_PD[0]
+    layer: 36
+    datatype: 10
+  - text: qspi_csn_PD[1]
+    layer: 36
+    datatype: 10
+  - text: qspi_csn_PU[0]
+    layer: 36
+    datatype: 10
+  - text: qspi_csn_PU[1]
+    layer: 36
+    datatype: 10
+  - text: qspi_csn_SL[0]
+    layer: 36
+    datatype: 10
+  - text: qspi_csn_SL[1]
+    layer: 36
+    datatype: 10
+  - text: qspi_sck_CS
+    layer: 36
+    datatype: 10
+  - text: qspi_sck_IE
+    layer: 36
+    datatype: 10
+  - text: qspi_sck_IN
+    layer: 36
+    datatype: 10
+  - text: qspi_sck_OE
+    layer: 36
+    datatype: 10
+  - text: qspi_sck_OUT
+    layer: 36
+    datatype: 10
+  - text: qspi_sck_PD
+    layer: 36
+    datatype: 10
+  - text: qspi_sck_PDRV0
+    layer: 36
+    datatype: 10
+  - text: qspi_sck_PDRV1
+    layer: 36
+    datatype: 10
+  - text: qspi_sck_PU
+    layer: 36
+    datatype: 10
+  - text: qspi_sck_SL
+    layer: 36
+    datatype: 10
+  - text: clk
+    layer: 42
+    datatype: 10
+  - text: clk_PD
+    layer: 42
+    datatype: 10
+  - text: clk_PU
+    layer: 42
+    datatype: 10
+  - text: qspi_io_CS[0]
+    layer: 42
+    datatype: 10
+  - text: qspi_io_CS[1]
+    layer: 42
+    datatype: 10
+  - text: qspi_io_CS[2]
+    layer: 42
+    datatype: 10
+  - text: qspi_io_CS[3]
+    layer: 42
+    datatype: 10
+  - text: qspi_io_IE[0]
+    layer: 42
+    datatype: 10
+  - text: qspi_io_IE[1]
+    layer: 42
+    datatype: 10
+  - text: qspi_io_IE[2]
+    layer: 42
+    datatype: 10
+  - text: qspi_io_IE[3]
+    layer: 42
+    datatype: 10
+  - text: qspi_io_IN[0]
+    layer: 42
+    datatype: 10
+  - text: qspi_io_IN[1]
+    layer: 42
+    datatype: 10
+  - text: qspi_io_IN[2]
+    layer: 42
+    datatype: 10
+  - text: qspi_io_IN[3]
+    layer: 42
+    datatype: 10
+  - text: qspi_io_OE[0]
+    layer: 42
+    datatype: 10
+  - text: qspi_io_OE[1]
+    layer: 42
+    datatype: 10
+  - text: qspi_io_OE[2]
+    layer: 42
+    datatype: 10
+  - text: qspi_io_OE[3]
+    layer: 42
+    datatype: 10
+  - text: qspi_io_OUT[0]
+    layer: 42
+    datatype: 10
+  - text: qspi_io_OUT[1]
+    layer: 42
+    datatype: 10
+  - text: qspi_io_OUT[2]
+    layer: 42
+    datatype: 10
+  - text: qspi_io_OUT[3]
+    layer: 42
+    datatype: 10
+  - text: qspi_io_PDRV0[0]
+    layer: 42
+    datatype: 10
+  - text: qspi_io_PDRV0[1]
+    layer: 42
+    datatype: 10
+  - text: qspi_io_PDRV0[2]
+    layer: 42
+    datatype: 10
+  - text: qspi_io_PDRV0[3]
+    layer: 42
+    datatype: 10
+  - text: qspi_io_PDRV1[0]
+    layer: 42
+    datatype: 10
+  - text: qspi_io_PDRV1[1]
+    layer: 42
+    datatype: 10
+  - text: qspi_io_PDRV1[2]
+    layer: 42
+    datatype: 10
+  - text: qspi_io_PDRV1[3]
+    layer: 42
+    datatype: 10
+  - text: qspi_io_PD[0]
+    layer: 42
+    datatype: 10
+  - text: qspi_io_PD[1]
+    layer: 42
+    datatype: 10
+  - text: qspi_io_PD[2]
+    layer: 42
+    datatype: 10
+  - text: qspi_io_PD[3]
+    layer: 42
+    datatype: 10
+  - text: qspi_io_PU[0]
+    layer: 42
+    datatype: 10
+  - text: qspi_io_PU[1]
+    layer: 42
+    datatype: 10
+  - text: qspi_io_PU[2]
+    layer: 42
+    datatype: 10
+  - text: qspi_io_PU[3]
+    layer: 42
+    datatype: 10
+  - text: qspi_io_SL[0]
+    layer: 42
+    datatype: 10
+  - text: qspi_io_SL[1]
+    layer: 42
+    datatype: 10
+  - text: qspi_io_SL[2]
+    layer: 42
+    datatype: 10
+  - text: qspi_io_SL[3]
+    layer: 42
+    datatype: 10
+  - text: rst_n
+    layer: 42
+    datatype: 10
+  - text: rst_n_PD
+    layer: 42
+    datatype: 10
+  - text: rst_n_PU
+    layer: 42
+    datatype: 10
+  - text: uart_rx
+    layer: 42
+    datatype: 10
+  - text: uart_rx_PD
+    layer: 42
+    datatype: 10
+  - text: uart_rx_PU
+    layer: 42
+    datatype: 10
+  - text: uart_tx_CS
+    layer: 42
+    datatype: 10
+  - text: uart_tx_IE
+    layer: 42
+    datatype: 10
+  - text: uart_tx_IN
+    layer: 42
+    datatype: 10
+  - text: uart_tx_OE
+    layer: 42
+    datatype: 10
+  - text: uart_tx_OUT
+    layer: 42
+    datatype: 10
+  - text: uart_tx_PD
+    layer: 42
+    datatype: 10
+  - text: uart_tx_PDRV0
+    layer: 42
+    datatype: 10
+  - text: uart_tx_PDRV1
+    layer: 42
+    datatype: 10
+  - text: uart_tx_PU
+    layer: 42
+    datatype: 10
+  - text: uart_tx_SL
+    layer: 42
+    datatype: 10
+  - text: VDD
+    layer: 46
+    datatype: 10
+  - text: VSS
+    layer: 46
+    datatype: 10
+  - text: VDD
+    layer: 81
+    datatype: 10
+  - text: VSS
+    layer: 81
+    datatype: 10
+participant_pin_count: 13

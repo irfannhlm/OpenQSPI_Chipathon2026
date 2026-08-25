@@ -1,0 +1,292 @@
+VERSION 5.8 ;
+DIVIDERCHAR "/" ;
+BUSBITCHARS "[]" ;
+DESIGN A09_BV ;
+UNITS DISTANCE MICRONS 200 ;
+DIEAREA ( 0 0 ) ( 110000 222000 ) ;
+PINS 91 ;
+- VSS + NET VSS + DIRECTION INOUT + USE GROUND
+  + LAYER Metal2 ( 0 13828 ) ( 200 15728 )
+  + LAYER Metal2 ( 0 11198 ) ( 200 13248 )
+  + LAYER Metal2 ( 0 8828 ) ( 200 10878 )
+  + LAYER Metal2 ( 0 6122 ) ( 200 8172 )
+  + LAYER Metal2 ( 0 3752 ) ( 200 5802 )
+  + LAYER Metal2 ( 0 1272 ) ( 200 3172 )
+  + FIXED ( 0 0 ) N ;
+- VDD + NET VDD + DIRECTION INOUT + USE POWER
+  + LAYER Metal2 ( 0 33828 ) ( 200 35728 )
+  + LAYER Metal2 ( 0 31198 ) ( 200 33248 )
+  + LAYER Metal2 ( 0 28828 ) ( 200 30878 )
+  + LAYER Metal2 ( 0 26122 ) ( 200 28172 )
+  + LAYER Metal2 ( 0 23752 ) ( 200 25802 )
+  + LAYER Metal2 ( 0 21272 ) ( 200 23172 )
+  + FIXED ( 0 0 ) N ;
+- clk_PU + NET clk_PU + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 54731 ) ( 200 54807 )
+  + FIXED ( 0 0 ) N ;
+- clk_PD + NET clk_PD + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 53858 ) ( 200 53934 )
+  + FIXED ( 0 0 ) N ;
+- clk + NET clk + DIRECTION INPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 41752 ) ( 200 41828 )
+  + FIXED ( 0 0 ) N ;
+- rst_n_PU + NET rst_n_PU + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 74731 ) ( 200 74807 )
+  + FIXED ( 0 0 ) N ;
+- rst_n_PD + NET rst_n_PD + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 73858 ) ( 200 73934 )
+  + FIXED ( 0 0 ) N ;
+- rst_n + NET rst_n + DIRECTION INPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 61752 ) ( 200 61828 )
+  + FIXED ( 0 0 ) N ;
+- uart_rx_PU + NET uart_rx_PU + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 94731 ) ( 200 94807 )
+  + FIXED ( 0 0 ) N ;
+- uart_rx_PD + NET uart_rx_PD + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 93858 ) ( 200 93934 )
+  + FIXED ( 0 0 ) N ;
+- uart_rx + NET uart_rx + DIRECTION INPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 81752 ) ( 200 81828 )
+  + FIXED ( 0 0 ) N ;
+- uart_tx_CS + NET uart_tx_CS + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 115252 ) ( 200 115328 )
+  + FIXED ( 0 0 ) N ;
+- uart_tx_SL + NET uart_tx_SL + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 102190 ) ( 200 102266 )
+  + FIXED ( 0 0 ) N ;
+- uart_tx_IE + NET uart_tx_IE + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 113647 ) ( 200 113723 )
+  + FIXED ( 0 0 ) N ;
+- uart_tx_OE + NET uart_tx_OE + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 101898 ) ( 200 101974 )
+  + FIXED ( 0 0 ) N ;
+- uart_tx_PU + NET uart_tx_PU + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 114731 ) ( 200 114807 )
+  + FIXED ( 0 0 ) N ;
+- uart_tx_PD + NET uart_tx_PD + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 113858 ) ( 200 113934 )
+  + FIXED ( 0 0 ) N ;
+- uart_tx_OUT + NET uart_tx_OUT + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 102044 ) ( 200 102120 )
+  + FIXED ( 0 0 ) N ;
+- uart_tx_PDRV0 + NET uart_tx_PDRV0 + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 114502 ) ( 200 114578 )
+  + FIXED ( 0 0 ) N ;
+- uart_tx_PDRV1 + NET uart_tx_PDRV1 + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 114360 ) ( 200 114436 )
+  + FIXED ( 0 0 ) N ;
+- uart_tx_IN + NET uart_tx_IN + DIRECTION INPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 101752 ) ( 200 101828 )
+  + FIXED ( 0 0 ) N ;
+- qspi_csn_CS[0] + NET qspi_csn_CS[0] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 135252 ) ( 200 135328 )
+  + FIXED ( 0 0 ) N ;
+- qspi_csn_SL[0] + NET qspi_csn_SL[0] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 122190 ) ( 200 122266 )
+  + FIXED ( 0 0 ) N ;
+- qspi_csn_IE[0] + NET qspi_csn_IE[0] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 133647 ) ( 200 133723 )
+  + FIXED ( 0 0 ) N ;
+- qspi_csn_OE[0] + NET qspi_csn_OE[0] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 121898 ) ( 200 121974 )
+  + FIXED ( 0 0 ) N ;
+- qspi_csn_PU[0] + NET qspi_csn_PU[0] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 134731 ) ( 200 134807 )
+  + FIXED ( 0 0 ) N ;
+- qspi_csn_PD[0] + NET qspi_csn_PD[0] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 133858 ) ( 200 133934 )
+  + FIXED ( 0 0 ) N ;
+- qspi_csn_OUT[0] + NET qspi_csn_OUT[0] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 122044 ) ( 200 122120 )
+  + FIXED ( 0 0 ) N ;
+- qspi_csn_PDRV0[0] + NET qspi_csn_PDRV0[0] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 134502 ) ( 200 134578 )
+  + FIXED ( 0 0 ) N ;
+- qspi_csn_PDRV1[0] + NET qspi_csn_PDRV1[0] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 134360 ) ( 200 134436 )
+  + FIXED ( 0 0 ) N ;
+- qspi_csn_IN[0] + NET qspi_csn_IN[0] + DIRECTION INPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 121752 ) ( 200 121828 )
+  + FIXED ( 0 0 ) N ;
+- qspi_csn_CS[1] + NET qspi_csn_CS[1] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 155252 ) ( 200 155328 )
+  + FIXED ( 0 0 ) N ;
+- qspi_csn_SL[1] + NET qspi_csn_SL[1] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 142190 ) ( 200 142266 )
+  + FIXED ( 0 0 ) N ;
+- qspi_csn_IE[1] + NET qspi_csn_IE[1] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 153647 ) ( 200 153723 )
+  + FIXED ( 0 0 ) N ;
+- qspi_csn_OE[1] + NET qspi_csn_OE[1] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 141898 ) ( 200 141974 )
+  + FIXED ( 0 0 ) N ;
+- qspi_csn_PU[1] + NET qspi_csn_PU[1] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 154731 ) ( 200 154807 )
+  + FIXED ( 0 0 ) N ;
+- qspi_csn_PD[1] + NET qspi_csn_PD[1] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 153858 ) ( 200 153934 )
+  + FIXED ( 0 0 ) N ;
+- qspi_csn_OUT[1] + NET qspi_csn_OUT[1] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 142044 ) ( 200 142120 )
+  + FIXED ( 0 0 ) N ;
+- qspi_csn_PDRV0[1] + NET qspi_csn_PDRV0[1] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 154502 ) ( 200 154578 )
+  + FIXED ( 0 0 ) N ;
+- qspi_csn_PDRV1[1] + NET qspi_csn_PDRV1[1] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 154360 ) ( 200 154436 )
+  + FIXED ( 0 0 ) N ;
+- qspi_csn_IN[1] + NET qspi_csn_IN[1] + DIRECTION INPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 141752 ) ( 200 141828 )
+  + FIXED ( 0 0 ) N ;
+- qspi_sck_CS + NET qspi_sck_CS + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 175252 ) ( 200 175328 )
+  + FIXED ( 0 0 ) N ;
+- qspi_sck_SL + NET qspi_sck_SL + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 162190 ) ( 200 162266 )
+  + FIXED ( 0 0 ) N ;
+- qspi_sck_IE + NET qspi_sck_IE + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 173647 ) ( 200 173723 )
+  + FIXED ( 0 0 ) N ;
+- qspi_sck_OE + NET qspi_sck_OE + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 161898 ) ( 200 161974 )
+  + FIXED ( 0 0 ) N ;
+- qspi_sck_PU + NET qspi_sck_PU + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 174731 ) ( 200 174807 )
+  + FIXED ( 0 0 ) N ;
+- qspi_sck_PD + NET qspi_sck_PD + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 173858 ) ( 200 173934 )
+  + FIXED ( 0 0 ) N ;
+- qspi_sck_OUT + NET qspi_sck_OUT + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 162044 ) ( 200 162120 )
+  + FIXED ( 0 0 ) N ;
+- qspi_sck_PDRV0 + NET qspi_sck_PDRV0 + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 174502 ) ( 200 174578 )
+  + FIXED ( 0 0 ) N ;
+- qspi_sck_PDRV1 + NET qspi_sck_PDRV1 + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 174360 ) ( 200 174436 )
+  + FIXED ( 0 0 ) N ;
+- qspi_sck_IN + NET qspi_sck_IN + DIRECTION INPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 161752 ) ( 200 161828 )
+  + FIXED ( 0 0 ) N ;
+- qspi_io_CS[0] + NET qspi_io_CS[0] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 195252 ) ( 200 195328 )
+  + FIXED ( 0 0 ) N ;
+- qspi_io_SL[0] + NET qspi_io_SL[0] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 182190 ) ( 200 182266 )
+  + FIXED ( 0 0 ) N ;
+- qspi_io_IE[0] + NET qspi_io_IE[0] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 193647 ) ( 200 193723 )
+  + FIXED ( 0 0 ) N ;
+- qspi_io_OE[0] + NET qspi_io_OE[0] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 181898 ) ( 200 181974 )
+  + FIXED ( 0 0 ) N ;
+- qspi_io_PU[0] + NET qspi_io_PU[0] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 194731 ) ( 200 194807 )
+  + FIXED ( 0 0 ) N ;
+- qspi_io_PD[0] + NET qspi_io_PD[0] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 193858 ) ( 200 193934 )
+  + FIXED ( 0 0 ) N ;
+- qspi_io_OUT[0] + NET qspi_io_OUT[0] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 182044 ) ( 200 182120 )
+  + FIXED ( 0 0 ) N ;
+- qspi_io_PDRV0[0] + NET qspi_io_PDRV0[0] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 194502 ) ( 200 194578 )
+  + FIXED ( 0 0 ) N ;
+- qspi_io_PDRV1[0] + NET qspi_io_PDRV1[0] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 194360 ) ( 200 194436 )
+  + FIXED ( 0 0 ) N ;
+- qspi_io_IN[0] + NET qspi_io_IN[0] + DIRECTION INPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 181752 ) ( 200 181828 )
+  + FIXED ( 0 0 ) N ;
+- qspi_io_CS[1] + NET qspi_io_CS[1] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 215252 ) ( 200 215328 )
+  + FIXED ( 0 0 ) N ;
+- qspi_io_SL[1] + NET qspi_io_SL[1] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 202190 ) ( 200 202266 )
+  + FIXED ( 0 0 ) N ;
+- qspi_io_IE[1] + NET qspi_io_IE[1] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 213647 ) ( 200 213723 )
+  + FIXED ( 0 0 ) N ;
+- qspi_io_OE[1] + NET qspi_io_OE[1] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 201898 ) ( 200 201974 )
+  + FIXED ( 0 0 ) N ;
+- qspi_io_PU[1] + NET qspi_io_PU[1] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 214731 ) ( 200 214807 )
+  + FIXED ( 0 0 ) N ;
+- qspi_io_PD[1] + NET qspi_io_PD[1] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 213858 ) ( 200 213934 )
+  + FIXED ( 0 0 ) N ;
+- qspi_io_OUT[1] + NET qspi_io_OUT[1] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 202044 ) ( 200 202120 )
+  + FIXED ( 0 0 ) N ;
+- qspi_io_PDRV0[1] + NET qspi_io_PDRV0[1] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 214502 ) ( 200 214578 )
+  + FIXED ( 0 0 ) N ;
+- qspi_io_PDRV1[1] + NET qspi_io_PDRV1[1] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 214360 ) ( 200 214436 )
+  + FIXED ( 0 0 ) N ;
+- qspi_io_IN[1] + NET qspi_io_IN[1] + DIRECTION INPUT + USE SIGNAL
+  + LAYER Metal2 ( 0 201752 ) ( 200 201828 )
+  + FIXED ( 0 0 ) N ;
+- qspi_io_CS[2] + NET qspi_io_CS[2] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 20252 221800 ) ( 20328 222000 )
+  + FIXED ( 0 0 ) N ;
+- qspi_io_SL[2] + NET qspi_io_SL[2] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 7190 221800 ) ( 7266 222000 )
+  + FIXED ( 0 0 ) N ;
+- qspi_io_IE[2] + NET qspi_io_IE[2] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 18647 221800 ) ( 18723 222000 )
+  + FIXED ( 0 0 ) N ;
+- qspi_io_OE[2] + NET qspi_io_OE[2] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 6898 221800 ) ( 6974 222000 )
+  + FIXED ( 0 0 ) N ;
+- qspi_io_PU[2] + NET qspi_io_PU[2] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 19731 221800 ) ( 19807 222000 )
+  + FIXED ( 0 0 ) N ;
+- qspi_io_PD[2] + NET qspi_io_PD[2] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 18858 221800 ) ( 18934 222000 )
+  + FIXED ( 0 0 ) N ;
+- qspi_io_OUT[2] + NET qspi_io_OUT[2] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 7044 221800 ) ( 7120 222000 )
+  + FIXED ( 0 0 ) N ;
+- qspi_io_PDRV0[2] + NET qspi_io_PDRV0[2] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 19502 221800 ) ( 19578 222000 )
+  + FIXED ( 0 0 ) N ;
+- qspi_io_PDRV1[2] + NET qspi_io_PDRV1[2] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 19360 221800 ) ( 19436 222000 )
+  + FIXED ( 0 0 ) N ;
+- qspi_io_IN[2] + NET qspi_io_IN[2] + DIRECTION INPUT + USE SIGNAL
+  + LAYER Metal2 ( 6752 221800 ) ( 6828 222000 )
+  + FIXED ( 0 0 ) N ;
+- qspi_io_CS[3] + NET qspi_io_CS[3] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 40252 221800 ) ( 40328 222000 )
+  + FIXED ( 0 0 ) N ;
+- qspi_io_SL[3] + NET qspi_io_SL[3] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 27190 221800 ) ( 27266 222000 )
+  + FIXED ( 0 0 ) N ;
+- qspi_io_IE[3] + NET qspi_io_IE[3] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 38647 221800 ) ( 38723 222000 )
+  + FIXED ( 0 0 ) N ;
+- qspi_io_OE[3] + NET qspi_io_OE[3] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 26898 221800 ) ( 26974 222000 )
+  + FIXED ( 0 0 ) N ;
+- qspi_io_PU[3] + NET qspi_io_PU[3] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 39731 221800 ) ( 39807 222000 )
+  + FIXED ( 0 0 ) N ;
+- qspi_io_PD[3] + NET qspi_io_PD[3] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 38858 221800 ) ( 38934 222000 )
+  + FIXED ( 0 0 ) N ;
+- qspi_io_OUT[3] + NET qspi_io_OUT[3] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 27044 221800 ) ( 27120 222000 )
+  + FIXED ( 0 0 ) N ;
+- qspi_io_PDRV0[3] + NET qspi_io_PDRV0[3] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 39502 221800 ) ( 39578 222000 )
+  + FIXED ( 0 0 ) N ;
+- qspi_io_PDRV1[3] + NET qspi_io_PDRV1[3] + DIRECTION OUTPUT + USE SIGNAL
+  + LAYER Metal2 ( 39360 221800 ) ( 39436 222000 )
+  + FIXED ( 0 0 ) N ;
+- qspi_io_IN[3] + NET qspi_io_IN[3] + DIRECTION INPUT + USE SIGNAL
+  + LAYER Metal2 ( 26752 221800 ) ( 26828 222000 )
+  + FIXED ( 0 0 ) N ;
+END PINS
+END DESIGN
