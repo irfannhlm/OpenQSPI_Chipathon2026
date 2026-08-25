@@ -25,16 +25,16 @@ meta:
     #Checker.LVS: null
 
 # Use 7-track for higher density
-STD_CELL_LIBRARY: gf180mcu_fd_sc_mcu7t5v0 
+STD_CELL_LIBRARY: gf180mcu_fd_sc_mcu7t5v0
 
 DESIGN_NAME: a09_chipathon26_top
 VERILOG_FILES:
-- dir::a09_chipathon26_top.sv
-- dir::../../../../rtl/qspi_master.sv
-- dir::../../../../rtl/fifo.sv
-- dir::../../../../rtl/apb_qspi.sv
-- dir::../../../../rtl/uart_simple.sv
-- dir::../../../../rtl/uart_to_apb.sv
+  - dir::a09_chipathon26_top.sv
+  - dir::../../../../rtl/qspi_master.sv
+  - dir::../../../../rtl/fifo.sv
+  - dir::../../../../rtl/apb_qspi.sv
+  - dir::../../../../rtl/uart_simple.sv
+  - dir::../../../../rtl/uart_to_apb.sv
 
 # Enable plugin for better SystemVerilog support
 # USE_SLANG: True
@@ -50,14 +50,14 @@ FALLBACK_SDC: dir::a09_chipathon26_top.sdc
 
 # Core sizing
 FP_SIZING: absolute
-DIE_AREA:  [0, 0, 550, 550]
-CORE_AREA: [20, 20, 530, 530]
+DIE_AREA: [0, 0, 550, 1110]
+CORE_AREA: [20, 20, 530, 1090]
 
 # Power / ground nets
 VDD_NETS:
-- VDD
+  - VDD
 GND_NETS:
-- VSS
+  - VSS
 
 # Clock
 CLOCK_PORT: clk
@@ -108,7 +108,7 @@ RUN_POST_GRT_DESIGN_REPAIR: true
 DESIGN_REPAIR_MAX_WIRE_LENGTH: 300
 GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH: 300
 CTS_CLK_MAX_WIRE_LENGTH: 500
-GRT_DESIGN_REPAIR_MAX_SLEW_PCT: 0  
+GRT_DESIGN_REPAIR_MAX_SLEW_PCT: 0
 GRT_DESIGN_REPAIR_MAX_CAP_PCT: 5
 MAX_CAPACITANCE_CONSTRAINT: 0.4 # give more margin (max is 0.5)
 
@@ -134,6 +134,7 @@ PDN_HOFFSET: 53.56
 PDN_CORE_RING: True
 PDN_CORE_VERTICAL_LAYER: Metal2
 PDN_CORE_HORIZONTAL_LAYER: Metal3
-PDN_CORE_RING_ALLOW_OUT_OF_DIE: False # force PDN ring inside die area 
+PDN_CORE_RING_ALLOW_OUT_OF_DIE: False # force PDN ring inside die area
 
-IO_PIN_ORDER_CFG: dir::pin_order.cfg
+# IO_PIN_ORDER_CFG: dir::pin_order.cfg
+FP_DEF_TEMPLATE: dir::../../../project_defs/BV/A09_BV.def
