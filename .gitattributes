@@ -1,0 +1,40 @@
+# Default: Enforce LF line endings for all text files
+* text=auto eol=lf
+
+# --- Layout & Mask Files ---
+*.gds       binary
+*.gds.gz    binary
+*.oasis     binary
+*.oas       binary
+*.cif       binary
+*.def       text eol=lf
+*.lef       text eol=lf
+
+# --- Schematic & Symbol Binary Backups ---
+*.sch.bak   binary
+*.sym.bak   binary
+
+# --- EDA Waveform & Simulation Dumps ---
+*.vcd       binary
+*.fsdb      binary
+*.raw       binary
+*.wdb       binary
+*.evcd      binary
+*.tr0       binary
+*.ac0       binary
+*.dc0       binary
+
+# --- Compiled Executables & Libraries ---
+*.o         binary
+*.a         binary
+*.so        binary
+*.elf       binary
+*.bin       binary
+
+# --- Compressed Archives & Images ---
+*.tar.gz    binary
+*.tgz       binary
+*.zip       binary
+*.png       binary
+*.jpg       binary
+*.pdf       binary
