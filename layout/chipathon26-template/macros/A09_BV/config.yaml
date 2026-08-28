@@ -1,0 +1,166 @@
+meta:
+  version: 3
+  flow: Classic
+  substituting_steps:
+
+    # Metal-density check (not in the Classic flow by default). Run for
+    # visibility, but non-fatal here: the GF180 M*.4 / MT.3 rules are die-wide
+    # min-coverage, and A09_BV is a sub-block integrated into the full chip where
+    # metal fill is added once at the top over the merged layout. Pre-filling the
+    # macro would double-fill against the top-level KLayout.Filler. Density is
+    # signed off at chip level. Report: reports/density.klayout.json.
+    "+Checker.KLayoutDRC": KLayout.Density
+    "+KLayout.Density": Checker.KLayoutDensity
+
+    # Disable KLayout DRC
+    #KLayout.DRC: null
+    #Checker.KLayoutDRC: null
+
+    # Disable KLayout antenna check
+    #KLayout.Antenna: null
+    #Checker.KLayoutAntenna: null
+
+    # Disable KLayout density check
+    #KLayout.Density: null
+    #Checker.KLayoutDensity: null
+
+    # Save time during development
+    # Enable for sign-off
+    #OpenROAD.IRDropReport: null
+    #Magic.DRC: null
+    #Checker.MagicDRC: null
+    #KLayout.XOR: null
+    #Netgen.LVS: null
+    #Checker.LVS: null
+
+# Use 7-track for higher density
+STD_CELL_LIBRARY: gf180mcu_fd_sc_mcu7t5v0 
+
+DESIGN_NAME: A09_BV
+VERILOG_FILES:
+- dir::A09_BV.sv
+- dir::../../../../rtl/qspi_master.sv
+- dir::../../../../rtl/fifo.sv
+- dir::../../../../rtl/apb_qspi.sv
+- dir::../../../../rtl/uart_simple.sv
+- dir::../../../../rtl/uart_to_apb.sv
+
+
+# Slightly smaller file sizes
+PRIMARY_GDSII_STREAMOUT_TOOL: klayout
+
+# Given Chipathon 2026 block type template
+FP_DEF_TEMPLATE: dir::../../../project_defs/BV/A09_BV.def
+FP_TEMPLATE_MATCH_MODE: permissive
+FP_TEMPLATE_COPY_POWER_PINS: true # use power pins from template
+PDN_ENABLE_PINS: false # DONT make the PDN straps as pins
+
+# SDC files
+PNR_SDC_FILE: dir::A09_BV.sdc
+SIGNOFF_SDC_FILE: dir::A09_BV.sdc
+FALLBACK_SDC: dir::A09_BV.sdc
+
+# Core sizing
+FP_SIZING: absolute
+DIE_AREA:  [0, 0, 550, 1110]
+CORE_AREA: [10, 10, 540, 1100]
+
+
+# Power / ground nets
+VDD_NETS:
+- VDD
+GND_NETS:
+- VSS
+
+# The step-21 PSM grid check runs before Odb.ApplyDEFTemplate creates the VDD/VSS
+# pins, so it reports a false-positive "does not contain any terminals". Step-58
+# IRDropReport confirms every shape is connected (PSM-0040) and LVS passes, so
+# the deferred violation is waived here rather than failing the flow.
+ERROR_ON_PDN_VIOLATIONS: false
+
+# Metal density (M2-M5/MT ~3-10% vs the 30% die-wide minimum) is fixed by fill
+# at chip integration, not in this sub-block. Keep the check for its report but
+# do not fail the macro flow on it.
+ERROR_ON_KLAYOUT_DENSITY: false
+
+# Clock
+CLOCK_PORT: clk
+CLOCK_NET: clk
+CLOCK_PERIOD: 25 # 40 MHz
+
+# add 3v3 timing corners
+DEFAULT_CORNER: max_ss_125C_3v00 # default use worst corner
+STA_CORNERS:
+  - nom_tt_025C_3v30
+  - min_ff_n40C_3v60
+  - max_ss_125C_3v00
+  - nom_tt_025C_5v00
+  - min_ff_n40C_5v50
+  - max_ss_125C_4v50
+LIB:
+  nom_tt_025C_3v30:
+    - "pdk_dir::libs.ref/gf180mcu_fd_sc_mcu7t5v0/lib/gf180mcu_fd_sc_mcu7t5v0__tt_025C_3v30.lib"
+  min_ff_n40C_3v60:
+    - "pdk_dir::libs.ref/gf180mcu_fd_sc_mcu7t5v0/lib/gf180mcu_fd_sc_mcu7t5v0__ff_n40C_3v60.lib"
+  max_ss_125C_3v00:
+    - "pdk_dir::libs.ref/gf180mcu_fd_sc_mcu7t5v0/lib/gf180mcu_fd_sc_mcu7t5v0__ss_125C_3v00.lib"
+  nom_tt_025C_5v00:
+    - "pdk_dir::libs.ref/gf180mcu_fd_sc_mcu7t5v0/lib/gf180mcu_fd_sc_mcu7t5v0__tt_025C_5v00.lib"
+  min_ff_n40C_5v50:
+    - "pdk_dir::libs.ref/gf180mcu_fd_sc_mcu7t5v0/lib/gf180mcu_fd_sc_mcu7t5v0__ff_n40C_5v50.lib"
+  max_ss_125C_4v50:
+    - "pdk_dir::libs.ref/gf180mcu_fd_sc_mcu7t5v0/lib/gf180mcu_fd_sc_mcu7t5v0__ss_125C_4v50.lib"
+
+# Yosys synthesis options
+MAX_FANOUT_CONSTRAINT: 16
+SYNTH_STRATEGY: "DELAY 4"
+SYNTH_SIZING: true
+SYNTH_ABC_BUFFERING: true
+
+# Optimize setup and hold timing
+RUN_POST_CTS_RESIZER_TIMING: true
+RUN_POST_GRT_RESIZER_TIMING: true
+PL_RESIZER_SETUP_MAX_BUFFER_PCT: 50
+GRT_RESIZER_SETUP_MAX_BUFFER_PCT: 50
+PL_RESIZER_SETUP_SLACK_MARGIN: 1.5
+GRT_RESIZER_SETUP_SLACK_MARGIN: 1.5
+PL_RESIZER_HOLD_SLACK_MARGIN: 0.35
+GRT_RESIZER_HOLD_SLACK_MARGIN: 0.3
+
+# Optimize slew and cap timing
+RUN_POST_GRT_DESIGN_REPAIR: true
+DESIGN_REPAIR_MAX_WIRE_LENGTH: 300
+GRT_DESIGN_REPAIR_MAX_WIRE_LENGTH: 300
+CTS_CLK_MAX_WIRE_LENGTH: 500
+GRT_DESIGN_REPAIR_MAX_SLEW_PCT: 0  
+GRT_DESIGN_REPAIR_MAX_CAP_PCT: 5
+MAX_CAPACITANCE_CONSTRAINT: 0.4 # give more margin (max is 0.5)
+
+# Fix antenna violations after DRT
+DRT_ANTENNA_REPAIR_ITERS: 10
+DRT_ANTENNA_REPAIR_MARGIN: 10 # %
+
+# Max routing layer
+GRT_ALLOW_CONGESTION: true
+RT_MAX_LAYER: Metal3
+
+# PDN - Straps
+PDN_VWIDTH: 1.6
+PDN_HWIDTH: 1.6
+PDN_VSPACING: 1
+PDN_HSPACING: 1
+PDN_VPITCH: 98 # integer multiple of std cell height
+PDN_HPITCH: 98 # integer multiple of std cell height
+PDN_VOFFSET: 53.56
+PDN_HOFFSET: 41.82
+
+# PDN - Ring
+PDN_CORE_RING: True
+PDN_CORE_RING_VOFFSET: 2
+PDN_CORE_RING_HOFFSET: 2
+PDN_CORE_VERTICAL_LAYER: Metal2
+PDN_CORE_HORIZONTAL_LAYER: Metal3
+PDN_CORE_RING_ALLOW_OUT_OF_DIE: False # force PDN ring inside die area 
+PDN_CORE_RING_CONNECT_TO_PADS: True # connect PDN ring to pads if possible
+
+PDN_CFG: dir::pdn_cfg.tcl
