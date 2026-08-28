@@ -9,7 +9,7 @@ meta:
 # =============================================================================
 # chip_top against the integration team's supplied BV padring.
 #
-# STATUS: Phase 2 draft - NOT YET RUN. See notes marked [VERIFY].
+# STATUS: [VERIFY] items resolved 2026-08-28. Not yet run end-to-end.
 #
 # This differs fundamentally from config.yaml.workshop-orig (kept alongside):
 #   old flow -> chip_top.sv *generated* the padring from PAD_NORTH/SOUTH/... lists
@@ -41,10 +41,19 @@ FP_SIZING: absolute
 DIE_AREA: [0, 0, 2935, 2935]
 CORE_AREA: [442, 442, 2493, 2493]
 
-# [VERIFY] variable name against the container's LibreLane before running:
-#   docker exec gf180 bash -lc 'grep -rn "DEF_TEMPLATE" \
-#     $(python3 -c "import librelane,os;print(os.path.dirname(librelane.__file__))")'
+# CONFIRMED 2026-08-28: FP_DEF_TEMPLATE is the correct spelling in LibreLane
+# 3.0.2 (steps/odb.py:265, steps/openroad.py:1343). Note this template DEF has
+# no DIEAREA line. get_die_area() returns a zero rect for it rather than
+# failing, so expect a bogus "0 0 0 0" die-area warning from this step; the
+# configured DIE_AREA above is what actually applies. Harmless.
 FP_DEF_TEMPLATE: dir::../project_defs/BV/A09_BV_padring.def
+
+# REQUIRED. A09_BV_padring.def declares 177 pins: the 88 bare bond-pad slots
+# (N01..W22) plus 89 core-side names (W17_A, W17_Y, ...). chip_top only has the
+# 88 slots as ports -- the core-side names are internal wires. In strict mode
+# relocate_pins treats all 89 as "in template, not in design" and exits
+# EX_DATAERR. Permissive skips them and places the 88 bond pads.
+FP_TEMPLATE_MATCH_MODE: permissive
 
 # ---- SDC --------------------------------------------------------------------
 PNR_SDC_FILE: dir::chip_top.sdc
@@ -54,8 +63,9 @@ FALLBACK_SDC: dir::chip_top.sdc
 # ---- Clock ------------------------------------------------------------------
 # Clock enters on bond pad W14 (gf180mcu_fd_io__in_s) and reaches the core on
 # the pad's Y terminal, which chip_top names W14_Y.
-# [VERIFY] chip_top.sdc still refers to the old clk_PAD / clk_pad/Y names and
-# must be updated to match, or STA will constrain nothing.
+# chip_top.sdc was rewritten on 2026-08-28 for these names (old workshop copy
+# kept as chip_top.sdc.workshop-orig). CLOCK_NET stays W14_Y: cts.tcl searches
+# for nets, while the SDC creates the clock on the W14 port.
 CLOCK_PORT: W14
 CLOCK_NET: W14_Y
 CLOCK_PERIOD: 25 # 40 MHz
@@ -63,12 +73,12 @@ CLOCK_PERIOD: 25 # 40 MHz
 # ---- Power / ground ---------------------------------------------------------
 # In the supplied padring the rails are the slot ports themselves:
 #   W12 = VSS (gf180mcu_fd_io__dvss), W13 = VDD (gf180mcu_fd_io__dvdd)
-# [VERIFY] whether VDD_NETS/GND_NETS should name VDD/VSS or W13/W12 here -
-# depends on how the padring netlist names the rails internally.
+# CONFIRMED 2026-08-28 from A09_BV_padring.v: every pad cell is wired
+# .VSS(W12) .DVSS(W12) .VDD(W13) .DVDD(W13), so the top-level rails are W13/W12.
 VDD_NETS:
-- VDD
+- W13
 GND_NETS:
-- VSS
+- W12
 
 # ---- Timing corners ---------------------------------------------------------
 DEFAULT_CORNER: max_ss_125C_3v00
@@ -157,10 +167,10 @@ MAGIC_GDS_FLATGLOB:
 - "G_ring_*"
 
 # ---- User macro -------------------------------------------------------------
-# [BLOCKER] These view paths do not all exist yet. macros/a09_chipathon26_top/final/
-# currently contains only gds/, pnl/, metrics.json and sta.rpt - no lef/, vh/,
-# nl/, spef/ or lib/. The macro must be re-hardened (Phase 3) with the BV
-# geometry AND with full view export before this config can run.
+# Views are produced by re-hardening the macro at BV geometry with full export:
+#   cd macros/a09_chipathon26_top && librelane config.yaml --pdk gf180mcuD --save-views-to ./final
+# The stale mixed-vintage final/ from the 1400x1400 and 550x550 runs was removed
+# on 2026-08-28; if final/ is missing or partial, re-run the macro before this.
 MACROS:
   a09_chipathon26_top:
     gds:
@@ -200,7 +210,7 @@ MACROS:
         orientation: N
 
 PDN_MACRO_CONNECTIONS:
-- "u_core VDD VDD VSS VSS"
+- "u_core W13 W12 VDD VSS"
 
 FP_MACRO_HORIZONTAL_HALO: 10
 FP_MACRO_VERTICAL_HALO: 10
