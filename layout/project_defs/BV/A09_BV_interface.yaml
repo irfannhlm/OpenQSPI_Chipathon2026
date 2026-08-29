@@ -2552,8 +2552,8 @@ pins:
     - 26828
     - 222000
 project_gds_size:
-  source_gds: /Users/kanobailey/chipathon/2026/gds/A09/a09_chipathon26_top.gds
-  top_cell: a09_chipathon26_top
+  source_gds: /Users/kanobailey/chipathon/2026/gds/A09/A09_BV.gds
+  top_cell: A09_BV
   layer: 0
   datatype: 0
   layout_dbu_microns: 0.001
@@ -2561,14 +2561,86 @@ project_gds_size:
   - 0
   - 0
   - 550000
-  - 550000
+  - 1110000
   width_microns: '550'
-  height_microns: '550'
+  height_microns: '1110'
   top_cell_text:
+  - text: qspi_io_CS[2]
+    layer: 36
+    datatype: 10
+  - text: qspi_io_CS[3]
+    layer: 36
+    datatype: 10
+  - text: qspi_io_IE[2]
+    layer: 36
+    datatype: 10
+  - text: qspi_io_IE[3]
+    layer: 36
+    datatype: 10
+  - text: qspi_io_IN[2]
+    layer: 36
+    datatype: 10
+  - text: qspi_io_IN[3]
+    layer: 36
+    datatype: 10
+  - text: qspi_io_OE[2]
+    layer: 36
+    datatype: 10
+  - text: qspi_io_OE[3]
+    layer: 36
+    datatype: 10
+  - text: qspi_io_OUT[2]
+    layer: 36
+    datatype: 10
+  - text: qspi_io_OUT[3]
+    layer: 36
+    datatype: 10
+  - text: qspi_io_PDRV0[2]
+    layer: 36
+    datatype: 10
+  - text: qspi_io_PDRV0[3]
+    layer: 36
+    datatype: 10
+  - text: qspi_io_PDRV1[2]
+    layer: 36
+    datatype: 10
+  - text: qspi_io_PDRV1[3]
+    layer: 36
+    datatype: 10
+  - text: qspi_io_PD[2]
+    layer: 36
+    datatype: 10
+  - text: qspi_io_PD[3]
+    layer: 36
+    datatype: 10
+  - text: qspi_io_PU[2]
+    layer: 36
+    datatype: 10
+  - text: qspi_io_PU[3]
+    layer: 36
+    datatype: 10
+  - text: qspi_io_SL[2]
+    layer: 36
+    datatype: 10
+  - text: qspi_io_SL[3]
+    layer: 36
+    datatype: 10
+  - text: qspi_io_CS[0]
+    layer: 36
+    datatype: 10
+  - text: qspi_io_CS[1]
+    layer: 36
+    datatype: 10
   - text: qspi_csn_CS[0]
     layer: 36
     datatype: 10
   - text: qspi_csn_CS[1]
+    layer: 36
+    datatype: 10
+  - text: qspi_io_IE[0]
+    layer: 36
+    datatype: 10
+  - text: qspi_io_IE[1]
     layer: 36
     datatype: 10
   - text: qspi_csn_IE[0]
@@ -2577,10 +2649,22 @@ project_gds_size:
   - text: qspi_csn_IE[1]
     layer: 36
     datatype: 10
+  - text: qspi_io_IN[0]
+    layer: 36
+    datatype: 10
+  - text: qspi_io_IN[1]
+    layer: 36
+    datatype: 10
   - text: qspi_csn_IN[0]
     layer: 36
     datatype: 10
   - text: qspi_csn_IN[1]
+    layer: 36
+    datatype: 10
+  - text: qspi_io_OE[0]
+    layer: 36
+    datatype: 10
+  - text: qspi_io_OE[1]
     layer: 36
     datatype: 10
   - text: qspi_csn_OE[0]
@@ -2589,10 +2673,22 @@ project_gds_size:
   - text: qspi_csn_OE[1]
     layer: 36
     datatype: 10
+  - text: qspi_io_OUT[0]
+    layer: 36
+    datatype: 10
+  - text: qspi_io_OUT[1]
+    layer: 36
+    datatype: 10
   - text: qspi_csn_OUT[0]
     layer: 36
     datatype: 10
   - text: qspi_csn_OUT[1]
+    layer: 36
+    datatype: 10
+  - text: qspi_io_PDRV0[0]
+    layer: 36
+    datatype: 10
+  - text: qspi_io_PDRV0[1]
     layer: 36
     datatype: 10
   - text: qspi_csn_PDRV0[0]
@@ -2601,10 +2697,22 @@ project_gds_size:
   - text: qspi_csn_PDRV0[1]
     layer: 36
     datatype: 10
+  - text: qspi_io_PDRV1[0]
+    layer: 36
+    datatype: 10
+  - text: qspi_io_PDRV1[1]
+    layer: 36
+    datatype: 10
   - text: qspi_csn_PDRV1[0]
     layer: 36
     datatype: 10
   - text: qspi_csn_PDRV1[1]
+    layer: 36
+    datatype: 10
+  - text: qspi_io_PD[0]
+    layer: 36
+    datatype: 10
+  - text: qspi_io_PD[1]
     layer: 36
     datatype: 10
   - text: qspi_csn_PD[0]
@@ -2613,10 +2721,22 @@ project_gds_size:
   - text: qspi_csn_PD[1]
     layer: 36
     datatype: 10
+  - text: qspi_io_PU[0]
+    layer: 36
+    datatype: 10
+  - text: qspi_io_PU[1]
+    layer: 36
+    datatype: 10
   - text: qspi_csn_PU[0]
     layer: 36
     datatype: 10
   - text: qspi_csn_PU[1]
+    layer: 36
+    datatype: 10
+  - text: qspi_io_SL[0]
+    layer: 36
+    datatype: 10
+  - text: qspi_io_SL[1]
     layer: 36
     datatype: 10
   - text: qspi_csn_SL[0]
@@ -2655,193 +2775,97 @@ project_gds_size:
   - text: qspi_sck_SL
     layer: 36
     datatype: 10
-  - text: clk
-    layer: 42
-    datatype: 10
-  - text: clk_PD
-    layer: 42
-    datatype: 10
-  - text: clk_PU
-    layer: 42
-    datatype: 10
-  - text: qspi_io_CS[0]
-    layer: 42
-    datatype: 10
-  - text: qspi_io_CS[1]
-    layer: 42
-    datatype: 10
-  - text: qspi_io_CS[2]
-    layer: 42
-    datatype: 10
-  - text: qspi_io_CS[3]
-    layer: 42
-    datatype: 10
-  - text: qspi_io_IE[0]
-    layer: 42
-    datatype: 10
-  - text: qspi_io_IE[1]
-    layer: 42
-    datatype: 10
-  - text: qspi_io_IE[2]
-    layer: 42
-    datatype: 10
-  - text: qspi_io_IE[3]
-    layer: 42
-    datatype: 10
-  - text: qspi_io_IN[0]
-    layer: 42
-    datatype: 10
-  - text: qspi_io_IN[1]
-    layer: 42
-    datatype: 10
-  - text: qspi_io_IN[2]
-    layer: 42
-    datatype: 10
-  - text: qspi_io_IN[3]
-    layer: 42
-    datatype: 10
-  - text: qspi_io_OE[0]
-    layer: 42
-    datatype: 10
-  - text: qspi_io_OE[1]
-    layer: 42
-    datatype: 10
-  - text: qspi_io_OE[2]
-    layer: 42
-    datatype: 10
-  - text: qspi_io_OE[3]
-    layer: 42
-    datatype: 10
-  - text: qspi_io_OUT[0]
-    layer: 42
-    datatype: 10
-  - text: qspi_io_OUT[1]
-    layer: 42
-    datatype: 10
-  - text: qspi_io_OUT[2]
-    layer: 42
-    datatype: 10
-  - text: qspi_io_OUT[3]
-    layer: 42
-    datatype: 10
-  - text: qspi_io_PDRV0[0]
-    layer: 42
-    datatype: 10
-  - text: qspi_io_PDRV0[1]
-    layer: 42
-    datatype: 10
-  - text: qspi_io_PDRV0[2]
-    layer: 42
-    datatype: 10
-  - text: qspi_io_PDRV0[3]
-    layer: 42
-    datatype: 10
-  - text: qspi_io_PDRV1[0]
-    layer: 42
-    datatype: 10
-  - text: qspi_io_PDRV1[1]
-    layer: 42
-    datatype: 10
-  - text: qspi_io_PDRV1[2]
-    layer: 42
-    datatype: 10
-  - text: qspi_io_PDRV1[3]
-    layer: 42
-    datatype: 10
-  - text: qspi_io_PD[0]
-    layer: 42
-    datatype: 10
-  - text: qspi_io_PD[1]
-    layer: 42
-    datatype: 10
-  - text: qspi_io_PD[2]
-    layer: 42
-    datatype: 10
-  - text: qspi_io_PD[3]
-    layer: 42
-    datatype: 10
-  - text: qspi_io_PU[0]
-    layer: 42
-    datatype: 10
-  - text: qspi_io_PU[1]
-    layer: 42
-    datatype: 10
-  - text: qspi_io_PU[2]
-    layer: 42
-    datatype: 10
-  - text: qspi_io_PU[3]
-    layer: 42
-    datatype: 10
-  - text: qspi_io_SL[0]
-    layer: 42
-    datatype: 10
-  - text: qspi_io_SL[1]
-    layer: 42
-    datatype: 10
-  - text: qspi_io_SL[2]
-    layer: 42
-    datatype: 10
-  - text: qspi_io_SL[3]
-    layer: 42
-    datatype: 10
-  - text: rst_n
-    layer: 42
-    datatype: 10
-  - text: rst_n_PD
-    layer: 42
-    datatype: 10
-  - text: rst_n_PU
-    layer: 42
-    datatype: 10
-  - text: uart_rx
-    layer: 42
-    datatype: 10
-  - text: uart_rx_PD
-    layer: 42
-    datatype: 10
-  - text: uart_rx_PU
-    layer: 42
-    datatype: 10
   - text: uart_tx_CS
-    layer: 42
+    layer: 36
     datatype: 10
   - text: uart_tx_IE
-    layer: 42
-    datatype: 10
-  - text: uart_tx_IN
-    layer: 42
-    datatype: 10
-  - text: uart_tx_OE
-    layer: 42
-    datatype: 10
-  - text: uart_tx_OUT
-    layer: 42
+    layer: 36
     datatype: 10
   - text: uart_tx_PD
-    layer: 42
+    layer: 36
     datatype: 10
   - text: uart_tx_PDRV0
-    layer: 42
+    layer: 36
     datatype: 10
   - text: uart_tx_PDRV1
-    layer: 42
+    layer: 36
     datatype: 10
   - text: uart_tx_PU
-    layer: 42
+    layer: 36
+    datatype: 10
+  - text: VDD
+    layer: 36
+    datatype: 10
+  - text: VDD
+    layer: 36
+    datatype: 10
+  - text: VDD
+    layer: 36
+    datatype: 10
+  - text: VDD
+    layer: 36
+    datatype: 10
+  - text: VDD
+    layer: 36
+    datatype: 10
+  - text: VSS
+    layer: 36
+    datatype: 10
+  - text: VSS
+    layer: 36
+    datatype: 10
+  - text: VSS
+    layer: 36
+    datatype: 10
+  - text: VSS
+    layer: 36
+    datatype: 10
+  - text: rst_n
+    layer: 36
+    datatype: 10
+  - text: rst_n_PD
+    layer: 36
+    datatype: 10
+  - text: rst_n_PU
+    layer: 36
+    datatype: 10
+  - text: uart_rx
+    layer: 36
+    datatype: 10
+  - text: uart_rx_PD
+    layer: 36
+    datatype: 10
+  - text: uart_rx_PU
+    layer: 36
+    datatype: 10
+  - text: VSS
+    layer: 36
+    datatype: 10
+  - text: VSS
+    layer: 36
+    datatype: 10
+  - text: uart_tx_IN
+    layer: 36
+    datatype: 10
+  - text: uart_tx_OE
+    layer: 36
+    datatype: 10
+  - text: uart_tx_OUT
+    layer: 36
+    datatype: 10
+  - text: clk
+    layer: 36
+    datatype: 10
+  - text: clk_PD
+    layer: 36
+    datatype: 10
+  - text: clk_PU
+    layer: 36
+    datatype: 10
+  - text: VDD
+    layer: 36
     datatype: 10
   - text: uart_tx_SL
-    layer: 42
-    datatype: 10
-  - text: VDD
-    layer: 46
-    datatype: 10
-  - text: VSS
-    layer: 46
-    datatype: 10
-  - text: VDD
-    layer: 81
-    datatype: 10
-  - text: VSS
-    layer: 81
+    layer: 36
     datatype: 10
 participant_pin_count: 13
