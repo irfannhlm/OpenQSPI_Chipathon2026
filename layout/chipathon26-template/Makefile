@@ -7,7 +7,7 @@ PDK_ROOT ?= $(MAKEFILE_DIR)/gf180mcu
 PDK ?= gf180mcuD
 PDK_TAG ?= 1.8.0
 
-MACRO ?= a09_chipathon26_top
+MACRO ?= A09_BV
 
 AVAILABLE_SLOTS = 1x1 0p5x1 1x0p5 0p5x0p5 workshop
 DEFAULT_SLOT = workshop
@@ -48,6 +48,10 @@ librelane-macro: ## Run LibreLane flow for macro
 	librelane macros/${MACRO}/config.yaml --save-views-to macros/${MACRO}/final --pdk ${PDK} --pdk-root ${PDK_ROOT} --manual-pdk
 .PHONY: librelane-macro
 
+bv-chip: ## Assemble hardened A09_BV into A09_BV_padring (KLayout) and run DRC/LVS
+	PDK_ROOT=${PDK_ROOT} PDK=${PDK} bv_chip/run.sh
+.PHONY: bv-chip
+
 librelane-macro-nodrc: ## Run LibreLane flow for macro without DRC checks
 	librelane macros/${MACRO}/config.yaml --save-views-to macros/${MACRO}/final --pdk ${PDK} --pdk-root ${PDK_ROOT} --manual-pdk --skip KLayout.DRC --skip Magic.DRC
 .PHONY: librelane-macro-nodrc
@@ -84,19 +88,24 @@ librelane-padring: ## Only create the padring
 	PDK_ROOT=${PDK_ROOT} PDK=${PDK} python3 scripts/padring.py librelane/slots/slot_${SLOT}.yaml librelane/config.yaml
 .PHONY: librelane-padring
 
+tb ?= chip_top_tb
+ifeq ($(MACRO),A09_BV)        
+    tb = bv_chip_tb
+endif
+
 sim: ## Run RTL simulation with cocotb
-	cd cocotb; PDK_ROOT=${PDK_ROOT} PDK=${PDK} SLOT=${SLOT} python3 chip_top_tb.py
+	cd cocotb; PDK_ROOT=${PDK_ROOT} PDK=${PDK} SLOT=${SLOT} python3 ${tb}.py
 .PHONY: sim
 
 sim-gl: ## Run gate-level simulation with cocotb (after copy-final)
-	cd cocotb; GL=1 PDK_ROOT=${PDK_ROOT} PDK=${PDK} SLOT=${SLOT} python3 chip_top_tb.py
+	cd cocotb; GL=1 PDK_ROOT=${PDK_ROOT} PDK=${PDK} SLOT=${SLOT} python3 ${tb}.py
 .PHONY: sim-gl
 
 sim-view: ## View simulation waveforms in GTKWave
 ifeq (${SIM},questa)
 	vsim -view cocotb/sim_build/vsim.wlf;
 else
-	gtkwave cocotb/sim_build/chip_top_tb.fst;
+	gtkwave cocotb/sim_build/${tb}.fst;
 endif
 .PHONY: sim-view
 
