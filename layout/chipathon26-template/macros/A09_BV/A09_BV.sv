@@ -172,7 +172,7 @@ module A09_BV #(
 
   assign qspi_csn_CS = {CS_NUM{1'b0}};  // CMOS input type for qspi_csn
   assign qspi_csn_SL = {CS_NUM{1'b0}};  // fast slew rate for qspi_csn
-  assign qspi_csn_PU = {CS_NUM{1'b0}};  // no pull-up for qspi_csn
+  assign qspi_csn_PU = {CS_NUM{1'b1}};  // pull-up for qspi_csn
   assign qspi_csn_PD = {CS_NUM{1'b0}};  // no pull-down for qspi_csn
   assign qspi_csn_OE = {CS_NUM{1'b1}};  // always enable output for qspi_csn
   assign qspi_csn_IE = {CS_NUM{1'b0}};  // disable input for qspi_csn
@@ -190,7 +190,7 @@ module A09_BV #(
 
   assign qspi_io_CS = 4'b0000;  // CMOS input type for qspi_io
   assign qspi_io_SL = 4'b0000;  // fast slew rate for qspi_io
-  assign qspi_io_PU = 4'b0000;  // no pull-up for qspi_io
+  assign qspi_io_PU = 4'b1111;  // pull-up for qspi_io
   assign qspi_io_PD = 4'b0000;  // no pull-down for qspi_io
   assign qspi_io_OE = qspi_oe;  // output enable for qspi_io is driven by the controller
   assign qspi_io_IE = ~qspi_oe;  // input enable is the inverse of output enable for qspi_io
