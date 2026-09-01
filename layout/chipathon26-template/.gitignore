@@ -6,22 +6,17 @@ gf180mcu/
 gf180_drc.lyrdb
 sim_build/
 final/*
+out/
 
 macros/**/final/*
 !macros/**/final/gds/
 !macros/**/final/gds/*
 !macros/**/final/pnl/
-!macros/**/final/pnl/**
+!macros/**/final/pnl/*
 !macros/**/final/metrics.json
-!macros/**/final/sta.rpt
-
-final/*
-# !final/gds/
-# !final/gds/*
-# !final/pnl/
-# !final/pnl/**
-!final/metrics.json
-!final/sta.rpt
+!macros/**/final/stapostpnr.rpt
+!macros/**/final/lvs.netgen.rpt
+!macros/**/final/drc*
 
 transcript
 
