@@ -23,6 +23,7 @@ final/*
 !final/metrics.json
 !final/sta.rpt
 
+transcript
 
 img/
 *.lyrdb
