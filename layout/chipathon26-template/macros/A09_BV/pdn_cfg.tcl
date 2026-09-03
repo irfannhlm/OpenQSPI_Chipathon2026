@@ -213,9 +213,7 @@ set ::_PG_BRIDGE_W_UM   2.0     ;# width (Y) of the VSS and VDD bridges
 set ::_PG_M2_LAND_UM    2.0     ;# VDD Metal2 landing reach from the die edge
 set ::_PG_M3_EDGE_UM    0.20    ;# Metal3 hop start offset from the die edge
 set ::_PG_VIA_ROWS      3       ;# Via2 cut rows per stack  (Y)
-set ::_PG_VIA_COLS      3       ;# Via2 cut cols per stack  (X)  -- matches the PDN
-                                ;#   strap->ring 3x3 stacks; 3x3 fits the 2 um
-                                ;#   bridge and the 1.6 um ring leg
+set ::_PG_VIA_COLS      3       ;# Via2 cut cols per stack  (X)
 
 proc _pg_template_path {} {
     # Locate the FP_DEF_TEMPLATE. That env var is not exported into the
@@ -241,8 +239,9 @@ proc _pg_template_path {} {
 
 proc _pg_template_pin_rows {net_name} {
     # -> {tdbu {{y1 y2 x2} ...}} : Metal2 stub rows for $net_name, in template DBU
-    set fh [open [_pg_template_path] r]
-    set tdbu 1000
+    set path [_pg_template_path]
+    set fh [open $path r]
+    set tdbu 0
     set rows {}
     set in 0
     while {[gets $fh line] >= 0} {
@@ -261,6 +260,9 @@ proc _pg_template_pin_rows {net_name} {
         }
     }
     close $fh
+    if {$tdbu == 0} {
+        error "power-bridge: no 'UNITS DISTANCE MICRONS' in $path"
+    }
     return [list $tdbu $rows]
 }
 
@@ -286,19 +288,23 @@ proc _pg_west_leg {net} {
 proc _pg_make_stack_via {block name m2 v2 m3 nrow ncol} {
     # An $nrow x $ncol Via2 stack as a VIARULE-generated via (Via2_GEN_HH), i.e.
     # the same DEF form pdngen uses for the ring -> both GDS streamers expand it
-    # identically -> no XOR.  0.26 um cuts (GF180 Vn.1); 0.26 um cut spacing for
-    # <=3 in a direction, 0.36 um for >=4 (Vn.2b); 0.06 um enclosure all round.
+    # identically -> no XOR.  GF180 Via2: 0.26 um cut (Vn.1); 0.06 um enclosure
+    # all round (Vn.3); 0.26 um cut spacing, 0.36 um once a direction has >=4
+    # cuts (Vn.2a/2b).  All in um * block DBU, so it is PDK/DBU agnostic.
+    set dbu [$block getDbUnitsPerMicron]
+    set cut [expr {round(0.26 * $dbu)}]
+    set enc [expr {round(0.06 * $dbu)}]
+    set sp  [expr {round(($nrow >= 4 || $ncol >= 4 ? 0.36 : 0.26) * $dbu)}]
     set v [odb::dbVia_create $block $name]
     $v setViaGenerateRule [[$block getTech] findViaGenerateRule "Via2_GEN_HH"]
-    set cs [expr {($nrow >= 4 || $ncol >= 4) ? 720 : 520}]
-    set p  [$v getViaParams]
+    set p [$v getViaParams]
     $p setBottomLayer $m2
     $p setCutLayer    $v2
     $p setTopLayer    $m3
-    $p setXCutSize 520 ; $p setYCutSize 520
-    $p setXCutSpacing $cs ; $p setYCutSpacing $cs
-    $p setXBottomEnclosure 120 ; $p setYBottomEnclosure 120
-    $p setXTopEnclosure    120 ; $p setYTopEnclosure    120
+    $p setXCutSize $cut ; $p setYCutSize $cut
+    $p setXCutSpacing $sp ; $p setYCutSpacing $sp
+    $p setXBottomEnclosure $enc ; $p setYBottomEnclosure $enc
+    $p setXTopEnclosure    $enc ; $p setYTopEnclosure    $enc
     $p setNumCutRows $nrow ; $p setNumCutCols $ncol
     $v setViaParams $p
     return $v
