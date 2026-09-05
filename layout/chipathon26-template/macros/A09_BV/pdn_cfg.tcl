@@ -223,12 +223,12 @@ if { $::env(PDN_CORE_RING) == 1 } {
 #     exact DEF form pdngen emits for the ring, so Magic and KLayout stream it to
 #     identical GDS -> no XOR difference.
 
-set ::_PG_VDD_BRIDGE_W_UM  0  ;# VDD bridge width (Y, um); 0 = full pin-stub
+set ::_PG_VDD_BRIDGE_W_UM  2.5  ;# VDD bridge width (Y, um); 0 = full pin-stub
                                ;#   height (needs PDN straps clear of the pin Ys)
-set ::_PG_M2_LAND_UM      3.0   ;# VDD Metal2 landing reach from the die edge
+set ::_PG_M2_LAND_UM      2.5   ;# VDD Metal2 landing reach from the die edge
 set ::_PG_M3_EDGE_UM      0.20  ;# Metal3 hop start offset from the die edge
-set ::_PG_VIA_ROWS        4     ;# Via2 cut rows per stack  (Y)
-set ::_PG_VIA_COLS        4     ;# Via2 cut cols per stack  (X)
+set ::_PG_VIA_ROWS        3     ;# Via2 cut rows per stack  (Y)
+set ::_PG_VIA_COLS        3     ;# Via2 cut cols per stack  (X)
 set ::_PG_VIA_STACKS       0    ;# via stacks per bridge end, tiled across the
                                ;#   width; 0 = auto (as many as fit)
 set ::_PG_VIA_STACK_GAP_UM 1.0  ;# solid-metal gap between adjacent stacks
