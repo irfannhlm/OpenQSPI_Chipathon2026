@@ -5134,7 +5134,7 @@ module A09_BV (clk,
  wire net542;
  wire net543;
  wire net544;
- wire net1697;
+ wire net545;
  wire net1522;
  wire net1553;
  wire net1562;
@@ -6179,16 +6179,16 @@ module A09_BV (clk,
  wire net1657;
  wire net1658;
  wire net1659;
- wire net1698;
+ wire net1697;
  wire net1661;
  wire net1662;
  wire net1663;
  wire net1664;
  wire net1665;
- wire net1699;
- wire net1667;
+ wire net1698;
  wire net1668;
  wire net1669;
+ wire net1699;
  wire net1671;
  wire net1672;
  wire net1673;
@@ -6526,21 +6526,6 @@ module A09_BV (clk,
     .VPW(VSS),
     .VSS(VSS));
  gf180mcu_fd_sc_mcu7t5v0__antenna ANTENNA_1 (.I(_1294_),
-    .VDD(VDD),
-    .VNW(VDD),
-    .VPW(VSS),
-    .VSS(VSS));
- gf180mcu_fd_sc_mcu7t5v0__antenna ANTENNA_2 (.I(net683),
-    .VDD(VDD),
-    .VNW(VDD),
-    .VPW(VSS),
-    .VSS(VSS));
- gf180mcu_fd_sc_mcu7t5v0__antenna ANTENNA_3 (.I(net1428),
-    .VDD(VDD),
-    .VNW(VDD),
-    .VPW(VSS),
-    .VSS(VSS));
- gf180mcu_fd_sc_mcu7t5v0__antenna ANTENNA_4 (.I(net1428),
     .VDD(VDD),
     .VNW(VDD),
     .VPW(VSS),
@@ -18053,11 +18038,7 @@ module A09_BV (clk,
     .VNW(VDD),
     .VPW(VSS),
     .VSS(VSS));
- gf180mcu_fd_sc_mcu7t5v0__fillcap_8 FILLER_142_317 (.VDD(VDD),
-    .VNW(VDD),
-    .VPW(VSS),
-    .VSS(VSS));
- gf180mcu_fd_sc_mcu7t5v0__fillcap_4 FILLER_142_325 (.VDD(VDD),
+ gf180mcu_fd_sc_mcu7t5v0__fillcap_32 FILLER_142_317 (.VDD(VDD),
     .VNW(VDD),
     .VPW(VSS),
     .VSS(VSS));
@@ -18065,11 +18046,7 @@ module A09_BV (clk,
     .VNW(VDD),
     .VPW(VSS),
     .VSS(VSS));
- gf180mcu_fd_sc_mcu7t5v0__fillcap_16 FILLER_142_345 (.VDD(VDD),
-    .VNW(VDD),
-    .VPW(VSS),
-    .VSS(VSS));
- gf180mcu_fd_sc_mcu7t5v0__fillcap_4 FILLER_142_361 (.VDD(VDD),
+ gf180mcu_fd_sc_mcu7t5v0__fillcap_16 FILLER_142_349 (.VDD(VDD),
     .VNW(VDD),
     .VPW(VSS),
     .VSS(VSS));
@@ -20017,7 +19994,7 @@ module A09_BV (clk,
     .VNW(VDD),
     .VPW(VSS),
     .VSS(VSS));
- gf180mcu_fd_sc_mcu7t5v0__fillcap_32 FILLER_149_364 (.VDD(VDD),
+ gf180mcu_fd_sc_mcu7t5v0__fillcap_16 FILLER_149_364 (.VDD(VDD),
     .VNW(VDD),
     .VPW(VSS),
     .VSS(VSS));
@@ -24041,15 +24018,15 @@ module A09_BV (clk,
     .VNW(VDD),
     .VPW(VSS),
     .VSS(VSS));
- gf180mcu_fd_sc_mcu7t5v0__fillcap_32 FILLER_163_512 (.VDD(VDD),
+ gf180mcu_fd_sc_mcu7t5v0__fill_1 FILLER_163_506 (.VDD(VDD),
     .VNW(VDD),
     .VPW(VSS),
     .VSS(VSS));
- gf180mcu_fd_sc_mcu7t5v0__fill_2 FILLER_163_544 (.VDD(VDD),
+ gf180mcu_fd_sc_mcu7t5v0__fillcap_32 FILLER_163_513 (.VDD(VDD),
     .VNW(VDD),
     .VPW(VSS),
     .VSS(VSS));
- gf180mcu_fd_sc_mcu7t5v0__fill_1 FILLER_163_546 (.VDD(VDD),
+ gf180mcu_fd_sc_mcu7t5v0__fill_2 FILLER_163_545 (.VDD(VDD),
     .VNW(VDD),
     .VPW(VSS),
     .VSS(VSS));
@@ -24265,15 +24242,23 @@ module A09_BV (clk,
     .VNW(VDD),
     .VPW(VSS),
     .VSS(VSS));
- gf180mcu_fd_sc_mcu7t5v0__fill_2 FILLER_164_374 (.VDD(VDD),
+ gf180mcu_fd_sc_mcu7t5v0__fillcap_8 FILLER_164_374 (.VDD(VDD),
     .VNW(VDD),
     .VPW(VSS),
     .VSS(VSS));
- gf180mcu_fd_sc_mcu7t5v0__fill_1 FILLER_164_376 (.VDD(VDD),
+ gf180mcu_fd_sc_mcu7t5v0__fill_2 FILLER_164_382 (.VDD(VDD),
     .VNW(VDD),
     .VPW(VSS),
     .VSS(VSS));
- gf180mcu_fd_sc_mcu7t5v0__fillcap_16 FILLER_164_397 (.VDD(VDD),
+ gf180mcu_fd_sc_mcu7t5v0__fill_1 FILLER_164_384 (.VDD(VDD),
+    .VNW(VDD),
+    .VPW(VSS),
+    .VSS(VSS));
+ gf180mcu_fd_sc_mcu7t5v0__fillcap_16 FILLER_164_395 (.VDD(VDD),
+    .VNW(VDD),
+    .VPW(VSS),
+    .VSS(VSS));
+ gf180mcu_fd_sc_mcu7t5v0__fill_2 FILLER_164_411 (.VDD(VDD),
     .VNW(VDD),
     .VPW(VSS),
     .VSS(VSS));
@@ -24462,6 +24447,10 @@ module A09_BV (clk,
     .VPW(VSS),
     .VSS(VSS));
  gf180mcu_fd_sc_mcu7t5v0__fill_2 FILLER_165_362 (.VDD(VDD),
+    .VNW(VDD),
+    .VPW(VSS),
+    .VSS(VSS));
+ gf180mcu_fd_sc_mcu7t5v0__fill_1 FILLER_165_386 (.VDD(VDD),
     .VNW(VDD),
     .VPW(VSS),
     .VSS(VSS));
@@ -27741,19 +27730,11 @@ module A09_BV (clk,
     .VNW(VDD),
     .VPW(VSS),
     .VSS(VSS));
- gf180mcu_fd_sc_mcu7t5v0__fillcap_16 FILLER_177_217 (.VDD(VDD),
+ gf180mcu_fd_sc_mcu7t5v0__fillcap_32 FILLER_177_217 (.VDD(VDD),
     .VNW(VDD),
     .VPW(VSS),
     .VSS(VSS));
- gf180mcu_fd_sc_mcu7t5v0__fillcap_8 FILLER_177_233 (.VDD(VDD),
-    .VNW(VDD),
-    .VPW(VSS),
-    .VSS(VSS));
- gf180mcu_fd_sc_mcu7t5v0__fillcap_4 FILLER_177_241 (.VDD(VDD),
-    .VNW(VDD),
-    .VPW(VSS),
-    .VSS(VSS));
- gf180mcu_fd_sc_mcu7t5v0__fill_1 FILLER_177_245 (.VDD(VDD),
+ gf180mcu_fd_sc_mcu7t5v0__fill_1 FILLER_177_249 (.VDD(VDD),
     .VNW(VDD),
     .VPW(VSS),
     .VSS(VSS));
@@ -29769,7 +29750,11 @@ module A09_BV (clk,
     .VNW(VDD),
     .VPW(VSS),
     .VSS(VSS));
- gf180mcu_fd_sc_mcu7t5v0__fillcap_8 FILLER_184_265 (.VDD(VDD),
+ gf180mcu_fd_sc_mcu7t5v0__fillcap_8 FILLER_184_263 (.VDD(VDD),
+    .VNW(VDD),
+    .VPW(VSS),
+    .VSS(VSS));
+ gf180mcu_fd_sc_mcu7t5v0__fill_2 FILLER_184_271 (.VDD(VDD),
     .VNW(VDD),
     .VPW(VSS),
     .VSS(VSS));
@@ -31797,11 +31782,7 @@ module A09_BV (clk,
     .VNW(VDD),
     .VPW(VSS),
     .VSS(VSS));
- gf180mcu_fd_sc_mcu7t5v0__fill_1 FILLER_191_262 (.VDD(VDD),
-    .VNW(VDD),
-    .VPW(VSS),
-    .VSS(VSS));
- gf180mcu_fd_sc_mcu7t5v0__fill_1 FILLER_191_265 (.VDD(VDD),
+ gf180mcu_fd_sc_mcu7t5v0__fillcap_4 FILLER_191_262 (.VDD(VDD),
     .VNW(VDD),
     .VPW(VSS),
     .VSS(VSS));
@@ -34569,19 +34550,7 @@ module A09_BV (clk,
     .VNW(VDD),
     .VPW(VSS),
     .VSS(VSS));
- gf180mcu_fd_sc_mcu7t5v0__fillcap_4 FILLER_200_489 (.VDD(VDD),
-    .VNW(VDD),
-    .VPW(VSS),
-    .VSS(VSS));
- gf180mcu_fd_sc_mcu7t5v0__fill_1 FILLER_200_493 (.VDD(VDD),
-    .VNW(VDD),
-    .VPW(VSS),
-    .VSS(VSS));
- gf180mcu_fd_sc_mcu7t5v0__fillcap_8 FILLER_200_496 (.VDD(VDD),
-    .VNW(VDD),
-    .VPW(VSS),
-    .VSS(VSS));
- gf180mcu_fd_sc_mcu7t5v0__fill_1 FILLER_200_504 (.VDD(VDD),
+ gf180mcu_fd_sc_mcu7t5v0__fillcap_16 FILLER_200_489 (.VDD(VDD),
     .VNW(VDD),
     .VPW(VSS),
     .VSS(VSS));
@@ -80617,7 +80586,7 @@ module A09_BV (clk,
     .VNW(VDD),
     .VPW(VSS),
     .VSS(VSS));
- gf180mcu_fd_sc_mcu7t5v0__nor2_2 _4266_ (.A1(_1219_),
+ gf180mcu_fd_sc_mcu7t5v0__nor2_1 _4266_ (.A1(_1219_),
     .A2(net955),
     .ZN(_1345_),
     .VDD(VDD),
@@ -101078,7 +101047,7 @@ module A09_BV (clk,
     .VNW(VDD),
     .VPW(VSS),
     .VSS(VSS));
- gf180mcu_fd_sc_mcu7t5v0__aoi222_2 _6827_ (.A1(\inst_apb_qspi.addr_q[10] ),
+ gf180mcu_fd_sc_mcu7t5v0__aoi222_1 _6827_ (.A1(\inst_apb_qspi.addr_q[10] ),
     .A2(net669),
     .B1(net676),
     .B2(\inst_apb_qspi.cfg0_q[10] ),
@@ -117439,12 +117408,6 @@ module A09_BV (clk,
     .VNW(VDD),
     .VPW(VSS),
     .VSS(VSS));
- gf180mcu_fd_sc_mcu7t5v0__dlyb_1 wire1667 (.I(_3254_),
-    .Z(net1667),
-    .VDD(VDD),
-    .VNW(VDD),
-    .VPW(VSS),
-    .VSS(VSS));
  gf180mcu_fd_sc_mcu7t5v0__buf_1 wire1668 (.I(_1329_),
     .Z(net1668),
     .VDD(VDD),
@@ -119071,8 +119034,14 @@ module A09_BV (clk,
     .VNW(VDD),
     .VPW(VSS),
     .VSS(VSS));
- gf180mcu_fd_sc_mcu7t5v0__dlyb_1 wire544 (.I(_3282_),
+ gf180mcu_fd_sc_mcu7t5v0__dlyb_1 wire544 (.I(net545),
     .Z(net544),
+    .VDD(VDD),
+    .VNW(VDD),
+    .VPW(VSS),
+    .VSS(VSS));
+ gf180mcu_fd_sc_mcu7t5v0__dlyb_1 wire545 (.I(_3282_),
+    .Z(net545),
     .VDD(VDD),
     .VNW(VDD),
     .VPW(VSS),
@@ -119119,7 +119088,7 @@ module A09_BV (clk,
     .VNW(VDD),
     .VPW(VSS),
     .VSS(VSS));
- gf180mcu_fd_sc_mcu7t5v0__dlyb_1 wire557 (.I(net1667),
+ gf180mcu_fd_sc_mcu7t5v0__dlyb_1 wire557 (.I(_3254_),
     .Z(net557),
     .VDD(VDD),
     .VNW(VDD),

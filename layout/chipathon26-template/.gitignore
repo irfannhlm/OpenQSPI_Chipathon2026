@@ -5,7 +5,7 @@ __pycache__/
 gf180mcu/
 gf180_drc.lyrdb
 sim_build/
-final/*
+final/
 out/
 
 macros/**/final/*
@@ -13,10 +13,11 @@ macros/**/final/*
 !macros/**/final/gds/*
 !macros/**/final/pnl/
 !macros/**/final/pnl/*
+!macros/**/final/drc/
+!macros/**/final/drc/*
 !macros/**/final/metrics.json
 !macros/**/final/stapostpnr.rpt
 !macros/**/final/lvs.netgen.rpt
-!macros/**/final/drc*
 
 transcript
 

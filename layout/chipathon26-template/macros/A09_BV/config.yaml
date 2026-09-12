@@ -153,7 +153,7 @@ PDN_HSPACING: 1
 PDN_VPITCH: 105.84 # integer multiple of std cell height
 PDN_HPITCH: 105.84 # integer multiple of std cell height
 PDN_VOFFSET: 53.56
-PDN_HOFFSET: 72.98
+PDN_HOFFSET: 76.90
 
 # PDN - Ring
 PDN_CORE_RING: True
