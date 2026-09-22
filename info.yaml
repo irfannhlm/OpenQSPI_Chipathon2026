@@ -12,11 +12,15 @@
 # Project metadata (used for documentation / review)
 # ======================================================
 project:
-  title: "Fully Configurable 32-bit QSPI Master Controller"             # Project title (e.g. "Simple CPU", "PLL", "ADC")
-  team: "A09 Crispi"                      # Your Team name
-  discord: "Irfan"                   # Optional: Discord username (for support / communication)
-  description: "A fully configurable QSPI controller wrapped with High-Speed UART interface"  # Short one-line description
+  title: "Fully Configurable 32-bit QSPI Master Controller"
+  team: "A09 Crispi"
+  discord: "Irfan"
+  description: "A fully configurable QSPI controller wrapped with High-Speed UART interface"
   lvs_config: "lvs_config.json"
+  gf_def_ready: true
+  ws_def_ready: false
+  drc_ready: true
+  lvs_ready: true
 
 pins:
   - name: VSS
