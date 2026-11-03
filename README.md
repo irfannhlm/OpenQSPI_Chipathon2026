@@ -71,3 +71,5 @@ make sim-gl SIM=questa  # SDF timing-annotated gate-level simulation with Questa
 - [APB Wrapped QSPI](docs/apb_qspi.md)
 - [QSPI CSR](docs/qspi_csr.md)
 - [UART FPGA GUI](docs/uart_fpga_gui.md)
+- [Post-Silicon Test Plan](docs/post_silicon_test_plan.md)
+- [Export Control Form (GF Rev 8.2)](docs/Export_Control_GF_Rev8.2_A09.docx)
