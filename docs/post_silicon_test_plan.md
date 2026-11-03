@@ -57,41 +57,36 @@ The GF180MCU I/O pads are 5 V pads that also work at 3.3 V ([Chipathon Integrati
 
 Timing at 3.3 V has 12.21 ns of slack at the typical corner (section 1), so 40 MHz is expected to work at room temperature.
 
-## 4. Test setups
+## 4. Test setup
 
-The test is written around the chip's pins so that it runs on either setup. Setup A is the primary path. Setup B is the fallback if no organiser board is available.
+The organisers deliver packaged chips without a test board, as in the previous Chipathon, so the team designs its own test PCB. The package (64 pins, QFN or QFP) and the bond map (which package pin connects to each of our pads) have not been decided by the organisers yet (section 14, item 2), so the board is specified here by what it must provide, not by its layout.
 
 ```
- Setup A: organiser test board (primary)
- +-----------+   USB    +--------------------------------------------------+
- |    PC     |--------->| organiser board: socket for packaged chip        |
- | silicon_  |          |   VDD (3.3 V, current readout)  clk (40 MHz)     |
- | test.py   |<---------|   rst_n   uart_rx/uart_tx (3.3 V)                |
- +-----------+          |   qspi_* to memory socket or header             |
-                        +--------------------------------------------------+
-
- Setup B: PYNQ-Z1 fallback
- +-----------+  USB-UART  +--------------------------------+   PMOD JA   +-------------+
- |    PC     |<---------->| breakout board                 |<----------->|  PYNQ-Z1    |
- | silicon_  | (FT232R or |  chip (package TBD, socket)    | clk, rst_n  |  MMCM clock |
- | test.py   |  CP2102N)  |  W25Q32JV on csn[0]            |   PMOD JB   |  gen, ILA   |
- +-----------+            |  MX25L6445E on csn[1]          |------------>|  on qspi_*  |
-       |                  |  shared qspi_sck, qspi_io[3:0] | (monitor)   +-------------+
-       |  bench supply -->|  VDD (chip), 3.3 V (memories)  |
-                          +--------------------------------+
+ +-----------+  USB-UART  +----------------------------------+   PMOD    +-------------+
+ |    PC     |<---------->| team test PCB                    |<--------->|  PYNQ-Z1    |
+ | silicon_  | (FT232R or |  chip (64-pin package, TBD)      | clk,rst_n |  MMCM clock |
+ | test.py   |  CP2102N)  |  W25Q32JV on qspi_csn[0]         |   PMOD    |  generator, |
+ +-----------+            |  MX25L6445E on qspi_csn[1]       |---------->|  ILA on     |
+                          |  shared qspi_sck, qspi_io[3:0]   | (monitor) |  qspi_*     |
+         bench supply --->|  VDD (chip), 3.3 V (memories)    |           +-------------+
+                          +----------------------------------+
 ```
 
-**Setup A requirements.** The organisers have not announced a board. Whatever board is used must provide:
+**Board requirements.** The test PCB must provide:
 
-1. an adjustable supply for our `VDD` (2.7-3.6 V) with a current readout;
-2. a 40 MHz clock on `clk`, or an input for an external clock;
-3. control of `rst_n`;
-4. a 3.3 V UART connection to a PC at 2 Mbps;
-5. access to `qspi_sck`, `qspi_csn[1:0]` and `qspi_io[3:0]`, either through a memory socket or a header short enough for 20 MHz SCK.
+1. an adjustable supply for our `VDD` (2.7-3.6 V, and 5.0 V for the optional C5 run) with a current readout, separate from the 3.3 V supply of the memories;
+2. a 40 MHz clock on `clk`, with a way to take `clk` from the PYNQ-Z1 instead for the clock sweep (C2);
+3. control of `rst_n`, from a button or from the PYNQ-Z1;
+4. a 3.3 V USB-UART bridge to the PC that supports 2 Mbps;
+5. the two Tier 1 memories close to the chip with short traces, on `qspi_csn[0]` and `qspi_csn[1]`, and a way to fit the Tier 2 parts;
+6. test points on `qspi_sck`, `qspi_csn[1:0]` and `qspi_io[3:0]` for the oscilloscope;
+7. a PMOD connection to the PYNQ-Z1 (3.3 V PMOD headers) carrying `clk`, `rst_n` and the QSPI lines.
 
-**Setup B.** A small breakout board holds the packaged chip in a socket and places both Tier 1 memories close to the chip with short traces. The PYNQ-Z1 (3.3 V PMOD headers) generates `clk` from an MMCM (Mixed-Mode Clock Manager, the FPGA's on-chip clock synthesiser) so the frequency can be swept, drives `rst_n`, and monitors the QSPI lines through PMOD JB with an ILA (Integrated Logic Analyzer, Xilinx's on-chip logic analyser). The UART goes through a USB-UART bridge on the breakout board. The PYNQ-Z1 is only an instrument here: the memories are on the breakout, not at the end of a PMOD cable.
+The board architecture (for example one board, or a chip adapter on a separate motherboard) is decided by the hardware owner once the package and bond map are known (section 12, task 5).
 
-Both setups need: a bench supply with current readout, a digital multimeter, an oscilloscope of at least 200 MHz bandwidth, and the PC running `interface/silicon_test.py` (section 7).
+**Role of the PYNQ-Z1.** It generates `clk` from an MMCM (Mixed-Mode Clock Manager, the FPGA's on-chip clock synthesiser) so the frequency can be swept, drives `rst_n`, and monitors the QSPI lines with an ILA (Integrated Logic Analyzer, Xilinx's on-chip logic analyser). It is only an instrument: the memories sit on the test PCB, not at the end of a PMOD cable. Before silicon arrives, it also runs the RTL as a stand-in chip to validate the test script (section 7).
+
+**Bench equipment:** a bench supply with current readout, a digital multimeter, an oscilloscope of at least 200 MHz bandwidth, and the PC running `interface/silicon_test.py` (section 7).
 
 ## 5. Memories under test
 
@@ -107,7 +102,7 @@ Notes:
 
 * The W25Q32JV and MX25L6445E datasheets are not yet in [`datasheet/`](../datasheet/). Their supply range, JEDEC IDs and DTR support must be confirmed from the datasheets before the pre-silicon re-simulation (section 10, item 3). The plain W25Q32JV has no DTR mode; Winbond sells DTR as a separate "-DTR" part.
 * The 23LC1024 is limited to 20 MHz SCK (`microchip-PSRAM-23LC1024.pdf`, selection table). The 23**A**1024 is a 1.7-2.2 V part and must not be used.
-* In Setup B, the W25Q32JV sits on `qspi_csn[0]` and the MX25L6445E on `qspi_csn[1]`, sharing `qspi_sck` and `qspi_io[3:0]`. This tests both chip-select lines without rewiring.
+* On the test PCB, the W25Q32JV sits on `qspi_csn[0]` and the MX25L6445E on `qspi_csn[1]`, sharing `qspi_sck` and `qspi_io[3:0]`. This tests both chip-select lines without rewiring.
 
 ## 6. Bring-up sequence
 
@@ -168,7 +163,7 @@ Characterisation runs on 3 chips (section 10). Every point is recorded per chip;
 | ID | Measurement | Method | Recorded value |
 |---|---|---|---|
 | C1 | Supply current | Bench supply readout or series shunt with a DMM; (a) `clk` running, idle; (b) continuous x4 read at SCK 20 MHz | mA at 3.3 V for (a) and (b); compare with the 7.7 mA STA estimate |
-| C2 | Highest working `clk` at 3.3 V | Raise `clk` from 40 MHz in 2 MHz steps (Setup B MMCM or a function generator). The UART baud follows `clk / 20`, so the PC baud is changed at every step. At each step run a 1 KB x4 read and compare. | last passing `clk` in MHz |
+| C2 | Highest working `clk` at 3.3 V | Raise `clk` from 40 MHz in 2 MHz steps (PYNQ-Z1 MMCM or a function generator). The UART baud follows `clk / 20`, so the PC baud is changed at every step. At each step run a 1 KB x4 read and compare. | last passing `clk` in MHz |
 | C3 | Lowest working VDD at 40 MHz | Lower VDD from 3.6 V in 0.1 V steps to 2.7 V (the memory minimum), running T1-10 at each step. Below 2.7 V a failure says nothing about our chip. DTR reads stop at the lower limit in the memory datasheet. | lowest passing VDD in V |
 | C4 | Signal quality at the fixed pad settings | Scope `qspi_sck` and `qspi_io0` at the memory pin at SCK 20 MHz | rise time, fall time, overshoot, ringing |
 | C5 | Optional 5 V run | Remove all 3 V memories. 23LC1024 only, VDD 5.0 V, `PRESCALER = 1` (SCK 10 MHz). The USB-UART interface must accept 5 V levels on its RX pin. Run T2-04. | pass/fail; supply current at 5 V |
@@ -192,9 +187,9 @@ Each chip gets a label written on the package or carrier, for example `A09-U01`,
 
 ## 11. Data logging and reporting
 
-`silicon_test.py` appends one row per test step to `silicon_results/<chip_id>/<date>_<setup>.csv` with these columns:
+`silicon_test.py` appends one row per test step to `silicon_results/<chip_id>/<date>_<board_rev>.csv` with these columns:
 
-`timestamp, chip_id, setup, vdd_V, clk_MHz, baud, prescaler, memory_part, chip_select, test_id, result, bytes_compared, bytes_mismatched, notes`
+`timestamp, chip_id, board_rev, clk_source, vdd_V, clk_MHz, baud, prescaler, memory_part, chip_select, test_id, result, bytes_compared, bytes_mismatched, notes`
 
 Raw read-back dumps, scope screenshots and ILA captures are stored next to the CSV. The final report (`docs/post_silicon_results.md`) gives per-chip tables, the yield, the C1-C5 values next to the signoff numbers of section 1, and every deviation from this plan.
 
@@ -206,7 +201,7 @@ Raw read-back dumps, scope screenshots and ILA captures are stored next to the C
 | 2 | Validate the script against the RTL on the PYNQ-Z1 with W25Q32JV and MX25L6445E; store the baseline logs | Hifz | T0 + 4 weeks |
 | 3 | Add the W25Q32JV and MX25L6445E datasheets to `datasheet/`; confirm IDs, QE bit and DTR support; obtain their vendor Verilog models and re-run `tb_qspi_master` and `tb_apb_qspi` against them | Hifz | T0 + 4 weeks |
 | 4 | Buy the Tier 2 parts and USB-UART bridges | Irfan | T0 + 8 weeks |
-| 5 | Design the Setup B breakout board once the package is known | Irfan | T0 + 8 weeks |
+| 5 | Design the test PCB to the section 4 requirements once the package and bond map are published; choose the board architecture | Irfan | T0 + 8 weeks, or 4 weeks after the bond map is published if later |
 | 6 | Prepare the bench: supply, DMM, scope, probes; write the measurement procedure for C1-C5 | Velin | T0 + 8 weeks |
 
 ## 13. Schedule and owners
@@ -216,7 +211,7 @@ T0 is the tapeout date (January 2027). S0 is the day packaged chips arrive. The 
 | Milestone | Target |
 |---|---|
 | Test script written and validated on the PYNQ-Z1 | T0 + 4 weeks |
-| Parts bought; Setup B breakout designed | T0 + 8 weeks |
+| Parts bought; test PCB designed | T0 + 8 weeks |
 | Smoke test done on all chips | S0 + 1 week |
 | Tier 1 done on all chips | S0 + 3 weeks |
 | Tier 2 and characterisation done on 3 chips | S0 + 6 weeks |
@@ -226,7 +221,7 @@ T0 is the tapeout date (January 2027). S0 is the day packaged chips arrive. The 
 |---|---|---|
 | Test lead | Nur Dawam | this plan, scheduling, pass/fail decisions, final report |
 | Software / script | Hifz | `silicon_test.py`, FPGA baseline, re-simulation with the owned parts |
-| Hardware / board | Irfan | Setup A coordination with the organisers, Setup B breakout, parts |
+| Hardware / board | Irfan | test PCB, package and bond map follow-up with the organisers, parts |
 | Measurement | Velin | bench setup, C1-C5 measurements, scope and ILA captures |
 
 ## 14. Open items and risks
@@ -234,7 +229,7 @@ T0 is the tapeout date (January 2027). S0 is the day packaged chips arrive. The 
 | # | Item | Effect | Action |
 |---|---|---|---|
 | 1 | It is not confirmed that our `VDD` pad powers only our block on the shared die | If the supply is shared, we may not choose 3.3 V, and C1 would include other blocks' current | Ask the organisers on issue #74 |
-| 2 | Package and organiser board not announced | Setup B breakout cannot be laid out yet | Track organiser announcements |
+| 2 | Package (64-pin, QFN or QFP) and bond map not decided by the organisers | The test PCB cannot be laid out yet | Ask the organisers on issue #74; track announcements |
 | 3 | The intake form lists 5 V core and I/O; this plan tests at 3.3 V | Mismatch in the organisers' records | Raise on issue #74 |
 | 4 | W25Q32JV and MX25L6445E datasheets not in the repository | IDs, QE bit and DTR support of T1-01, T1-07 and T1-11 are unconfirmed | Pre-silicon task 3 |
 | 5 | `docs/qspi_master.md` and `docs/uart_fpga_gui.md` state a minimum `PRESCALER` of 2, while the RTL and all testbenches use 0 | The plan assumes 0 works, as in simulation | Correct the docs or confirm the limit |
